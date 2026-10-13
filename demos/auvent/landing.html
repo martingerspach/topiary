@@ -1,0 +1,292 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Auvent</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Auvent surveille la météo de vos chantiers et vous prévient trois jours à l’avance quand une tâche risque d’être bloquée. Démonstration d’une marque fictive créée par Topiary.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300..600&family=Fragment+Mono&display=swap">
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="lib/verre.css">
+<link rel="stylesheet" href="landing/landing.css">
+<link rel="stylesheet" href="landing/limites.css">
+
+<a class="evitement" href="#contenu" lang="fr">Aller au contenu</a>
+
+<header class="tete" id="tete" data-contexte="nuit" lang="fr">
+  <div class="tete-fond" data-verre="bord:10 flou:10" aria-hidden="true"></div>
+  <a class="tete-marque" href="#haut" aria-label="Auvent, retour en haut"><span class="tete-plaque" data-verre="bord:12 flou:8" aria-hidden="true"></span><span class="logo" data-logo></span></a>
+  <nav class="tete-nav" aria-label="Sections de la page">
+    <div class="tete-liens" data-verre="bord:12 flou:6">
+      <a href="#traduction">Comment ça marche</a>
+      <a href="#planning">Le planning</a>
+      <a href="#seuils">Vos limites</a>
+      <a href="#tarif">Tarif</a>
+      <span class="tete-curseur" aria-hidden="true"></span>
+    </div>
+    <a class="bouton bouton--plein tete-appel" href="#essai"><span class="bouton-texte">Essayer</span><span class="bouton-fleche" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+  </nav>
+</header>
+
+<main id="contenu" lang="fr">
+
+  <!-- 1 · Héros : la promesse, le verdict de la ville, le bulletin de demain -->
+  <section class="heros av-nuit" id="haut" aria-labelledby="titre" data-contexte="nuit">
+    <canvas class="heros-pluie" id="pluie" aria-hidden="true"></canvas>
+    <figure class="heros-objet" id="objet">
+      <img class="heros-image" src="images/pluviometre.webp" srcset="images/pluviometre-680.webp 680w, images/pluviometre.webp 1360w" sizes="(max-width: 899px) 280px, 560px" fetchpriority="high" width="1360" height="2048" alt="Un pluviomètre en chrome et en verre, qui recueille et mesure la pluie.">
+      <svg class="cotes" id="cotes" aria-hidden="true"></svg>
+      <p class="cote cote--niveau" id="cote-niveau" aria-hidden="true"><span id="cote-ville">Nantes, mercredi</span> <b id="cote-mm">14&nbsp;mm</b></p>
+    </figure>
+
+    <div class="heros-texte cadre">
+      <h1 class="heros-titre" id="titre">Sachez trois jours à&nbsp;l’avance ce que la météo va bloquer.</h1>
+      <p class="heros-chapeau">Auvent surveille la météo de vos chantiers et vous propose un autre planning avant les intempéries.</p>
+      <div class="heros-demo">
+        <p class="heros-ville"><label for="ville">Votre chantier est à</label> <span class="choix" data-verre="bord:12"><select id="ville"></select><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></span></p>
+        <p class="heros-verdict" aria-live="polite"><span class="heros-verdict-titre" id="verdict">Mercredi, la dalle attendra jeudi.</span></p>
+      </div>
+      <div class="heros-actions">
+        <a class="bouton bouton--plein" href="#essai"><span class="bouton-texte">Essayer un mois</span><span class="bouton-fleche" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+        <a class="bouton bouton--verre" href="#traduction" data-verre="bord:12"><span class="bouton-texte">Voir comment ça marche</span></a>
+      </div>
+    </div>
+
+    <div class="heros-pied cadre">
+      <aside class="bulletin" id="bulletin" data-verre="bord:20 flou:10" aria-labelledby="bulletin-titre">
+        <p class="bulletin-tete"><span id="bulletin-titre">Bulletin de demain, 6&nbsp;h</span><span class="bulletin-date" id="bulletin-date">mardi 13 octobre</span></p>
+        <p class="bulletin-chantier" id="bulletin-chantier">Les Bateliers, Nantes</p>
+        <p class="bulletin-texte" id="bulletin-texte">Pas de coulage mercredi&nbsp;: il pleut de 9&nbsp;h à 13&nbsp;h. On coule jeudi à 7&nbsp;h.</p>
+        <a class="bouton-icone" href="#traduction" aria-label="Voir le bulletin sur le téléphone du chef de chantier"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></a>
+      </aside>
+    </div>
+    <p class="heros-fiction cadre">Démonstration&nbsp;: Auvent est une marque fictive créée par Topiary.</p>
+  </section>
+
+  <!-- 2 · Énoncé : le problème en une phrase, éclairée au fil de la lecture -->
+  <section class="enonce av-nuit" aria-label="Ce que fait Auvent" data-contexte="nuit" data-bascule="jour@-200">
+    <div class="cadre">
+      <p class="enonce-texte" id="enonce">Votre appli météo vous dit qu’il va pleuvoir. Auvent vous dit quoi faire sur chaque chantier.</p>
+    </div>
+  </section>
+
+  <!-- 3 · Comment ça marche : la météo d'un côté, le bulletin du chef de chantier de l'autre -->
+  <section class="traduction av-jour" id="traduction" aria-labelledby="t-trad" data-contexte="jour">
+    <div class="cadre trad">
+      <div class="guides" aria-hidden="true"><i style="grid-column:1"></i><i style="grid-column:5"></i><i style="grid-column:9"></i><i class="fin" style="grid-column:12"></i></div>
+      <div class="trad-texte">
+        <h2 id="t-trad">À 6&nbsp;h, vos chefs de chantier savent quoi faire.</h2>
+        <p>Auvent compare chaque nuit la météo à votre planning. Chaque chef de chantier reçoit sa consigne sur son téléphone. Vous recevez sa réponse directement.</p>
+      </div>
+
+      <figure class="releve" id="releve">
+        <div class="releve-carte">
+          <p class="releve-tete">Pluie prévue mercredi, à Nantes</p>
+          <p class="releve-legende"><span class="releve-tirets" aria-hidden="true"></span>Limite du coulage</p>
+          <div class="releve-graphe" id="releve-graphe" role="img" aria-label="Pluie prévue mercredi à Nantes, de 6 h à 20 h. Le coulage est prévu de 7 h à 13 h ; de 9 h à 13 h, la pluie dépasse la limite du coulage."></div>
+        </div>
+        <figcaption class="trad-legende">Ce que dit la météo</figcaption>
+      </figure>
+
+      <figure class="tel-socle">
+        <div class="tel" id="tel">
+          <div class="tel-ecran av-nuit" id="tel-ecran">
+            <div class="tel-ile" id="tel-ile" aria-hidden="true"></div>
+            <div class="tel-statut" aria-hidden="true"><span>6:00</span><span class="tel-icones"><svg viewBox="0 0 18 12"><path d="M1 11h2V8H1zM5 11h2V6H5zM9 11h2V3.5H9zM13 11h2V1h-2z"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3.2" fill="none" stroke-width="1"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.6"/><path d="M24 4.2v3.6a1.9 1.9 0 0 0 0-3.6z"/></svg></span></div>
+            <p class="tel-date">mardi 13 octobre</p>
+            <p class="tel-horloge" aria-hidden="true">6:00</p>
+            <div class="tel-notifs" id="tel-notifs" aria-live="polite">
+              <div class="notif-place" id="notif-place">
+              <div class="notif notif--neuve" id="notif" data-verre="bord:16 flou:5">
+                <div class="notif-tete"><span class="notif-app" aria-hidden="true"></span><span class="notif-nom">Auvent</span><span class="notif-quand">maintenant</span></div>
+                <p class="notif-titre">Les Bateliers, Nantes</p>
+                <p class="notif-texte">Pas de coulage mercredi&nbsp;: il pleut de 9&nbsp;h à 13&nbsp;h. Mercredi, on monte les cloisons du RDC. On coule jeudi à 7&nbsp;h.</p>
+                <div class="notif-actions">
+                  <button type="button" class="notif-action" id="notif-ok">C’est noté</button>
+                  <button type="button" class="notif-action" id="notif-pb">Signaler un problème</button>
+                </div>
+              </div>
+              </div>
+              <div class="notif notif--veille" data-verre="bord:16 flou:5">
+                <div class="notif-tete"><span class="notif-app" aria-hidden="true"></span><span class="notif-nom">Auvent</span><span class="notif-quand">hier, 17:00</span></div>
+                <p class="notif-titre">Les Bateliers, Nantes</p>
+                <p class="notif-texte">Pluie possible mercredi matin. On vous confirme le coulage demain à 6&nbsp;h.</p>
+              </div>
+            </div>
+            <p class="tel-retour" id="tel-retour" role="status"></p>
+            <div class="tel-barre" aria-hidden="true"></div>
+          </div>
+        </div>
+        <figcaption class="trad-legende">Ce que reçoit le chef de chantier</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- 4 · Le planning : le produit, en quatre temps -->
+  <section class="planning av-jour" id="planning" aria-labelledby="t-plan" data-contexte="jour" data-bascule="nuit@-230">
+    <div class="cadre plan">
+      <div class="guides" aria-hidden="true"><i style="grid-column:1"></i><i style="grid-column:5"></i><i class="fin" style="grid-column:12"></i></div>
+      <div class="plan-texte">
+        <h2 id="t-plan">Votre planning change avant la pluie.</h2>
+        <p class="plan-chapeau">Exemple&nbsp;: cinq chantiers dans l’Ouest pendant une semaine de pluie. Rien ne bouge sans votre accord.</p>
+        <ol class="etapes" id="etapes">
+          <li class="etape" data-etape="0">
+            <button class="etape-bouton" type="button" aria-controls="app"><span class="etape-quand">Samedi soir</span><span class="etape-titre">La pluie s’annonce pour mercredi</span></button>
+            <p class="etape-texte">Trois tâches sont menacées. Le coulage de Nantes reste incertain. Vous prévenez la centrale à béton sans rien annuler.</p>
+          </li>
+          <li class="etape" data-etape="1">
+            <button class="etape-bouton" type="button" aria-controls="app"><span class="etape-quand">Mardi, 6&nbsp;h</span><span class="etape-titre">La pluie est confirmée</span></button>
+            <p class="etape-texte">Quatre tâches sont bloquées mercredi sur quatre chantiers.</p>
+          </li>
+          <li class="etape" data-etape="2">
+            <button class="etape-bouton" type="button" aria-controls="app"><span class="etape-quand">Mardi, 6&nbsp;h&nbsp;01</span><span class="etape-titre">Auvent propose un autre planning</span></button>
+            <p class="etape-texte">Chaque tâche bloquée passe au premier jour possible. Un travail à l’intérieur prend sa place.</p>
+          </li>
+          <li class="etape" data-etape="3">
+            <button class="etape-bouton" type="button" aria-controls="app"><span class="etape-quand">Mardi, 6&nbsp;h&nbsp;02</span><span class="etape-titre">Vos équipes sont prévenues</span></button>
+            <p class="etape-texte">Vous validez d’un clic. Chaque chef de chantier reçoit son planning sur son téléphone. Vous voyez qui l’a lu.</p>
+          </li>
+        </ol>
+      </div>
+      <div class="plan-scene">
+        <div class="onglets" role="group" aria-label="Les quatre temps du planning">
+          <button type="button" class="onglet" data-etape="0">Samedi</button>
+          <button type="button" class="onglet" data-etape="1">Mardi</button>
+          <button type="button" class="onglet" data-etape="2">Proposé</button>
+          <button type="button" class="onglet" data-etape="3">Envoyé</button>
+        </div>
+        <div class="app" id="app" role="region" aria-label="Démonstration du planning d’Auvent" aria-describedby="app-etat">
+          <div class="app-barre">
+            <p class="app-titre">Semaine du 13 octobre <span class="app-sous">5 chantiers, 20 tâches</span></p>
+            <p class="app-emis fondu" id="app-emis">Météo de samedi soir</p>
+          </div>
+          <div class="app-defile"><div class="app-grille" id="app-grille"></div></div>
+          <div class="app-etat fondu" id="app-etat-vu" aria-hidden="true"></div>
+          <p class="sr" id="app-etat" aria-live="polite"></p>
+        </div>
+        <p class="onglet-texte" id="onglet-texte"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 · Les limites : celles du métier, réglées par l'entreprise ; la démonstration jouable (landing/limites.js) -->
+  <section class="seuils av-nuit" id="seuils" aria-labelledby="t-seuils" data-contexte="nuit">
+    <div class="cadre limites">
+      <div class="seuils-texte">
+        <h2 id="t-seuils">C’est vous qui fixez les limites.</h2>
+        <p>Auvent part des limites du métier. Vous les réglez selon votre matériel.</p>
+        <ol class="lim-etapes">
+          <li>Choisissez une tâche.</li>
+          <li>Déplacez sa limite.</li>
+          <li>Auvent recalcule la semaine du chantier.</li>
+        </ol>
+      </div>
+      <div class="lim-app" id="lim-app" role="group" aria-labelledby="lim-app-titre">
+        <div class="lim-barre"><p class="lim-titre" id="lim-app-titre">Les Bateliers, Nantes <span class="lim-sous">Semaine du 13 octobre</span></p></div>
+        <div class="lim-corps">
+          <fieldset class="lim-taches">
+            <legend class="sr">Tâche</legend>
+            <label class="lim-tache"><input type="radio" name="lim-tache" value="nacelle" checked><span>Nacelle</span></label>
+            <label class="lim-tache"><input type="radio" name="lim-tache" value="grue"><span><span class="lim-t-long">Grue à tour</span><span class="lim-t-court" aria-hidden="true">Grue</span></span></label>
+            <label class="lim-tache"><input type="radio" name="lim-tache" value="coulage"><span>Coulage</span></label>
+          </fieldset>
+          <p class="lim-resultat" id="lim-resultat"></p>
+          <p class="lim-legende" aria-hidden="true">
+            <span class="lim-item"><i class="lim-cle lim-cle--courbe"></i><span id="lim-cle-courbe">Vent prévu de 7&nbsp;h à 17&nbsp;h, en km/h</span></span>
+            <span class="lim-item"><i class="lim-cle lim-cle--limite"></i>Votre limite</span>
+            <span class="lim-item"><i class="lim-cle lim-cle--arret"></i>Arrêt</span>
+          </p>
+          <div class="lim-zone" id="lim-zone" role="group" aria-label="">
+            <ul class="lim-semaine" id="lim-semaine"></ul>
+          </div>
+          <div class="lim-reglage">
+            <div class="lim-reglage-tete"><label class="lim-etiquette" id="lim-etiquette" for="lim-curseur">Vent maximal pour la nacelle</label><output class="lim-valeur" id="lim-valeur" for="lim-curseur" aria-hidden="true">45&nbsp;km/h</output></div>
+            <div class="lim-piste"><span class="lim-repere" aria-hidden="true"></span><input class="lim-curseur" id="lim-curseur" type="range" min="30" max="60" step="1" value="45" aria-describedby="lim-habituelle"></div>
+            <div class="lim-bornes" aria-hidden="true"><span id="lim-min">30&nbsp;km/h</span><span id="lim-max">60&nbsp;km/h</span></div>
+            <div class="lim-habitude"><p id="lim-habituelle">Limite habituelle&nbsp;: 45&nbsp;km/h</p><button type="button" class="lim-retablir" id="lim-retablir" aria-label="Rétablir la limite habituelle" hidden>Rétablir</button></div>
+          </div>
+        </div>
+        <p class="sr" id="lim-annonce" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 · Tarif et questions -->
+  <section class="tarif av-jour" id="tarif" aria-labelledby="t-tarif" data-contexte="nuit" data-bascule="jour@240">
+    <div class="cadre tarif-grille">
+      <div class="guides" aria-hidden="true"><i style="grid-column:1"></i><i style="grid-column:6"></i><i class="fin" style="grid-column:12"></i></div>
+      <div class="prix">
+        <h2 id="t-tarif" class="prix-montant"><span class="prix-v">49&nbsp;€</span> <span class="prix-u">HT par chantier et par mois</span></h2>
+        <ul class="prix-liste">
+          <li>Tous vos chefs de chantier sont inclus.</li>
+          <li>Un chantier terminé ne se paie plus.</li>
+          <li>Le premier chantier est offert pendant un mois.</li>
+        </ul>
+        <a class="bouton bouton--plein" href="#essai"><span class="bouton-texte">Essayer sur un chantier</span><span class="bouton-fleche" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></a>
+      </div>
+      <div class="questions">
+        <h2 class="questions-titre">Questions fréquentes</h2>
+        <div class="faq" id="faq">
+          <details class="faq-item">
+            <summary><span>Qui décide d’arrêter un chantier&nbsp;?</span><span class="faq-plus" aria-hidden="true"></span></summary>
+            <p>Vous. Auvent vous prévient et vous propose un planning. La décision reste la vôtre.</p>
+          </details>
+          <details class="faq-item">
+            <summary><span>D’où vient la météo&nbsp;?</span><span class="faq-plus" aria-hidden="true"></span></summary>
+            <p>De Météo-France. La prévision est calculée pour chaque chantier et mise à jour plusieurs fois par jour.</p>
+          </details>
+          <details class="faq-item">
+            <summary><span>Et si la météo change pendant la nuit&nbsp;?</span><span class="faq-plus" aria-hidden="true"></span></summary>
+            <p>Auvent vérifie de nouveau dans la nuit. Si le planning change, vous recevez un message avant 7&nbsp;h.</p>
+          </details>
+          <details class="faq-item">
+            <summary><span>Et pour le chômage intempéries&nbsp;?</span><span class="faq-plus" aria-hidden="true"></span></summary>
+            <p>Auvent garde la météo heure par heure de chaque jour d’arrêt. Vous la joignez à votre déclaration.</p>
+          </details>
+          <details class="faq-item">
+            <summary><span>Faut-il installer quelque chose&nbsp;?</span><span class="faq-plus" aria-hidden="true"></span></summary>
+            <p>Non. Auvent fonctionne sur ordinateur et sur téléphone. Votre planning s’importe depuis Excel.</p>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- 7 · Pied : l'essai, puis le nom -->
+<footer lang="fr" class="pied av-nuit" id="essai" aria-labelledby="t-essai" data-contexte="jour" data-bascule="nuit@210">
+  <div class="cadre pied-grille">
+    <div class="pied-appel">
+      <h2 id="t-essai">Essayez sur votre prochain chantier.</h2>
+      <form class="essai" id="essai-form" data-verre="bord:20 flou:4">
+        <label for="essai-ville">Ville du chantier</label>
+        <div class="essai-ligne">
+          <span class="choix choix--champ"><select id="essai-ville"></select><svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5"/></svg></span>
+          <button class="bouton bouton--plein" type="submit"><span class="bouton-texte">Essayer un mois</span><span class="bouton-fleche" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span></button>
+        </div>
+        <p class="essai-retour" id="essai-retour" role="status"></p>
+      </form>
+      <p class="pied-note">Un mois offert, sans carte bancaire.</p>
+    </div>
+    <nav class="pied-liens" aria-label="Pied de page">
+      <a href="#traduction">Comment ça marche</a>
+      <a href="#planning">Le planning</a>
+      <a href="#seuils">Vos limites</a>
+      <a href="#tarif">Tarif et questions</a>
+    </nav>
+    <p class="pied-fiction">Auvent est une marque fictive créée par Topiary pour montrer son travail. Les chantiers et la météo sont simulés. Les illustrations sont générées par IA puis retouchées par le studio.</p>
+  </div>
+  <div class="pied-mot" aria-hidden="true"><span class="logo logo--geant" data-logo></span></div>
+</footer>
+
+<script src="lib/carte.js"></script>
+<script src="lib/scenario.js"></script>
+<script src="lib/ville.js"></script>
+<script src="lib/verre.js"></script>
+<script src="marque/mot-ciel-data.js"></script>
+<script src="marque/logo-ciel.js"></script>
+<script src="marque/vent-pied.js"></script>
+<script src="landing/dessins.js"></script>
+<script src="landing/planning.js"></script>
+<script src="landing/landing.js"></script>
+<script src="landing/limites.js"></script>
+</body></html>

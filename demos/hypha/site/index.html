@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en" class="hy-theme-chamber hy-strain-pink">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HYPHA · Mycelium One, grown not made</title>
+<meta name="description" content="Mycelium One is a sneaker grown from mycelium in nine days, 500 pairs to a strain. Reserve yours and watch it grow. A fictional brand by Topiary.">
+<meta name="theme-color" content="#110F0D">
+<link rel="icon" href="media/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/bodoni-moda-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/bodoni-moda-latin-opsz-italic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/archivo-latin-wdth-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../components/hypha.css">
+<link rel="stylesheet" href="site.css">
+<script>
+/* État d'affichage, posé avant le premier rendu.
+   ?strain=pink|gold|blue · ?rm=1 (animations réduites) · ?fige=1 (état final, sans animation, pour les captures)
+   ?k=0..1 (la pousse figée à un instant) · ?j=0..90 (la coupe du sol figée à un jour) · ?t=<ms> (ouverture du mot-symbole figée)
+   ?seul=<id de section> (captures) · ?mini=1 (montrée réduite, dans l'atelier de Clover sur le site de Topiary)
+   data-cx-dwell : le temps de pose (ms) que la visite de Clover accorde à une section qui s'anime à l'arrivée */
+(function () {
+  var q = new URLSearchParams(location.search), h = document.documentElement;
+  var st = ['gold', 'blue'].indexOf(q.get('strain')) >= 0 ? q.get('strain') : 'pink';
+  var calm = q.has('rm') || q.has('fige') || q.has('k') || q.has('j') || q.has('t') || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  h.className = 'js hy-theme-chamber hy-strain-' + st + (calm ? ' is-calm' : '');
+  if (q.get('seul')) h.setAttribute('data-seul', q.get('seul'));
+})();
+</script>
+</head>
+<body class="hy-root">
+<a class="hs-skip" href="#main">Skip to content</a>
+<header class="hs-head" id="head">
+  <div class="hs-wrap">
+    <a class="hs-brand" href="#top" aria-label="HYPHA, back to top"><span class="hy-wordmark hy-wordmark--small"><span data-lockup="intro" aria-hidden="true"></span><span aria-hidden="true">YPHA</span></span></a>
+    <nav class="hs-nav" aria-label="Sections">
+      <a href="#drop">Mycelium One</a>
+      <a href="#pairs">Every pair</a>
+      <a href="#yours">Yours</a>
+      <a href="#return">Return</a>
+    </nav>
+    <p class="hs-left"><b data-left>88</b> of 500 left</p>
+    <a class="hs-btn hs-btn--compact" href="#buy">Reserve</a>
+  </div>
+</header>
+
+<main id="main">
+<section class="hs-scene hy-theme-chamber hy-strain-pink" id="top" aria-labelledby="h1" data-strain-scope>
+  <div class="hs-pin" id="pin">
+    <div class="hs-set" id="set" role="img" aria-label="A sneaker grown from mycelium in the dark, its whole surface standing in white threads.">
+      <img class="hs-still" id="still" src="media/chambre-960/000.webp" alt="" aria-hidden="true">
+      <canvas id="pair" aria-hidden="true"></canvas>
+    </div>
+    <canvas class="hs-dust" id="dust" aria-hidden="true"></canvas>
+    <div class="hs-cap" id="cap" aria-hidden="true">
+      <p class="hs-cap-day">Day <span class="hy-odo" id="day-odo"></span></p>
+      <div class="hs-cap-lines">
+        <p>We seed the mold with living culture.</p>
+        <p>Each seed wakes and reaches out in threads.</p>
+        <p>The colonies meet. The pair finds its shape.</p>
+        <p>The threads stand up into a down, 6&nbsp;mm deep.</p>
+        <p>We could press it flat, into leather. We stop it here.</p>
+      </div>
+    </div>
+    <div class="hs-copy" id="copy">
+      <h1 class="hs-kicker" id="h1"><b>Mycelium One.</b> A sneaker grown from mycelium, 500&nbsp;pairs to a strain.</h1>
+      <div class="hs-titles">
+        <p class="hs-intro hy-display" aria-hidden="true"><span class="hs-l"><span>Nine days</span></span><span class="hs-l"><span><i>in the dark.</i></span></span></p>
+        <p class="hs-title hy-display"><span class="hs-l"><span>Grown,</span></span> <span class="hs-l"><span><i>not made.</i></span></span></p>
+      </div>
+    </div>
+    <div class="hs-end" id="end"><a class="hs-btn" href="#buy">Reserve a pair <span>€165</span></a></div>
+    <p class="hs-cue" id="cue" aria-hidden="true"><i></i><span>Scroll to grow it</span></p>
+    <div class="hy-tl" id="ruler" role="slider" tabindex="0" aria-label="Day in the growing chamber" aria-valuemin="1" aria-valuemax="9" aria-valuenow="1" aria-valuetext="Day 1 of 9">
+      <div class="hy-tl-run"><b class="hy-tl-fill"></b><span class="hy-tl-ghost"></span><span class="hy-tl-head"></span></div>
+      <div class="hy-tl-nums" aria-hidden="true"></div>
+    </div>
+  </div>
+  <p class="hs-sr">As you scroll, nine days pass in the growing chamber. The mold is seeded with living culture, points of light in the dark. On day 3 each seed sends out threads; on day 5 the colonies meet and the pair takes its shape; on day 7 the threads stand up into a down. On day 9, instead of pressing it into leather, we stop the growth and keep the pair as it grew.</p>
+</section>
+
+<section class="hs-sec hs-drop hy-on-strain" id="drop" aria-labelledby="drop-t" data-cx-dwell="2400">
+  <div class="hs-wrap">
+    <div class="hs-poster" id="poster">
+      <p class="hy-numeral hs-poster-k">Drop <span data-strain-drop>004</span> · <span data-strain-name>Pink Oyster</span> <i class="hy-latin" data-strain-latin>Pleurotus djamor</i></p>
+      <h2 class="hs-poster-t" id="drop-t"><span class="hs-l"><span>Mycelium</span></span> <span class="hs-l"><span>One</span></span></h2>
+      <figure class="hs-print">
+        <div class="hs-print-img" id="plate">
+          <img class="hs-ink hs-ink--w" src="media/blanc.webp" width="2202" height="951" alt="" aria-hidden="true" decoding="async">
+          <img class="hs-ink hs-ink--k" src="media/encre.webp" width="2202" height="951" decoding="async" alt="The Mycelium One in side view, printed in black and white ink on the colour of its strain: a low sneaker covered in standing threads, with beaded eyelets along the lacing and a denser sole.">
+          <i class="hs-pt" style="--x: 59.3%; --y: 16.6%" aria-hidden="true">1</i>
+          <i class="hs-pt" style="--x: 39.2%; --y: 46.7%" aria-hidden="true">2</i>
+          <i class="hs-pt" style="--x: 22.4%; --y: 78.3%" aria-hidden="true">3</i>
+          <div class="hs-loupe" id="loupe" aria-hidden="true"><div class="hs-loupe-in"><img class="hs-ink hs-ink--w" src="media/blanc.webp" alt="" loading="lazy" decoding="async"><img class="hs-ink hs-ink--k" src="media/encre.webp" alt="" loading="lazy" decoding="async"></div></div>
+        </div>
+        <figcaption>
+          <ol class="hs-details">
+            <li><button type="button" class="hs-detail" data-x="0.593" data-y="0.166"><i aria-hidden="true">1</i><b>Down</b><span>Threads up to 6&nbsp;mm, dried standing.</span></button></li>
+            <li><button type="button" class="hs-detail" data-x="0.392" data-y="0.467"><i aria-hidden="true">2</i><b>Eyelets</b><span>Grown around steel pins. Hemp laces.</span></button></li>
+            <li><button type="button" class="hs-detail" data-x="0.224" data-y="0.783"><i aria-hidden="true">3</i><b>Sole</b><span>Pressed dense, underfoot only.</span></button></li>
+          </ol>
+        </figcaption>
+      </figure>
+      <div class="hs-poster-side">
+        <p class="hy-lead">Mycelium is usually pressed flat, into a leather. We dry ours standing, on day&nbsp;9. The growth stops and the down stays.</p>
+        <form class="hs-label hy-theme-daylight hy-strain-pink" id="buy" data-strain-scope novalidate>
+          <p class="hs-label-head"><b>Mycelium One</b><span data-strain-name>Pink Oyster</span></p>
+          <p class="hs-price"><span class="hs-sr">Price: </span><b>€165</b><span>Shipping in Europe included</span></p>
+          <fieldset class="hy-sizes"><legend>Size, EU</legend><div class="hy-sizes-grid">
+            <label class="hy-size"><input type="radio" name="size" value="39"><span>39</span></label>
+            <label class="hy-size"><input type="radio" name="size" value="40"><span>40</span></label>
+            <label class="hy-size"><input type="radio" name="size" value="41"><span>41</span></label>
+            <label class="hy-size"><input type="radio" name="size" value="42"><span>42</span></label>
+            <label class="hy-size"><input type="radio" name="size" value="43"><span>43</span></label>
+            <label class="hy-size"><input type="radio" name="size" value="44" disabled aria-describedby="size-out"><span>44</span></label>
+            <label class="hy-size"><input type="radio" name="size" value="45"><span>45</span></label>
+          </div></fieldset>
+          <div class="hs-edition">
+            <div class="hs-rule" id="edition" style="--p: 0.824" aria-hidden="true"><b></b></div>
+            <p><span><b data-taken>412</b> reserved</span><span><b data-left>88</b> of 500 left</span></p>
+          </div>
+          <button type="submit" class="hs-btn hs-btn--wide" id="buy-go">Reserve</button>
+          <div class="hs-buy-notes">
+            <p id="buy-note">We seed pair <span data-next>0413</span> tomorrow at 09:00 and ship it on day&nbsp;9. You pay when it ships.</p>
+            <p class="hy-help" id="size-out">Size 44 is gone for this drop.</p>
+            <p class="hs-status" id="buy-status" role="status"></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hs-sec hs-pairs hy-theme-chamber hy-strain-pink" id="pairs" aria-labelledby="pairs-t" data-strain-scope data-cx-dwell="3600">
+  <div class="hs-wrap hs-pairs-grid">
+    <figure class="hs-specimen">
+      <div class="hs-disc">
+        <canvas id="print" role="img" aria-label="The spore print of pair 0413: the spores of its strain, fallen in fine radiating gills, with the mark of the pair at its centre."></canvas>
+        <canvas class="hs-disc-h" id="one-mark" aria-hidden="true"></canvas>
+      </div>
+    </figure>
+    <div class="hs-pairs-copy">
+      <h2 class="hy-title-1" id="pairs-t">No two pairs grow alike.</h2>
+      <p class="hy-lead">Each pair carries a mark grown from its number, and the spore print its strain left in the chamber. Both are printed on its box. Slide through the drop.</p>
+      <div class="hs-pair-id">
+        <p class="hs-pair-no" id="pair-no" aria-live="polite"><span class="hs-sr">Pair </span><b>0413</b><span>of 500</span></p>
+        <p class="hs-pair-state" id="pair-state">Next to be seeded. It could be yours.</p>
+      </div>
+      <div class="hs-pair-rule">
+        <label class="hs-sr" for="pair-n">Pair number, from 1 to 500</label>
+        <div class="hs-range-wrap" id="pair-wrap">
+          <input class="hs-range" id="pair-n" type="range" min="1" max="500" step="1" value="413">
+          <div class="hs-range-run" aria-hidden="true"><div class="hs-rule" id="pair-rule"><b></b></div><i class="hs-range-head"></i></div>
+        </div>
+        <p class="hs-pair-ends" aria-hidden="true"><span>0001</span><span>0500</span></p>
+      </div>
+      <div class="hs-pairs-act">
+        <a class="hs-btn" href="#buy">Reserve pair <span data-next>0413</span></a>
+        <button type="button" class="hs-more" id="regrow">Grow it again</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hs-sec hy-theme-daylight hy-strain-pink" id="yours" aria-labelledby="yours-t" data-strain-scope>
+  <div class="hs-wrap hs-yours">
+    <div class="hs-yours-top">
+      <h2 class="hy-display" id="yours-t">Yours starts tomorrow.</h2>
+      <p class="hy-lead">A drop is not a stock. Your pair does not exist yet: reserve it today and it grows for you, while you watch.</p>
+      <ol class="hs-steps">
+        <li><span class="hy-numeral">Tomorrow, 09:00</span><p>We seed pair <span data-next>0413</span> in its mold. The number is yours from then on.</p></li>
+        <li><span class="hy-numeral">Every morning</span><p>We send you its photograph from the chamber. Nine mornings, nine photographs.</p></li>
+        <li><span class="hy-numeral">Day 9</span><p>We open the chamber, dry the pair standing, and ship it to you.</p></li>
+      </ol>
+    </div>
+
+    <div class="hs-sheet">
+      <div class="hs-sheet-head">
+        <h3 class="hy-title-3">Pair 0397, nine mornings</h3>
+        <p>It left the chamber last Thursday.</p>
+      </div>
+      <ol class="hs-strip">
+        <li><img src="media/matins/1.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 1: points of living culture in the dark, in the outline of a sneaker."><p><b>Day 1</b><span>Seeded</span></p></li>
+        <li><img src="media/matins/2.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 2: the points brighten."><p><b>Day 2</b><span>Waking</span></p></li>
+        <li><img src="media/matins/3.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 3: each point sends out short threads."><p><b>Day 3</b><span>First threads</span></p></li>
+        <li><img src="media/matins/4.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 4: the threads lengthen into small colonies."><p><b>Day 4</b><span>Reaching out</span></p></li>
+        <li><img src="media/matins/5.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 5: the colonies touch and the shape of the pair appears."><p><b>Day 5</b><span>Colonies meet</span></p></li>
+        <li><img src="media/matins/6.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 6: the surface closes up."><p><b>Day 6</b><span>Closing up</span></p></li>
+        <li><img src="media/matins/7.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 7: the threads stand up into a down."><p><b>Day 7</b><span>Down stands</span></p></li>
+        <li><img src="media/matins/8.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 8: the down thickens along the collar and the lacing."><p><b>Day 8</b><span>Thickening</span></p></li>
+        <li><img src="media/matins/9.webp" width="900" height="600" loading="lazy" decoding="async" alt="Day 9: the finished pair, covered in standing white threads."><p><b>Day 9</b><span>Dried, shipped</span></p></li>
+      </ol>
+    </div>
+
+    <div class="hs-wear-grid" id="wear">
+      <h2 class="hy-title-1" id="wear-t">Before you ask.</h2>
+      <div class="hs-faq">
+        <details open><summary>Can it get wet?<i aria-hidden="true"></i></summary><p>Yes. We wax the down with beeswax on day&nbsp;9, so rain beads on it. Do not soak it, and let it dry away from heat.</p></details>
+        <details><summary>Does it smell of mushroom?<i aria-hidden="true"></i></summary><p>Faintly, for about a week, like a forest floor after rain. Then of nothing.</p></details>
+        <details><summary>How long does it last?<i aria-hidden="true"></i></summary><p>Two to three years of daily wear. The down flattens where you walk and stays standing elsewhere. We resole each pair once, free.</p></details>
+        <details><summary>Is it still alive?<i aria-hidden="true"></i></summary><p>No. Drying it on day&nbsp;9 stops the growth for good. Nothing will grow in your wardrobe.</p></details>
+        <details><summary>What if my size is gone?<i aria-hidden="true"></i></summary><p>Each strain is grown once, in 500 pairs. Leave your email at the foot of this page and we tell you when the next one seeds.</p></details>
+        <details><summary>Do I have to bury it?<i aria-hidden="true"></i></summary><p>No. Send it back when it is worn out. We compost it and take €40 off your next pair.</p></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="hs-ground hy-theme-chamber hy-strain-pink" id="return" aria-labelledby="return-t" data-strain-scope data-cx-dwell="2200">
+  <div class="hs-ground-pin" id="ground-pin">
+    <canvas id="soil-c" role="img" aria-label="A cross-section of soil in the dark. The worn pair lies buried; the threads of the soil reach it, take it back, and keep its shape; on day 90, oyster mushrooms of its strain fruit above where it lay."></canvas>
+    <div class="hs-ground-copy" id="ground-copy">
+      <h2 class="hy-display" id="return-t">Bury it.</h2>
+      <p class="hy-lead">Worn out, the pair goes into the ground, laces and all. Ninety days later it is soil.</p>
+    </div>
+    <div class="hs-ground-side" id="ground-side">
+      <div class="hs-cap hs-cap--top" id="soil-cap" aria-hidden="true">
+        <p class="hs-cap-day">Day <span class="hy-odo" id="soil-odo"></span></p>
+        <div class="hs-cap-lines">
+          <p>In the ground, laces and all.</p>
+          <p>The threads of the soil find it and move in.</p>
+          <p>The felt is gone. The threads keep its shape.</p>
+          <p><span data-strain-name>Pink Oyster</span> fruits where it lay.</p>
+        </div>
+      </div>
+      <div class="hs-ground-end" id="soil-end"><a class="hs-btn" href="#buy">Reserve a pair <span>€165</span></a></div>
+    </div>
+    <div class="hy-tl" id="soil-rule" role="slider" tabindex="0" aria-label="Day underground" aria-valuemin="0" aria-valuemax="90" aria-valuenow="0" aria-valuetext="Day 0 of 90">
+      <div class="hy-tl-run"><b class="hy-tl-fill"></b><span class="hy-tl-ghost"></span><span class="hy-tl-head"></span></div>
+      <div class="hy-tl-nums" aria-hidden="true"></div>
+    </div>
+  </div>
+  <p class="hs-sr">As you scroll, ninety days pass underground. The buried pair lies in the soil. By day 30 the threads of the soil have reached it and spread through it. By day 60 its felt is gone and the threads keep its shape. On day 90, oyster mushrooms of its strain fruit above the place where it lay.</p>
+</section>
+</main>
+
+<footer class="hs-foot hy-theme-chamber hy-strain-pink" id="foot" data-strain-scope data-cx-dwell="2600">
+  <canvas class="hs-net" aria-hidden="true"></canvas>
+  <div class="hs-wrap">
+    <p class="hs-foot-word" role="img" aria-label="HYPHA"><span class="hs-foot-slot" aria-hidden="true"><canvas id="foot-h"></canvas></span><span aria-hidden="true">YPHA</span></p>
+    <div class="hs-foot-grid">
+      <form class="hs-news" id="news" novalidate>
+        <label for="news-mail"><b>Next strain: <span data-strain-next>Golden Oyster</span>.</b> Leave your email and we tell you the morning it seeds.</label>
+        <div class="hs-news-row">
+          <input class="hy-input" id="news-mail" type="email" autocomplete="email" spellcheck="false" placeholder="name@example.com" aria-describedby="news-status">
+          <button type="submit" class="hs-btn">Tell me</button>
+        </div>
+        <p class="hs-status" id="news-status" role="status"></p>
+      </form>
+      <div class="hs-fiction">
+        <p><b>HYPHA is a fictional brand</b>, created by Topiary to show its work. No product exists and nothing is sold.</p>
+        <p>The photographs of the pair are generated by AI. The mark, the spore prints, the soil and the network are drawn in code.</p>
+        <p>© 2026 Topiary</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="../components/rule.js" defer></script>
+<script src="../brand/mark.js" defer></script>
+<script src="../landing/network.js" defer></script>
+<script src="soil.js" defer></script>
+<script src="site.js" defer></script>
+</body>
+</html>

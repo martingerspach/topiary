@@ -1,0 +1,909 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><style>:root{color-scheme:light;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Ourlet · Découpe, pliage et thermolaquage à Baume-les-Dames (Doubs)</title>
+<meta name="description" content="Notre tôlerie de Baume-les-Dames (Doubs) découpe, plie jusqu’à 3&nbsp;m, soude et thermolaque vos pièces, de 1 à 5&nbsp;000. Avec un DXF, le prix s’affiche tout de suite. Nous chiffrons dans la journée les croquis cotés et les PDF.">
+<link rel="preload" href="fonts/mona-sans-latin-standard-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="tokens/tokens-v2.css">
+<link rel="stylesheet" href="components/ourlet-v2.css">
+<script>
+document.documentElement.lang = 'fr';
+// le texte du premier écran attend sa police (préchargée) : il apparaît une fois, à sa place, sans se recomposer (CLS nul) ;
+// délai de secours de chargement (réseau lent), pas une animation
+if (document.fonts && !document.fonts.check('1em "Mona Sans"')) {
+  document.documentElement.classList.add('police-attente');
+  const fin = () => document.documentElement.classList.remove('police-attente');
+  document.fonts.load('1em "Mona Sans"').then(fin, fin); setTimeout(fin, 1200);
+}
+</script>
+<style>
+/* Ourlet, landing v5 « Grège » : monochrome chaud, grotesque large, la pièce gravée en trame de lignes depuis sa vraie
+   géométrie. Une seule page, pour les professionnels du bâtiment d'abord : le premier écran (la pièce sur son bon, prix et
+   date), le film des quatre postes et la fiche de capacités, le prix en ligne, l'atelier, les questions, le contact, le pied de
+   page en tôle. Texte à 7:1 au moins, jamais sous 15 px. Couleurs, durées et courbes : uniquement les tokens Grège. */
+html, body { margin: 0; background: var(--ou-p-creme-100); }
+html { scroll-padding-top: 5.5rem; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+html.menu-ouvert { overflow: hidden; }
+html.police-attente main, html.police-attente .nav { visibility: hidden; } /* tout le contenu : sur téléphone, le haut de la section suivante est déjà à l’écran */
+.nav a.tel-nav { font-weight: 600; font-variant-numeric: lining-nums; }
+@media (max-width: 1180px) { .nav a.tel-nav { display: none; } }
+.nav .appel { display: none; background: transparent; box-shadow: none; color: inherit; }
+@media (max-width: 760px) { .nav .appel { display: inline-grid; } }
+@media (max-width: 380px) { .nav .btn .lg { display: none; } }
+@media (max-width: 420px) { .nav .mark { padding: 0 0.4rem 0 0.6rem; } .nav .mark svg, .nav .mark:empty::before { width: 4.6rem; } .nav .btn { padding: 0 0.95rem; } .nav { gap: 0.1rem; } }
+.skip { position: absolute; left: -999px; top: 0; z-index: 40; background: var(--ou-p-charbon-850); color: var(--ou-p-givre); padding: 0.75rem 1rem; border-radius: var(--ou-radius-sm); }
+.skip:focus { left: 1rem; top: 1rem; }
+.sec { padding-block: var(--ou-section); }
+.sec--suite { padding-top: 0; }
+.head { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--ou-space-5) var(--ou-space-8); align-items: end; margin-bottom: var(--ou-space-8); }
+.head p { margin: 0; color: var(--ou-color-text-muted); max-width: 30rem; justify-self: end; }
+.head--stack { grid-template-columns: minmax(0, 1fr); align-items: start; }
+.head--stack p { justify-self: start; max-width: 34rem; }
+@media (max-width: 860px) { .head { grid-template-columns: minmax(0, 1fr); align-items: start; margin-bottom: var(--ou-space-7); } .head p { justify-self: start; } }
+.tourne { animation: tourne calc(var(--ou-dur-appui) * 1) linear infinite; transform-origin: 50% 50%; }
+@keyframes tourne { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .tourne { animation: none; } }
+
+/* ---------- Premier écran (D1, le bon de travail) : la phrase du métier à gauche, la pièce sur son bon à droite ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--ou-space-7); align-items: center; min-height: min(100svh, 60rem);
+  padding: 6.5rem max(var(--ou-gutter), calc((100vw - var(--ou-container)) / 2 + var(--ou-gutter))) var(--ou-space-7);
+  position: relative; isolation: isolate; background: var(--ou-grad-hero); }
+/* v6 : la lumière d'atelier posée sur le bon (fondu radial chaud) et la trame de lignes de nos gravures, qui s'efface autour de lui */
+.hero::before, .hero::after { content: ""; position: absolute; z-index: -1; pointer-events: none; }
+.hero::before { inset: 0; background: var(--ou-lampe-claire) 74% 46% / min(76rem, 96vw) min(48rem, 92%) no-repeat; }
+.hero::after { inset: 0; background: repeating-linear-gradient(180deg, color-mix(in srgb, var(--ou-p-taupe-600) 13%, transparent) 0 1px, transparent 1px 6px);
+  -webkit-mask-image: radial-gradient(42% 58% at 70% 46%, #000 0%, transparent 100%); mask-image: radial-gradient(42% 58% at 70% 46%, #000 0%, transparent 100%); }
+@media (forced-colors: active) { .hero::before, .hero::after { display: none; } }
+.hero .txt { display: grid; gap: var(--ou-space-5); align-content: center; min-width: 0; }
+.hero h1 { margin: 0; font-size: clamp(1.875rem, 1rem + 2.1vw, 2.9rem); line-height: 1.04; letter-spacing: -0.03em; font-weight: 600; font-stretch: 122%; text-wrap: balance; }
+.insec { white-space: nowrap; }
+/* les capacités du bâtiment : une petite plaque signalétique, valeurs alignées, filets fins */
+.caps { margin: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 30rem; border-top: 1px solid var(--ou-p-greige-400); }
+.caps > div { display: grid; gap: 0.05rem; align-content: start; padding: 0.55rem 1rem 0.6rem 0; border-bottom: 1px solid var(--ou-p-greige-400); min-width: 0; }
+.caps > div:nth-child(even) { padding-left: 1rem; border-left: 1px solid var(--ou-p-greige-400); }
+.caps dt { font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.caps dd { margin: 0; font-weight: 600; font-variant-numeric: lining-nums; }
+.hero .appel { margin: 0; color: var(--ou-p-encre-2); font-size: var(--ou-text-small); max-width: 32rem; }
+.hero .appel a, a.tel { color: var(--ou-p-encre); font-weight: 600; white-space: nowrap; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.25em;
+  transition: text-decoration-thickness var(--ou-dur-retour) var(--ou-ease-retour), text-underline-offset var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .hero .appel a:hover, a.tel:hover { text-decoration-thickness: 2px; text-underline-offset: 0.16em; transition-duration: var(--ou-dur-approche); transition-timing-function: var(--ou-ease-approche); } }
+/* le bon : une feuille posée sur la crème, l'exemple, puis ce que porte un bon de travail */
+.bon { background: var(--ou-p-creme-50); border-radius: var(--ou-radius-lg); display: grid; grid-template-columns: minmax(0, 1fr); overflow: hidden; min-width: 0;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ou-p-taupe-600) 16%, transparent), var(--ou-ombre-3); }
+.bon-tete { display: flex; justify-content: space-between; align-items: baseline; gap: var(--ou-space-4); padding: var(--ou-space-4) var(--ou-space-5) 0; }
+.bon-tete b { font-weight: 600; font-stretch: 112%; font-size: var(--ou-text-title-3); }
+.bon-tete span { color: var(--ou-p-encre-2); font-size: var(--ou-text-small); }
+.bon-tete .mob { display: none; }
+.bon-vue { position: relative; height: clamp(15rem, 30vw, 24rem); margin: 0 var(--ou-space-3); }
+.dvp canvas, .dvp svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.dvp-coupe { stroke: var(--ou-p-taupe-500); stroke-width: 1; }
+.dvp-coupe-faite { stroke: var(--ou-p-encre); stroke-width: 1.5; }
+.dvp-pli { stroke: var(--ou-p-encre-2); stroke-width: 1; stroke-dasharray: 14 3 2 3; }
+.dvp-liseré { stroke: var(--ou-p-creme-50); stroke-width: 3; stroke-linecap: round; }
+.dvp-cote { stroke: var(--ou-p-encre-2); stroke-width: 1; }
+.dvp-pointe { fill: var(--ou-p-encre-2); }
+.dvp-chiffre { font: 560 15px var(--ou-font-sans); fill: var(--ou-p-encre); }
+.dvp-plaque { fill: var(--ou-p-creme-50); stroke: var(--ou-p-greige-400); stroke-width: 1; }
+.bon-vue .rejouer { position: absolute; bottom: var(--ou-space-2); right: 0; z-index: 1; background: var(--ou-p-creme-200); box-shadow: none; color: var(--ou-p-encre); }
+@media (hover: hover) { .bon-vue .rejouer:hover { background: var(--ou-p-greige-300); } }
+/* la tôle sous le bon : le fichier glissé dessus la fait réagir comme le dépôt de l'outil */
+.depot .btn { transition: background-color var(--ou-dur-retour) var(--ou-ease-approche), transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .depot:hover .btn { background: var(--_bg-h); transition-duration: var(--ou-dur-approche); } .depot:hover .btn svg path { animation: ou-passe calc(var(--ou-dur-approche) * 2 + var(--ou-dur-micro)) both; } }
+.depot:active .btn { transform: scale(0.965); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.bon dl { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--ou-p-greige-300); }
+.bon dl > div { padding: var(--ou-space-3) var(--ou-space-4) var(--ou-space-4); display: grid; gap: 0.15rem; align-content: start; min-width: 0; }
+.bon dl > div + div { border-left: 1px solid var(--ou-p-greige-300); }
+.bon dt { font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.bon dd { margin: 0; font-weight: 600; font-size: var(--ou-text-title-3); line-height: 1.25; font-stretch: 108%; font-variant-numeric: lining-nums; }
+.bon dd small { display: block; font-weight: 450; font-size: var(--ou-text-small); color: var(--ou-p-encre-2); font-stretch: 100%; }
+/* la date arrive par le script : deux lignes réservées, la carte ne bouge pas quand elle s’écrit (le prix est déjà dans la page) */
+.bon [data-bon-date] { min-height: 2.5em; }
+.bon .prix-bon dd { font-size: clamp(1.375rem, 1rem + 0.8vw, 1.75rem); letter-spacing: -0.02em; font-stretch: 118%; }
+.bon dt .mob { display: none; }
+.bon-pied { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ou-space-3) var(--ou-space-5); padding: var(--ou-space-4) var(--ou-space-4) var(--ou-space-4) var(--ou-space-5); border-top: 1px solid var(--ou-p-greige-300); background: var(--ou-p-creme-200); }
+.bon-pied > p { margin: 0; font-size: var(--ou-text-small); color: var(--ou-p-encre-2); max-width: 22rem; }
+.bon-pied .acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ou-space-2) var(--ou-space-4); }
+/* « Remplacez par votre plan » : un vrai champ de fichier sous l'apparence du bouton (clavier, lecteur d'écran, glisser-déposer) */
+.depot { position: relative; display: inline-flex; }
+.depot input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border-radius: var(--ou-radius-pill); }
+.depot .btn { pointer-events: none; }
+.depot:has(input:focus-visible) .btn { outline: 2px solid var(--ou-p-encre); outline-offset: 3px; }
+.depot input:focus-visible { outline: none; }
+@media (max-width: 1100px) { .bon dl { grid-template-columns: 1fr 1fr; } .bon dl > div:nth-child(3) { border-left: 0; } .bon dl > div:nth-child(n+3) { border-top: 1px solid var(--ou-p-greige-300); } }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-3); padding: 5.25rem var(--ou-gutter) var(--ou-space-5); align-items: start; min-height: 0; }
+  .hero .txt { gap: var(--ou-space-2); }
+  .hero h1 { font-size: clamp(1.55rem, 1.1rem + 2.4vw, 2.4rem); }
+  .caps > div:nth-child(2), .caps > div:nth-child(3) { display: none; }
+  .caps > div:nth-child(4) { padding-left: 1rem; border-left: 1px solid var(--ou-p-greige-400); }
+  .caps > div { padding-block: 0.4rem 0.45rem; }
+  .bon-tete { display: grid; gap: 0.1rem; padding: var(--ou-space-3) var(--ou-space-4) 0; } .bon-tete .desk { display: none; } .bon-tete .mob { display: block; }
+  .bon-vue { height: 9.25rem; }
+  .bon dl > div.det { display: none; }
+  .bon dl { grid-template-columns: 1fr 1fr; } .bon dl > div:nth-child(n+3) { border-top: 0; } .bon dl > div.prix-bon { border-left: 0; }
+  .bon dl > div { padding: var(--ou-space-2) var(--ou-space-4) var(--ou-space-3); }
+  .bon dt .desk { display: none; } .bon dt .mob { display: inline; }
+  .bon-pied { padding: var(--ou-space-3) var(--ou-space-4); } .bon-pied > p { display: none; }
+  .bon-pied .acts, .bon-pied .depot, .bon-pied .depot .btn { width: 100%; }
+}
+/* téléphone à l'horizontale : deux colonnes, le bon reste à côté de la phrase */
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 540px) {
+  .hero { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); min-height: 100svh; padding: 4.75rem var(--ou-gutter) var(--ou-space-4); align-items: start; }
+  .hero h1 { font-size: 1.5rem; } .caps, .hero .appel { display: none; }
+  .bon-vue { height: 7.5rem; }
+}
+/* le dépôt sur toute la page : un voile qui dit où lâcher le fichier */
+.depose { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: var(--ou-gutter); background: color-mix(in srgb, var(--ou-p-creme-100) 88%, transparent); pointer-events: none; }
+.depose > div { display: grid; gap: var(--ou-space-2); justify-items: center; text-align: center; max-width: 30rem; padding: var(--ou-space-7) var(--ou-space-6); border-radius: var(--ou-radius-lg); background: var(--ou-p-creme-50); box-shadow: inset 0 0 0 2px var(--ou-p-encre); }
+.depose b { font-size: var(--ou-text-title-2); font-stretch: 115%; font-weight: 600; }
+.depose p { margin: 0; color: var(--ou-p-encre-2); }
+@media (forced-colors: active) { .depose > div { border: 2px solid CanvasText; } .bon { border: 1px solid CanvasText; } }
+
+/* ---------- Le film des quatre postes ---------- */
+.film-sec .head { display: grid; gap: var(--ou-space-4); margin-bottom: var(--ou-space-6); }
+.film { margin: 0; display: grid; gap: var(--ou-space-3); }
+.film-scene { position: relative; aspect-ratio: 16 / 7.6; max-height: 76svh; width: 100%; background: var(--ou-p-creme-50); border-radius: var(--ou-radius); overflow: hidden; box-shadow: 0 0 0 1px color-mix(in srgb, var(--ou-p-taupe-600) 14%, transparent), var(--ou-ombre-2); }
+.film-scene canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.film-ligne { position: absolute; left: var(--ou-space-4); bottom: var(--ou-space-4); right: var(--ou-space-4); margin: 0; display: flex; }
+.film-ligne span { background: color-mix(in srgb, var(--ou-p-creme-50) 94%, transparent); color: var(--ou-p-encre); border-radius: var(--ou-radius-pill); padding: 0.45rem 0.95rem; font-weight: 560; font-size: var(--ou-text-small); font-variant-numeric: tabular-nums; box-shadow: 0 0 0 1px var(--ou-p-greige-300); max-width: 100%; }
+.film-ligne i { font-style: normal; display: inline-block; }
+.film-cmd { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ou-space-3); }
+.chap { display: flex; flex-wrap: wrap; gap: 0.25rem; position: relative; }
+.chap button { all: unset; box-sizing: border-box; cursor: pointer; position: relative; min-height: 2.75rem; padding: 0 0.95rem; display: inline-flex; align-items: center; border-radius: var(--ou-radius-pill); font-size: var(--ou-text-small); font-weight: 560; color: var(--ou-p-encre);
+  transition: background-color var(--ou-dur-retour) var(--ou-ease-approche), transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .chap button:hover { background: var(--ou-p-creme-200); transition-duration: var(--ou-dur-approche); } }
+.chap button:active { transform: scale(0.96); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.chap button:focus-visible { outline: 2px solid var(--ou-p-encre); outline-offset: 2px; }
+/* le chapitre en cours : le filet ourlé de l'en-tête (le pied du L), qui glisse au geste d'approche */
+.chap .chap-ind { position: absolute; left: 0; bottom: 0.2rem; height: 5px; width: 100px; pointer-events: none; transform-origin: 0 50%; transform: translateX(var(--x, 0)); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); }
+.chap .chap-ind .bar { position: absolute; left: 0; top: 0; height: 5px; width: 100px; background: var(--ou-p-encre); transform-origin: 0 50%; transform: scaleX(var(--k, 0.5)); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); }
+.chap .chap-ind svg { position: absolute; top: 0; left: 0; width: 11px; height: 5px; fill: var(--ou-p-encre); transform: translateX(var(--hx, 50px)); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); }
+@media (prefers-reduced-motion: reduce) { .chap .chap-ind, .chap .chap-ind .bar, .chap .chap-ind svg { transition: none; } }
+@media (forced-colors: active) { .chap .chap-ind .bar { background: Highlight; } .chap .chap-ind svg { fill: Highlight; } .chap button[aria-current="step"] { outline: 2px solid Highlight; } }
+.film-pause { position: absolute; top: var(--ou-space-3); right: var(--ou-space-3); background: color-mix(in srgb, var(--ou-p-creme-50) 94%, transparent); box-shadow: 0 0 0 1px var(--ou-p-greige-300); color: var(--ou-p-encre); }
+@media (hover: hover) { .film-pause:hover { background: var(--ou-p-creme-200); } }
+@media (max-width: 420px) { .chap button { padding: 0 0.62rem; } }
+.film-reduit { margin: 0; color: var(--ou-p-encre-2); font-size: var(--ou-text-small); }
+/* la fiche de capacités : un tableau, une ligne par métier */
+/* v6 : la fiche posée sur l'établi, comme une feuille de capacités (papier, filet, ombre courte) */
+.capa { margin-top: var(--ou-space-7); background: var(--ou-p-creme-50); border-radius: var(--ou-radius); padding: var(--ou-space-5) var(--ou-space-6) var(--ou-space-6);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ou-p-taupe-600) 12%, transparent), var(--ou-ombre-1); }
+@media (max-width: 640px) { .capa { padding: var(--ou-space-4) var(--ou-space-4) var(--ou-space-5); } }
+@media (forced-colors: active) { .capa { border: 1px solid CanvasText; } }
+.capa .tw { overflow-x: auto; }
+.capa table { width: 100%; border-collapse: collapse; min-width: 52rem; font-variant-numeric: lining-nums; }
+.capa caption { text-align: left; font-weight: 600; font-size: var(--ou-text-title-3); font-stretch: 110%; padding-bottom: var(--ou-space-3); }
+.capa th, .capa td { text-align: left; vertical-align: top; padding: 0.75rem 1rem 0.75rem 0; border-bottom: 1px solid var(--ou-p-greige-400); }
+.capa thead th { font-size: var(--ou-text-small); font-weight: 560; color: var(--ou-p-encre-2); border-bottom-color: var(--ou-p-encre); }
+.capa tbody th { font-weight: 600; white-space: nowrap; }
+.capa p { margin: var(--ou-space-4) 0 0; color: var(--ou-p-encre-2); max-width: 46rem; }
+@media (max-width: 760px) { .film-scene { aspect-ratio: 4 / 3.6; } .film-ligne { left: var(--ou-space-3); right: var(--ou-space-3); bottom: var(--ou-space-3); } }
+
+/* ---------- Prix en ligne (section sombre) ---------- */
+/* v6 : la lampe au-dessus de l'établi (fondu chaud sur le charbon, sous le titre), l'établi et la carte du prix posés avec leur ombre */
+.prix { color: var(--ou-p-givre); background: var(--ou-lampe-sombre) 50% 62% / min(92rem, 120vw) min(56rem, 78%) no-repeat, var(--ou-p-charbon-850); }
+@media (max-width: 1000px) { .prix { background: var(--ou-lampe-sombre) 50% 40% / 150vw 70% no-repeat, var(--ou-p-charbon-850); } }
+.prix .head p { color: var(--ou-p-givre-2); }
+.drop { position: relative; display: flex; align-items: center; gap: var(--ou-space-4); max-width: 46rem; margin: 0 auto var(--ou-space-7); padding: 0.4rem 0.4rem 0.4rem 1.4rem; border-radius: var(--ou-radius-pill); background: var(--ou-p-greige-300); color: var(--ou-p-encre); cursor: pointer;
+  transition: background-color var(--ou-dur-retour) var(--ou-ease-approche); box-shadow: var(--ou-ombre-nuit); }
+.drop svg.ico { width: 1.4rem; height: 1.4rem; flex: none; }
+/* survol : le dépôt s'éclaire, la flèche du document monte d'un cran, le bouton fonce */
+.drop svg.ico path:last-child { transition: transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .drop:hover { background: var(--ou-p-creme-200); transition-duration: var(--ou-dur-approche); } .drop:hover svg.ico path:last-child { transform: translateY(-2px); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); } .drop:hover .btn { background: var(--_bg-h); } }
+.drop:active .btn { transform: scale(0.965); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.drop span.t { flex: 1; min-width: 0; font-weight: 520; }
+.drop span.t small { display: block; font-size: var(--ou-text-small); color: var(--ou-p-encre-2); font-weight: 450; }
+.drop .btn { pointer-events: none; }
+.drop input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border-radius: inherit; }
+.drop:has(input:focus-visible) { outline: 2px solid var(--ou-p-givre); outline-offset: 3px; }
+.drop input:focus-visible, .filebox input:focus-visible { outline: none; }
+.drop[data-over] { background: var(--ou-p-sauge); }
+.tool { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: var(--ou-space-4); align-items: start; }
+.tool > * { min-width: 0; }
+.bench { background: var(--ou-p-creme-100); color: var(--ou-p-encre); border-radius: var(--ou-radius); padding: var(--ou-space-4); display: grid; gap: var(--ou-space-5); box-shadow: var(--ou-ombre-nuit); }
+.viewer { margin: 0; background: var(--ou-p-creme-50); border-radius: var(--ou-radius-sm); display: grid; box-shadow: 0 0 0 1px var(--ou-p-creme-200); }
+.viewer .vue-dvp, .viewer .plan { transition: opacity var(--ou-dur-approche) linear; }
+.viewer[data-stale] .vue-dvp, .viewer[data-stale] .plan { opacity: 0.3; }
+.vbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ou-space-3); padding: var(--ou-space-3) var(--ou-space-3) 0 var(--ou-space-4); }
+.vname { display: grid; line-height: 1.3; min-width: 0; }
+.vname > span { font-weight: 600; overflow-wrap: anywhere; }
+.vname small { font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.vtools { display: flex; gap: var(--ou-space-2); align-items: center; }
+.vtools .icon-btn { background: var(--ou-p-creme-200); box-shadow: none; }
+.viewer .vue-dvp { position: relative; height: clamp(15rem, 25vw, 21rem); margin: 0 var(--ou-space-3); }
+.viewer .plan { height: clamp(15rem, 25vw, 21rem); padding: var(--ou-space-3) var(--ou-space-4); }
+.viewer .plan svg { width: 100%; height: 100%; display: block; }
+/* v7 : la vue pliée et le plan coté occupent la même case, le plan par-dessus (passage « Pliée / À plat » en mouvement) ; vignettes gravées */
+.viewer .vue-dvp, .viewer .plan { grid-area: 2 / 1 / 3 / 2; }
+.viewer .plan { position: relative; z-index: 1; }
+.ex-pic canvas { width: 100%; height: 100%; display: block; }
+.ctl { display: grid; gap: var(--ou-space-5); padding: 0 var(--ou-space-2) var(--ou-space-2); }
+.ctl .row { display: grid; gap: 0.6rem; border: 0; padding: 0; margin: 0; min-width: 0; }
+.ctl legend { padding: 0; margin: 0 0 0.6rem; }
+.ex-groupes { display: grid; gap: var(--ou-space-3); }
+.ex-grp { display: grid; gap: 0.45rem; }
+.ex-titre { font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.ex-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; }
+.stock { display: flex; flex-wrap: wrap; gap: 0.1rem; margin-top: 0.4rem; }
+.stock button { all: unset; box-sizing: border-box; position: relative; width: 2.75rem; height: 2.75rem; cursor: pointer; border-radius: 50%; }
+.stock button::before { content: ""; position: absolute; inset: 0.4375rem; border-radius: 50%; background: var(--c); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ou-p-encre) 22%, transparent), 0 2px 4px -2px color-mix(in srgb, var(--ou-p-taupe-700) 50%, transparent); forced-color-adjust: none;
+  transition: transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .stock button:hover::before { transform: scale(1.12); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); } }
+.stock button:active::before { transform: scale(0.94); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.stock button[aria-checked="true"]::after { content: ""; position: absolute; inset: 0.1875rem; border-radius: 50%; box-shadow: 0 0 0 2px var(--ou-p-encre); }
+.stock button:focus-visible { outline: 2px solid var(--ou-p-encre); outline-offset: 0; }
+@media (forced-colors: active) { .stock button[aria-checked="true"]::after { box-shadow: 0 0 0 3px Highlight; } }
+.ral-autre { display: grid; gap: 0.35rem; margin-top: 0.6rem; }
+.price .ml { margin: 0; font-size: var(--ou-text-small); }
+.date-q { margin: 0; font-weight: 560; }
+.date-q + p, .livr { margin: 0; font-size: var(--ou-text-small); }
+.ex { all: unset; box-sizing: border-box; cursor: pointer; display: grid; grid-template-columns: 3.25rem minmax(0, 1fr); gap: 0.6rem; align-items: center; padding: 0.4rem 0.7rem 0.4rem 0.4rem; border-radius: var(--ou-radius-sm); background: var(--ou-p-creme-50); box-shadow: inset 0 0 0 1px var(--ou-p-creme-200); min-height: 4.25rem;
+  transition: box-shadow var(--ou-dur-retour) var(--ou-ease-approche), background-color var(--ou-dur-retour) var(--ou-ease-approche), transform var(--ou-dur-retour) var(--ou-ease-retour); }
+.ex-pic { width: 3.25rem; height: 2.75rem; display: grid; place-items: center; transition: transform var(--ou-dur-retour) var(--ou-ease-retour); }
+/* survol : la fiche se pose sur l'établi (fond clair, filet taupe) et la pièce avance d'un rien vers le visiteur */
+@media (hover: hover) { .ex:hover .ex-pic { transform: scale(1.08); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); } }
+.ex:active { transform: scale(0.98); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.ex-pic svg { width: 100%; height: 100%; display: block; }
+.ex-txt { display: grid; min-width: 0; line-height: 1.25; }
+.ex-txt strong { font-weight: 560; font-size: var(--ou-text-small); }
+.ex-txt span { font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.ex[aria-pressed="true"] { box-shadow: inset 0 0 0 2px var(--ou-p-encre); }
+.ex:focus-visible { outline: 2px solid var(--ou-p-encre); outline-offset: 2px; }
+@media (hover: hover) { .ex:hover { box-shadow: inset 0 0 0 1px var(--ou-p-taupe-600), var(--ou-ombre-1); transition-duration: var(--ou-dur-approche); } .ex[aria-pressed="true"]:hover { box-shadow: inset 0 0 0 2px var(--ou-p-encre), var(--ou-ombre-1); } }
+@media (forced-colors: active) { .ex { border: 1px solid ButtonText; } .ex[aria-pressed="true"] { outline: 3px solid Highlight; } }
+.bench .seg span, .chip { background: var(--ou-p-creme-200); color: var(--ou-p-encre); }
+.bench .seg input:checked + span { background: var(--ou-p-charbon-850); color: var(--ou-p-givre); }
+@media (hover: hover) { .bench .seg label:hover input:not(:checked) + span, .chip:hover { background: var(--ou-p-greige-300); } }
+.ep { display: block; }
+.ep legend { padding: 0; margin: 0 0 0.6rem; font-size: var(--ou-text-small); font-weight: 560; }
+.ep label { display: inline-block; margin: 0 0.3rem 0.35rem 0; }
+.qrow { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; }
+.qrow .unit { position: relative; width: 9.5rem; }
+.qrow .unit .input { padding-right: 4.5rem; background: var(--ou-p-creme-50); border-color: var(--ou-p-greige-400); color: var(--ou-p-encre); font-variant-numeric: lining-nums; }
+.qrow .unit span { position: absolute; right: 1.1rem; top: 50%; transform: translateY(-50%); color: var(--ou-p-encre-2); pointer-events: none; font-size: var(--ou-text-small); }
+.chip { all: unset; box-sizing: border-box; cursor: pointer; min-height: 2.75rem; min-width: 2.75rem; padding: 0 0.95rem; display: inline-grid; place-items: center; border-radius: var(--ou-radius-pill); font-size: var(--ou-text-small); font-weight: 520; background: var(--ou-p-creme-200);
+  transition: background-color var(--ou-dur-retour) var(--ou-ease-approche), transform var(--ou-dur-retour) var(--ou-ease-retour); }
+.chip:active { transform: scale(0.96); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.chip:focus-visible { outline: 2px solid var(--ou-p-encre); outline-offset: 2px; }
+@media (forced-colors: active) { .chip { border: 1px solid ButtonText; } }
+.ral-sel { display: grid; gap: 0.35rem; margin-top: 0.6rem; }
+.ral-sel i { width: var(--ou-control); height: var(--ou-control); border-radius: 50%; flex: none; background: var(--c, var(--ou-p-sauge)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ou-p-encre) 20%, transparent); forced-color-adjust: none; }
+.ral-sel .select-wrap { flex: 1; min-width: 0; }
+.ral-sel .select { background: var(--ou-p-creme-50); border-color: var(--ou-p-greige-400); color: var(--ou-p-encre); }
+.ou-label { font-size: var(--ou-text-small); font-weight: 560; }
+.statut { display: grid; gap: 0.4rem; }
+.ou-status { display: flex; gap: 0.5rem; align-items: flex-start; margin: 0; font-size: var(--ou-text-small); color: var(--ou-p-encre); }
+.ou-status svg { width: 1.1rem; height: 1.1rem; flex: none; margin-top: 0.15em; }
+.ou-status.ok svg { color: var(--ou-p-vert-700); }
+.ou-status.warn svg, .ou-status.err svg { color: var(--ou-p-rouge); }
+.ou-status.err { color: var(--ou-p-rouge); font-weight: 560; }
+.bench .err { color: var(--ou-p-rouge); }
+/* Carte du prix : taupe, texte givre ; un état à la fois */
+.quote { background: var(--ou-p-taupe-700); color: var(--ou-p-givre); border-radius: var(--ou-radius); padding: var(--ou-space-5); display: grid; gap: var(--ou-space-5); position: sticky; top: 5.5rem;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ou-p-givre) 12%, transparent), var(--ou-ombre-nuit);
+  --ou-color-text: var(--ou-p-givre); --ou-color-text-muted: var(--ou-p-givre); --ou-color-border: color-mix(in srgb, var(--ou-p-givre) 22%, transparent); --ou-color-graphic: var(--ou-p-givre); --ou-color-surface: var(--ou-p-taupe-700); --ou-color-accent: var(--ou-p-sauge); --ou-color-action: var(--ou-p-givre); --ou-color-action-text: var(--ou-p-encre); --ou-color-focus: var(--ou-p-givre); --ou-color-danger-text: var(--ou-p-rouge-clair); }
+.price { display: grid; gap: 0.5rem; container-type: inline-size; }
+.price .k { font-weight: 560; }
+.price .v { font-size: clamp(3rem, 19cqi, 5.25rem); line-height: 0.92; letter-spacing: -0.035em; font-weight: 560; font-stretch: 125%; white-space: nowrap; }
+.price .v small { display: block; font-size: var(--ou-text-small); letter-spacing: 0; font-stretch: 100%; font-weight: 500; margin-top: 0.6rem; }
+.price p { margin: 0; font-size: var(--ou-text-small); }
+.etat { display: flex; gap: 0.75rem; align-items: flex-start; margin: 0; padding: var(--ou-space-4); border-radius: var(--ou-radius-sm); background: color-mix(in srgb, var(--ou-p-givre) 10%, transparent); }
+.etat svg { width: 1.3rem; height: 1.3rem; flex: none; margin-top: 0.1em; }
+.etat p { margin: 0; }
+.etat--erreur { box-shadow: inset 0 0 0 1.5px var(--ou-p-rouge-clair); }
+.etat--erreur svg { color: var(--ou-p-rouge-clair); }
+.courbe { display: grid; gap: 0.6rem; border-top: 1px solid color-mix(in srgb, var(--ou-p-givre) 22%, transparent); padding-top: var(--ou-space-4); }
+.courbe h3 { margin: 0; font-size: var(--ou-text-small); font-weight: 560; }
+.courbe .plot { position: relative; }
+.courbe svg { display: block; width: 100%; height: auto; cursor: pointer; touch-action: pan-y; }
+.tip { position: absolute; transform: translate(-50%, calc(-100% - 14px)); background: var(--ou-p-givre); color: var(--ou-p-encre); padding: 0.5rem 0.75rem; border-radius: var(--ou-radius-xs); font-size: var(--ou-text-small); display: grid; white-space: nowrap; pointer-events: none; }
+/* dépliants : même signe plus que les questions */
+.dep { border-top: 1px solid color-mix(in srgb, var(--ou-p-givre) 22%, transparent); }
+.dep summary { list-style: none; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 2.75rem; font-weight: 560; font-size: var(--ou-text-small); border-radius: var(--ou-radius-xs); }
+.dep summary::-webkit-details-marker { display: none; }
+.dep .pm { width: 1rem; height: 1rem; position: relative; flex: none; }
+.dep .pm::before, .dep .pm::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1.5px; background: currentColor; transition: transform var(--ou-dur-approche) var(--ou-ease-approche); }
+.dep .pm::after { transform: rotate(90deg); }
+.dep[open] .pm::before { transform: rotate(45deg); } .dep[open] .pm::after { transform: rotate(135deg); }
+@media (forced-colors: active) { .dep .pm::before, .dep .pm::after { background: CanvasText; forced-color-adjust: none; } }
+.quote .tbl th, .quote .tbl td { border-color: color-mix(in srgb, var(--ou-p-givre) 18%, transparent); }
+.quote .dep td span { display: block; font-size: var(--ou-text-small); }
+.quote tr.tot td { font-weight: 650; border-top: 1px solid var(--ou-p-givre); }
+.quote .btn { --_bg: var(--ou-p-givre); --_fg: var(--ou-p-encre); --_bg-h: var(--ou-p-creme-50); }
+.ask { display: grid; gap: var(--ou-space-3); }
+.ask .input { background: color-mix(in srgb, var(--ou-p-givre) 10%, transparent); border-color: color-mix(in srgb, var(--ou-p-givre) 40%, transparent); color: var(--ou-p-givre); }
+.ask .err { color: var(--ou-p-rouge-clair); }
+.notice { display: flex; gap: 0.6rem; align-items: flex-start; margin: 0; padding: 0.9rem 1rem; border-radius: var(--ou-radius-sm); background: color-mix(in srgb, var(--ou-p-givre) 10%, transparent); font-size: var(--ou-text-small); }
+.notice svg { width: 1.1rem; height: 1.1rem; flex: none; margin-top: 0.15em; color: var(--ou-p-sauge); }
+.notice p { margin: 0; }
+.btn[aria-busy="true"] { cursor: progress; }
+.pbar { position: fixed; left: 0.75rem; right: 0.75rem; bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px)); z-index: 25; display: flex; align-items: center; justify-content: space-between; gap: var(--ou-space-4);
+  padding: 0.5rem 0.5rem 0.5rem 1.2rem; border-radius: var(--ou-radius-pill); background: var(--ou-p-charbon-950); color: var(--ou-p-givre); box-shadow: 0 10px 30px -12px color-mix(in srgb, var(--ou-p-encre) 60%, transparent);
+  transform: translateY(calc(100% + 1.5rem)); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); }
+.pbar[data-on] { transform: none; transition: transform var(--ou-dur-retour) var(--ou-ease-retour); }
+.pbar > div { min-width: 0; display: grid; line-height: 1.2; }
+.pbar strong { font-size: var(--ou-text-title-3); font-weight: 600; font-stretch: 115%; white-space: nowrap; }
+.pbar span { font-size: var(--ou-text-small); color: var(--ou-p-givre-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pbar a { --_bg: var(--ou-p-givre); --_fg: var(--ou-p-encre); --_bg-h: var(--ou-p-creme-50); }
+@media (min-width: 1000px) { .pbar { display: none; } }
+@media (max-width: 1000px) { .tool { grid-template-columns: minmax(0, 1fr); } .quote { position: static; } }
+@media (max-width: 640px) { .ex-list { grid-template-columns: minmax(0, 1fr); } .ex { min-height: 3.75rem; } .drop { flex-wrap: wrap; border-radius: var(--ou-radius); padding: 1rem; } .drop .btn { width: 100%; } .bench { padding: var(--ou-space-3); } .quote { padding: var(--ou-space-4); } }
+
+/* ---------- L'atelier ---------- */
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--ou-space-4); }
+.fact { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); border-radius: var(--ou-radius); overflow: hidden; min-height: 22rem; box-shadow: var(--ou-ombre-2); }
+.fact .img { position: relative; background: var(--ou-p-charbon-900); }
+.fact .img img { position: absolute; inset: 0; width: 100%; height: 100%; display: block; object-fit: cover; }
+.fact .txt { background: var(--ou-p-taupe-700); color: var(--ou-p-givre); padding: var(--ou-space-5); display: flex; flex-direction: column; justify-content: space-between; gap: var(--ou-space-5); container-type: inline-size; }
+.fact .txt p { margin: 0; }
+.fact .t-num { text-align: right; font-size: clamp(2.25rem, 14.5cqi, 5.25rem); white-space: nowrap; }
+.fact .t-num small { display: block; font-size: var(--ou-text-small); letter-spacing: 0; font-stretch: 100%; font-weight: 500; margin-top: 0.5rem; }
+.visit { margin-top: var(--ou-space-4); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--ou-space-4); padding: var(--ou-space-5) var(--ou-space-5) var(--ou-space-5) var(--ou-space-6); border-radius: var(--ou-radius); background: var(--ou-p-creme-200); }
+.visit p { margin: 0.25rem 0 0; color: var(--ou-color-text-muted); }
+@media (max-width: 1100px) { .facts { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .fact { grid-template-columns: minmax(0, 1fr); } .fact .img { min-height: 15rem; } .visit { padding: var(--ou-space-5); } }
+
+/* ---------- Questions ---------- */
+.qa { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: var(--ou-space-7); align-items: start; }
+.qa .intro p { margin: var(--ou-space-4) 0 0; color: var(--ou-color-text-muted); max-width: 26rem; }
+@media (max-width: 900px) { .qa { grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-6); } }
+
+/* ---------- Contact : le formulaire, et le plan qu'on nous envoie, coté ---------- */
+/* v6 : l'encadré du contact prend le vert de la marque (RAL 6019), le seul grand aplat de couleur de la page avant le pied */
+.cta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: var(--ou-space-7); align-items: center; border-radius: var(--ou-radius-lg); background: var(--ou-p-sauge); padding: clamp(2rem, 1rem + 4vw, 4.5rem);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ou-p-vert-700) 14%, transparent), var(--ou-ombre-2); }
+@media (forced-colors: active) { .cta { border: 1px solid CanvasText; } }
+.cta .in { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-4); justify-items: start; min-width: 0; }
+.cta .in > p { margin: 0; color: var(--ou-p-encre-2); max-width: 30rem; }
+@media (max-width: 380px) { .cta h2 { font-size: var(--ou-text-title-1); } }
+.cta a.tel { color: var(--ou-p-encre); font-weight: 600; white-space: nowrap; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+.cform { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-4); width: min(100%, 30rem); margin-top: var(--ou-space-2); }
+.cform .field { grid-template-columns: minmax(0, 1fr); }
+.cform .input { background: var(--ou-p-creme-50); border-color: var(--ou-p-greige-400); }
+.cform .hint { margin: 0; font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.cform .btn { justify-self: start; }
+.filebox { position: relative; display: flex; align-items: center; gap: 0.75rem; min-height: var(--ou-control); padding: 0.25rem 1rem 0.25rem 0.25rem; border-radius: var(--ou-radius-pill); background: var(--ou-p-creme-50); box-shadow: inset 0 0 0 1px var(--ou-p-greige-400); cursor: pointer;
+  transition: box-shadow var(--ou-dur-retour) var(--ou-ease-approche); }
+.filebox-t { transition: background-color var(--ou-dur-retour) var(--ou-ease-approche), transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .filebox:hover { box-shadow: inset 0 0 0 1px var(--ou-p-taupe-600); transition-duration: var(--ou-dur-approche); } .filebox:hover .filebox-t { background: var(--ou-p-charbon-950); } }
+.filebox:active .filebox-t { transform: scale(0.96); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.filebox input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; border-radius: inherit; }
+.filebox:has(input:focus-visible) { outline: 2px solid var(--ou-p-encre); outline-offset: 2px; }
+.filebox-t { display: inline-flex; align-items: center; min-height: 2.25rem; padding: 0 1rem; border-radius: var(--ou-radius-pill); background: var(--ou-p-charbon-850); color: var(--ou-p-givre); font-size: var(--ou-text-small); font-weight: 560; white-space: nowrap; }
+.filebox-n { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--ou-text-small); color: var(--ou-p-encre-2); }
+.filebox[data-err] { box-shadow: inset 0 0 0 2px var(--ou-p-rouge); }
+.cta .notice { background: var(--ou-p-charbon-850); color: var(--ou-p-givre); max-width: 30rem; }
+.plan-cote { margin: 0; color: var(--ou-p-encre-2); min-width: 0; }
+.plan-cote svg { display: block; width: 100%; height: auto; }
+@media (max-width: 900px) { .cta { grid-template-columns: minmax(0, 1fr); } .plan-cote { order: -1; max-width: 34rem; } }
+@media (max-width: 520px) { .cform .btn { width: 100%; } }
+
+/* ---------- Pied de page : une plaque d'acier brossé, le nom découpé au laser (lib/plaque.js) ; le texte se pose sur des zones calmes ---------- */
+.foot { position: relative; isolation: isolate; overflow: hidden; background: var(--ou-p-charbon-950); color: var(--ou-p-givre); padding-block: var(--ou-space-9) var(--ou-space-4); }
+.foot > canvas { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; }
+.foot[data-plaque="repli"] { background: var(--ou-p-charbon-900) url("img/plaque-repli-v7.jpg") 50% 50% / cover no-repeat; }
+.foot:not([data-plaque="gl"]) > canvas { visibility: hidden; } /* shader en compilation, contexte perdu ou repli : le canvas attend */
+.foot .wrap { display: grid; gap: var(--ou-space-7); }
+/* la plaque signalétique : un intitulé, sa valeur, des filets fins ; aucune imitation de matière sur le texte */
+.f-plaque { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--ou-p-taupe-600); }
+.f-plaque > div { display: grid; align-content: start; gap: var(--ou-space-2); min-width: 0; padding: var(--ou-space-4) var(--ou-space-5) var(--ou-space-5); }
+.f-plaque > div + div { border-left: 1px solid var(--ou-p-taupe-600); }
+.f-plaque > div:first-child { padding-left: 0; }
+.f-plaque dt { font-size: var(--ou-text-small); line-height: var(--ou-leading-small); color: var(--ou-p-givre-2); }
+.f-plaque dd { margin: 0; font-weight: 520; }
+.f-plaque .nw { white-space: nowrap; }
+.f-plaque .tel { display: inline-flex; align-items: center; min-height: 2.75rem; margin-block: -0.5rem; color: inherit; white-space: nowrap;
+  font-size: var(--ou-text-title-3); font-weight: 600; font-stretch: var(--ou-stretch-title-3); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.25em; }
+.f-mark { color: var(--ou-p-givre); }
+.f-mark svg { display: block; width: 100%; height: auto; aspect-ratio: 4412.3 / 748.2; overflow: visible; }
+/* sans WebGL, ou mouvements réduits : la plaque est l'image exportée du shader ; le nom, une saignée sombre dont le chanfrein
+   suit l'éclairage d'ambiance du shader (pente du bas tournée vers le ciel, éclairée ; pente du haut dans l'ombre) */
+.foot[data-plaque="repli"] .f-mark { color: var(--ou-p-encre); filter: drop-shadow(0 1.5px 0 var(--ou-p-taupe-600)) drop-shadow(0 -1px 0 var(--ou-p-encre)); }
+.f-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--ou-space-3) var(--ou-space-6); padding-top: var(--ou-space-3);
+  border-top: 1px solid var(--ou-p-taupe-600); color: var(--ou-p-givre-2); font-size: var(--ou-text-small); line-height: var(--ou-leading-small); }
+.f-bottom p { margin: 0; max-width: 46rem; }
+.f-end { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--ou-space-5); }
+.top-link { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; color: var(--ou-p-givre); text-decoration: none; font-weight: 560; }
+.top-link { text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 1px; text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--ou-dur-retour) var(--ou-ease-approche), text-underline-offset var(--ou-dur-retour) var(--ou-ease-retour); }
+.top-link svg { width: 1rem; height: 1rem; transition: transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .top-link:hover svg { transform: translateY(-3px); transition: transform var(--ou-dur-approche) var(--ou-ease-approche); } .top-link:hover { text-decoration-color: currentColor; text-underline-offset: 0.2em; transition-duration: var(--ou-dur-approche); } }
+@media (max-width: 960px) {
+  .f-plaque { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .f-plaque > div:nth-child(3) { border-left: 0; padding-left: 0; }
+  .f-plaque > div:nth-child(n+3) { border-top: 1px solid var(--ou-p-taupe-600); }
+}
+/* téléphone : une ligne par entrée, l'intitulé à gauche, la valeur alignée à droite de lui */
+@media (max-width: 560px) {
+  .foot { padding-top: var(--ou-space-8); }
+  .foot .wrap { gap: var(--ou-space-6); }
+  .f-plaque { grid-template-columns: minmax(0, 1fr); }
+  .f-plaque > div, .f-plaque > div:nth-child(n) { grid-template-columns: 6.25rem minmax(0, 1fr); gap: 0 var(--ou-space-4); padding: var(--ou-space-3) 0; border-left: 0; }
+  .f-plaque > div + div { border-top: 1px solid var(--ou-p-taupe-600); }
+  .f-plaque dt { padding-top: 0.125rem; } /* même ligne de base que la valeur (mesurée : 0 px d'écart, téléphone compris) */
+}
+@media (max-width: 359px) { .f-plaque > div, .f-plaque > div:nth-child(n) { grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-1); } }
+@media (prefers-reduced-motion: reduce) { .top-link svg { transition: none; } }
+@media (forced-colors: active) {
+  .foot, .foot[data-plaque] { background: Canvas; color: CanvasText; }
+  .foot > canvas { display: none; }
+  .f-mark, .foot[data-plaque] .f-mark { color: CanvasText; filter: none; }
+  /* passage en couleurs forcées pendant que la plaque tourne : le nom de la couche SVG (encre « none ») reprend la couleur du système */
+  .f-mark path { fill: CanvasText; } .f-mark path[stroke-width] { fill: none; stroke: CanvasText; }
+  .f-bottom { color: CanvasText; }
+  .foot a, .f-plaque .tel { color: LinkText; }
+  .top-link { text-decoration: underline; text-underline-offset: 0.25em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pbar, .pbar[data-on], .drop, .viewer canvas, .viewer .plan, .hero .appel a, a.tel, .chap button, .ex, .ex-pic, .chip, .filebox, .filebox-t, .top-link, .depot .btn, .stock button::before, .drop svg.ico path { transition: none !important; }
+  .depot:hover .btn svg path { animation: none; }
+  .chap button:active, .ex:active, .chip:active, .depot:active .btn, .drop:active .btn, .filebox:active .filebox-t, .stock button:active::before { transform: none; }
+  .ex:hover .ex-pic, .stock button:hover::before, .drop:hover svg.ico path:last-child { transform: none; }
+}
+/* Couleurs forcées : les illustrations gardent leurs teintes (cartes, mosaïque, bandeau, photos) ; les tracés de données et le nom suivent les couleurs du système */
+@media (forced-colors: active) {
+  .mcard, .hero-r, .banner, .fact .img { forced-color-adjust: none; }
+  .courbe svg path, .courbe svg line, .courbe svg circle { stroke: CanvasText; }
+  .courbe svg text, .courbe svg circle { fill: CanvasText; }
+  .filebox, .drop, .etat, .notice, .pbar { outline: 1px solid CanvasText; }
+}
+</style>
+<link rel="stylesheet" href="components/prix-v8.css">
+
+<div class="ou2" id="top" lang="fr">
+  <a class="skip" href="#contenu" data-hors-menu>Aller au contenu</a>
+  <div class="depose" data-depose hidden aria-hidden="true"><div><b>Déposez le fichier ici</b><p>Avec un DXF, le prix s’affiche tout de suite. Nous chiffrons dans la journée les DWG, STEP et PDF, les croquis cotés et les photos.</p></div></div>
+  <header class="hdr">
+    <nav class="nav" aria-label="Navigation principale">
+      <a class="mark" href="#top" aria-label="Ourlet, haut de page" data-logo></a>
+      <ul class="links">
+        <li><a class="lk" href="#capacites">Capacités</a></li><li><a class="lk" href="#prix">Prix en ligne</a></li><li><a class="lk" href="#atelier">Atelier</a></li><li><a class="lk" href="#questions">Questions</a></li>
+      </ul>
+      <span class="ind" aria-hidden="true"><i class="bar"></i><svg class="hem" viewBox="0 0 11 5"><path fill-rule="evenodd" d="M0,0H8.5A2.5,2.5 0 0 1 8.5,5H0Z M0,2H8.5V3H0Z"/></svg></span>
+      <a class="lk tel-nav" href="tel:+33353014720" aria-label="Appeler l’atelier au 03&nbsp;53&nbsp;01&nbsp;47&nbsp;20, du lundi au vendredi de 7&nbsp;h&nbsp;30 à 17&nbsp;h&nbsp;30">03&nbsp;53&nbsp;01&nbsp;47&nbsp;20</a>
+      <a class="icon-btn appel" href="tel:+33353014720" aria-label="Appeler l’atelier au 03&nbsp;53&nbsp;01&nbsp;47&nbsp;20, du lundi au vendredi de 7&nbsp;h&nbsp;30 à 17&nbsp;h&nbsp;30"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 3.5h3l1.5 4.2-2 1.4a11 11 0 0 0 5.8 5.8l1.4-2 4.2 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.6 5.7a2 2 0 0 1 2-2.2z"/></svg></a>
+      <a class="btn" href="#prix"><span>Chiffrer<span class="lg"> une pièce</span></span></a>
+      <button class="menu-btn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Ouvrir le menu" data-menu-btn><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path class="l1" d="M5 8.5h14"/><path class="l2" d="M5 15.5h14"/></svg></button>
+    </nav>
+    <div class="menu" id="menu" data-menu hidden>
+      <ul>
+        <li><a href="#capacites">Capacités</a></li><li><a href="#prix">Prix en ligne</a></li><li><a href="#atelier">Atelier</a></li><li><a href="#questions">Questions</a></li><li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="menu-foot"><a href="tel:+33353014720">03&nbsp;53&nbsp;01&nbsp;47&nbsp;20</a><span>Du lundi au vendredi, de 7&nbsp;h&nbsp;30 à 17&nbsp;h&nbsp;30</span></div>
+    </div>
+  </header>
+  <div class="scrim" data-scrim hidden></div>
+
+  <main id="contenu" data-hors-menu>
+    <section class="hero" aria-labelledby="h1">
+      <div class="txt">
+        <h1 id="h1">Nous découpons, plions, soudons et thermolaquons vos pièces en tôle, à <span class="insec">Baume-les-Dames</span>.</h1>
+        <dl class="caps">
+          <div><dt>Longueur pliée</dt><dd>3&nbsp;000&nbsp;mm</dd></div>
+          <div><dt>Acier plié</dt><dd>jusqu’à 8&nbsp;mm</dd></div>
+          <div><dt>Aluminium plié</dt><dd>jusqu’à 6&nbsp;mm</dd></div>
+          <div><dt>En stock</dt><dd>RAL&nbsp;7016 et 5 autres teintes</dd></div>
+        </dl>
+        <p class="appel">L’atelier répond au <a href="tel:+33353014720">03&nbsp;53&nbsp;01&nbsp;47&nbsp;20</a>, du lundi au vendredi, de 7&nbsp;h&nbsp;30 à 17&nbsp;h&nbsp;30.</p>
+      </div>
+      <article class="bon" aria-labelledby="bon-t" data-bon>
+        <div class="bon-tete"><b id="bon-t">Exemple de chiffrage</b><span class="desk" data-bon-nom>Jardinière 8800-J</span><span class="mob" data-bon-nom-mob>Jardinière 8800-J, 4&nbsp;pièces, acier 2&nbsp;mm, RAL&nbsp;7016</span></div>
+        <div class="bon-vue dvp" data-bon-vue role="img" aria-label="La jardinière 8800-J est posée sur son bon de travail. Sa tôle découpée à plat se plie en un bac de 800 × 300&nbsp;mm, haut de 300&nbsp;mm. Elle est en acier de 2&nbsp;mm, thermolaquée en RAL&nbsp;7016 Gris anthracite.">
+          <button class="icon-btn rejouer" type="button" data-bon-rejouer aria-label="Rejouer le pliage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4.4h4.4"/></svg></button>
+        </div>
+        <dl>
+          <div class="det"><dt>Matière</dt><dd data-bon-mat>Acier 2&nbsp;mm<small>RAL&nbsp;7016 Gris anthracite</small></dd></div>
+          <div class="det"><dt>Quantité</dt><dd data-bon-qte>4&nbsp;pièces</dd></div>
+          <div class="prix-bon"><dt><span class="desk">Prix à la pièce</span><span class="mob">Prix indicatif</span></dt><dd data-bon-prix>161,67&nbsp;€&nbsp;HT<small>soit 194,00&nbsp;€&nbsp;TTC</small></dd></div>
+          <div><dt><span class="desk">Prêtes le</span><span class="mob">Date indicative</span></dt><dd data-bon-date>–</dd></div>
+        </dl>
+        <div class="bon-pied"><p>Prix et date indicatifs. Le devis les confirme.</p>
+          <div class="acts">
+            <label class="depot"><span class="btn" aria-hidden="true">Remplacez par votre plan <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></span><input type="file" data-bon-fichier accept=".dxf,.dwg,.step,.stp,.pdf,.jpg,.jpeg,.png,.heic" aria-label="Remplacez par votre plan. Avec un DXF, le prix s’affiche tout de suite. Nous chiffrons dans la journée les DWG, STEP et PDF, les croquis cotés et les photos."></label>
+            <a class="link" href="#contact">Envoyer un croquis ou une photo</a>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <section class="sec film-sec sec--suite" id="capacites" aria-labelledby="h-film">
+  <div class="wrap">
+    <div class="head"><h2 class="t-display" id="h-film">La jardinière <span class="insec">8800-J</span> passe par nos quatre postes</h2></div>
+    <figure class="film">
+      <div class="film-scene" data-film role="img" aria-label="Film de 43 secondes en boucle. Un portique laser découpe trois trous d’écoulement, puis le contour de la jardinière 8800-J, dans une tôle d’acier de 2&nbsp;mm. Un robot monté sur un rail prend le flan avec ses ventouses et le porte à la presse plieuse. La presse relève les quatre parois à 90°, une à une&nbsp;; le robot retourne la pièce entre deux coups. Sur un plateau tournant, deux robots soudent les quatre angles. Le robot suspend la jardinière à un convoyeur aérien&nbsp;; dans la cabine, quatre pistolets montés sur deux élévateurs la couvrent de poudre RAL&nbsp;7016, puis le four tunnel cuit la poudre à 180&nbsp;°C. À la sortie du four, un palettiseur décroche la jardinière et la pose, quatrième de la commande, sur sa palette.">
+        <p class="film-ligne" aria-hidden="true"><span><i data-valeurs>Le laser découpe une tôle d’acier de 2&nbsp;mm</i></span></p>
+        <button class="icon-btn film-pause" type="button" data-pause aria-label="Mettre le film en pause"></button>
+      </div>
+      <div class="film-cmd">
+        <div class="chap" role="group" aria-label="Aller à un poste du film" data-chap>
+          <button type="button" data-ch="decoupe">Découpe</button><button type="button" data-ch="pliage">Pliage</button><button type="button" data-ch="soudure">Soudure</button><button type="button" data-ch="peinture">Peinture</button>
+          <span class="chap-ind" aria-hidden="true"><i class="bar"></i><svg viewBox="0 0 11 5"><path fill-rule="evenodd" d="M0,0H8.5A2.5,2.5 0 0 1 8.5,5H0Z M0,2H8.5V3H0Z"/></svg></span>
+        </div>
+        <p class="film-reduit" data-reduit hidden>Votre appareil est réglé pour limiter les animations. Le film reste donc à l’arrêt. Choisissez un poste pour le voir.</p>
+      </div>
+    </figure>
+    <div class="capa">
+      <div class="tw" tabindex="0" role="region" aria-label="Capacités de l’atelier">
+        <table>
+        <caption>Capacités de l’atelier</caption>
+        <thead><tr><th scope="col">Métier</th><th scope="col">Matières et épaisseurs</th><th scope="col">Dimensions maximales</th><th scope="col">Tolérance</th><th scope="col">Machines</th><th scope="col">Délai type</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Découpe laser</th><td>Acier de 0,5 à 20&nbsp;mm, inox de 0,5 à 10&nbsp;mm, aluminium de 0,5 à 10&nbsp;mm</td><td>Tôle de 3&nbsp;000 × 1&nbsp;500&nbsp;mm</td><td>±&nbsp;0,1&nbsp;mm</td><td>Laser fibre de 6&nbsp;kW</td><td>3 jours ouvrés</td></tr>
+          <tr><th scope="row">Pliage</th><td>Acier jusqu’à 8&nbsp;mm, inox et aluminium jusqu’à 6&nbsp;mm</td><td>3&nbsp;000&nbsp;mm de long, la longueur d’une barre de couvertine</td><td>±&nbsp;0,5° sur l’angle, ±&nbsp;0,2&nbsp;mm sur la cote pliée</td><td>Trois presses plieuses, poinçons à segments</td><td>5 jours ouvrés, découpe comprise</td></tr>
+          <tr><th scope="row">Soudure</th><td>Acier, inox et aluminium, en MIG et en TIG (inox décapé et passivé)</td><td>Ensemble de 3&nbsp;000 × 1&nbsp;500&nbsp;mm</td><td>±&nbsp;1&nbsp;mm sur l’ensemble soudé</td><td>Huit postes de soudure, un robot dès 50 pièces</td><td>2 jours ouvrés de plus</td></tr>
+          <tr><th scope="row">Peinture</th><td>Acier, inox et aluminium, poudre polyester cuite à 180&nbsp;°C</td><td>Pièce de 3&nbsp;200 × 1&nbsp;200 × 1&nbsp;800&nbsp;mm</td><td>Poudre de 60 à 80&nbsp;µm d’épaisseur</td><td>Cabine de poudrage et four de cuisson</td><td>2 jours ouvrés de plus en teinte de stock, 7 pour une autre teinte</td></tr>
+        </tbody>
+      </table></div>
+      <p>Six teintes courantes du bâtiment sont en stock&nbsp;: RAL 7016 Gris anthracite, 7022 Gris terre d’ombre, 9005 Noir foncé, 9010 Blanc pur, 9016 Blanc signalisation et 8019 Brun gris. Pour une autre teinte RAL, comptez 5&nbsp;jours ouvrés de plus. Nous envoyons une plaquette peinte sur demande.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec prix ou-sombre" id="prix" aria-labelledby="h-prix">
+      <div class="wrap" id="outil">
+        <div class="head"><h2 class="t-display" id="h-prix">Chiffrez votre pièce</h2><p>Déposez un fichier DXF, ou prenez une de nos pièces en exemple. Le calcul se fait sur votre téléphone ou votre ordinateur, et votre plan reste chez vous. L’atelier confirme ensuite le prix par un devis.</p></div>
+        <label class="drop" data-drop><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 3h9l5 5v13H5z"/><path d="M14 3v5h5M12 17v-6M9 14l3-3 3 3"/></svg><span class="t">Déposez votre plan<small>Avec un DXF, le prix s’affiche tout de suite. Nous chiffrons dans la journée les DWG, STEP et PDF, les croquis cotés et les photos.</small></span><span class="btn">Choisir un fichier</span><input type="file" data-file accept=".dxf,.dwg,.step,.stp,.pdf,.jpg,.jpeg,.png,.heic" aria-label="Déposez votre plan. Avec un DXF, le prix s’affiche tout de suite. Nous chiffrons dans la journée les DWG, STEP et PDF, les croquis cotés et les photos."></label>
+        <div class="tool">
+          <div class="bench ou-clair">
+            <figure class="viewer" data-viewer>
+              <div class="vbar"><span class="vname"><span data-nom></span><small data-teinte></small></span>
+                <span class="vtools"><span class="seg" role="radiogroup" aria-label="Vue de la pièce"><label><input type="radio" name="ou-vue" value="plie" checked><span>Pliée</span></label><label><input type="radio" name="ou-vue" value="plat"><span>À plat</span></label></span>
+                <button type="button" class="icon-btn" data-replay aria-label="Rejouer le pliage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4.4h4.4"/></svg></button></span></div>
+              <div class="vue-dvp dvp" data-canvas role="img" aria-label="La pièce choisie, pliée pli après pli"></div>
+              <div class="plan" data-plan hidden></div>
+            </figure>
+            <div class="ctl">
+              <div class="row"><span class="ou-label" id="lb-p">Ou prenez une de nos pièces en exemple</span><div class="ex-groupes" data-exemples></div><div class="statut" data-statut></div></div>
+              <fieldset class="row"><legend class="ou-label">Matière</legend>
+                <div class="seg"><label><input type="radio" name="ou-mat" value="acier" checked><span><i style="background:var(--ou-i-mat-acier)"></i>Acier</span></label><label><input type="radio" name="ou-mat" value="inox"><span><i style="background:var(--ou-i-mat-inox)"></i>Inox</span></label><label><input type="radio" name="ou-mat" value="alu"><span><i style="background:var(--ou-i-mat-alu)"></i>Aluminium</span></label></div></fieldset>
+              <fieldset class="seg ep" data-ep></fieldset>
+              <div class="row"><label class="ou-label" for="ou-qte">Quantité</label>
+                <div class="qrow"><div class="unit"><input class="input" type="text" inputmode="numeric" autocomplete="off" value="4" data-qte id="ou-qte" aria-describedby="qte-err"><span aria-hidden="true">pièces</span></div>
+                  <button type="button" class="chip" data-q="1" aria-label="1 pièce">1</button><button type="button" class="chip" data-q="10" aria-label="10 pièces">10</button><button type="button" class="chip" data-q="50" aria-label="50 pièces">50</button><button type="button" class="chip" data-q="250" aria-label="250 pièces">250</button><button type="button" class="chip" data-q="1000" aria-label="1&nbsp;000 pièces">1&nbsp;000</button></div>
+                <p class="ou-status err" id="qte-err" data-qerr hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8.5 8.5l7 7M15.5 8.5l-7 7"/></svg><span>Indiquez un nombre entier de pièces, de 1 à 5&nbsp;000.</span></p></div>
+              <fieldset class="row"><legend class="ou-label">Finition</legend>
+                <div class="seg"><label><input type="radio" name="ou-fin" value="ral" checked><span>Thermolaquage</span></label><label><input type="radio" name="ou-fin" value="brut"><span>Sans peinture</span></label></div>
+                <div class="ral-sel" data-ral-wrap><span class="ou-label" id="lb-stock">En stock</span><div class="stock" role="radiogroup" aria-labelledby="lb-stock" data-stock></div><div class="ral-autre"><label class="ou-label" for="ou-ral">Autres teintes RAL, 5 jours ouvrés de plus</label><div class="select-wrap"><select class="select" id="ou-ral" data-ral></select></div></div></div></fieldset>
+            </div>
+          </div>
+          <div class="quote" id="resultat">
+            <div class="tete" data-tete><div class="tete-in"><div class="price" data-prix><span class="k" data-qlabel>Prix indicatif</span><span class="v"><span data-pu></span><small>HT la pièce, <span data-ttc></span></small></span></div><div class="etat" data-etat hidden></div></div></div>
+            <div class="q-corps" data-corps>
+              <div class="somme" data-somme>
+                <div class="tol" data-tol role="img"><span class="num" data-tol-min></span><i aria-hidden="true"></i><span class="num" data-tol-max></span></div>
+                <p class="ml" data-ml hidden></p>
+                <p data-fourchette></p>
+              </div>
+              <div class="delai" data-delai>
+                <p class="date-q" data-date></p>
+                <div class="frise" data-frise role="list" aria-label="Jours ouvrés, poste par poste"></div>
+                <p>Nous comptons cette date en jours ouvrés à partir du jour où nous recevons le plan. Un plan reçu après 11&nbsp;h compte pour le jour ouvré suivant.</p>
+                <p class="livr">Retrait à l’atelier dès 7&nbsp;h&nbsp;30, ou livraison sur chantier le mardi et le jeudi.</p>
+              </div>
+            </div>
+            <div class="agir">
+              <button class="btn btn--wide" type="button" data-ouvrir>Recevoir le devis</button>
+              <form class="ask" data-form hidden novalidate>
+              <div class="field"><label class="label" for="ask-soc">Société (facultatif)</label><input class="input" id="ask-soc" name="societe" autocomplete="organization"></div>
+              <div class="field"><label class="label" for="ask-ct">Téléphone ou e-mail</label><input class="input" id="ask-ct" name="contact" autocomplete="email" aria-describedby="ask-err"><p class="err" id="ask-err" data-err hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg><span></span></p></div>
+              <button class="btn btn--wide" type="submit">Envoyer ma demande</button>
+            </form>
+              <div class="notice" data-envoye role="status" hidden tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg><p></p></div>
+            </div>
+            <div class="courbe" data-courbe-wrap>
+              <h3>Le prix à la pièce selon la quantité</h3>
+              <div class="plot"><svg data-courbe role="img" aria-label="Prix à la pièce selon la quantité, de 1 à 1&nbsp;000 pièces. Choisissez un point de la courbe pour passer à cette quantité. Les valeurs sont aussi dans le tableau ci-dessous."></svg><input class="plot-clavier" type="range" min="0" max="8" step="1" value="0" data-courbe-clavier aria-label="Quantité, d’un palier à l’autre"><span class="plot-focus" aria-hidden="true"></span><div class="tip" data-tip hidden></div></div>
+              <p class="gain" data-gain></p>
+              <details class="dep" data-valeurs-wrap><summary>Voir les valeurs<span class="pm" aria-hidden="true"></span></summary><div class="dep-in"><table class="tbl"><caption class="sr">Prix selon la quantité</caption><thead><tr><th scope="col">Quantité</th><th scope="col" class="num">À la pièce</th><th scope="col" class="num">Total</th></tr></thead><tbody data-courbe-table></tbody></table></div></details>
+            </div>
+            <div class="postes" data-postes-wrap>
+              <h3>Le prix à la pièce, poste par poste</h3>
+              <div class="gamme" data-postes role="list" aria-label="Part de chaque poste dans le prix à la pièce"></div>
+              <details class="dep" data-detail-wrap><summary>Voir le calcul poste par poste<span class="pm" aria-hidden="true"></span></summary><div class="dep-in"><table class="tbl" role="table"><caption class="sr">Calcul du prix, poste par poste</caption><thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader">Poste</th><th scope="col" role="columnheader" class="num">Par pièce</th><th scope="col" role="columnheader" class="num">Total</th></tr></thead><tbody role="rowgroup" data-detail></tbody></table></div></details>
+            </div>
+            <p class="sr" role="status" data-annonce></p>
+          </div>
+        </div>
+      </div>
+      <div class="pbar" id="pbar" aria-hidden="true" data-hors-menu><div><strong id="pbar-pu"></strong><span id="pbar-q"></span></div><a class="btn" href="#resultat" tabindex="-1">Voir le total et la date</a></div>
+    </section>
+
+    <section class="sec" id="atelier" aria-labelledby="h-at">
+      <div class="wrap">
+        <div class="head"><h2 class="t-display" id="h-at">L’atelier</h2><p>L’atelier est à Baume-les-Dames, entre Besançon et Montbéliard. Nous y sommes installés depuis 1979.</p></div>
+        <div class="facts">
+          <div class="fact"><div class="img"><picture><source type="image/avif" srcset="img/atelier-pieces-720.avif 720w, img/atelier-pieces-1200.avif 1200w, img/atelier-pieces-1792.avif 1792w" sizes="(max-width: 560px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 21vw"><source type="image/webp" srcset="img/atelier-pieces-720.webp 720w, img/atelier-pieces-1200.webp 1200w, img/atelier-pieces-1792.webp 1792w" sizes="(max-width: 560px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 21vw"><img src="img/atelier-pieces-1200.jpg" srcset="img/atelier-pieces-720.jpg 720w, img/atelier-pieces-1200.jpg 1200w, img/atelier-pieces-1792.jpg 1792w" sizes="(max-width: 560px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 21vw" alt="Un pupitre, une chape et une platine perforée, peints en vert pâle, posés sur un fond vert." width="1792" height="2240" loading="lazy" decoding="async"></picture></div><div class="txt"><p>Votre pièce reste chez nous de la découpe au thermolaquage, sans passer par un sous-traitant.</p><div class="t-num">4&nbsp;200&nbsp;m²<small>d’atelier couvert, 65 personnes</small></div></div></div>
+          <div class="fact"><div class="img"><picture><source type="image/avif" srcset="img/atelier-acier-720.avif 720w, img/atelier-acier-1200.avif 1200w, img/atelier-acier-1792.avif 1792w" sizes="(max-width: 560px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 21vw"><source type="image/webp" srcset="img/atelier-acier-720.webp 720w, img/atelier-acier-1200.webp 1200w, img/atelier-acier-1792.webp 1792w" sizes="(max-width: 560px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 21vw"><img src="img/atelier-acier-1200.jpg" srcset="img/atelier-acier-720.jpg 720w, img/atelier-acier-1200.jpg 1200w, img/atelier-acier-1792.jpg 1792w" sizes="(max-width: 560px) calc(100vw - 2rem), (max-width: 1100px) 44vw, 21vw" alt="Un pupitre en acier brut plié, éclairé en lumière rasante dans la pénombre." width="1792" height="2240" loading="lazy" decoding="async"></picture></div><div class="txt"><p>Notre camion livre sur chantier le mardi et le jeudi, dans le Doubs, le Jura, le Territoire de Belfort et la Haute-Saône. Vous pouvez aussi retirer vos pièces à l’atelier dès 7&nbsp;h&nbsp;30.</p><div class="t-num">30&nbsp;min<small>de Besançon par l’A36</small></div></div></div>
+        </div>
+        <div class="visit"><div><strong class="t-3">Visite le vendredi à 14&nbsp;h</strong><p>Venez sans rendez-vous avec votre plan ou votre croquis, et nous vous montrerons les machines qui feront la pièce.</p></div><a class="btn btn--line" href="tel:+33353014720">Appeler le 03&nbsp;53&nbsp;01&nbsp;47&nbsp;20</a></div>
+      </div>
+    </section>
+
+    <section class="sec sec--suite" id="questions" aria-labelledby="h-qa">
+      <div class="wrap qa">
+        <div class="intro"><h2 class="t-display" id="h-qa">Questions</h2></div>
+        <div class="faq">
+          <details><summary><span class="n">01</span>Travaillez-vous pour les particuliers, et à l’unité&nbsp;?<span class="pm" aria-hidden="true"></span></summary><p>Oui. Nous faisons de 1 à 5&nbsp;000 pièces, pour les particuliers et pour les entreprises. Une pièce seule coûte plus cher, car elle paie à elle seule le réglage des machines. Dès la deuxième, ce réglage se partage et le prix à la pièce baisse.</p></details>
+          <details><summary><span class="n">02</span>Quels fichiers acceptez-vous&nbsp;?<span class="pm" aria-hidden="true"></span></summary><p>Avec un DXF à plat, le prix s’affiche tout de suite sur cette page. Tous les logiciels de dessin technique savent l’enregistrer. Nous chiffrons aussi dans la journée les DWG, STEP et PDF, les croquis ou coupes cotés à la main et les photos avec les mesures.</p></details>
+          <details><summary><span class="n">03</span>Quelles teintes RAL avez-vous en stock&nbsp;?<span class="pm" aria-hidden="true"></span></summary><p>Six teintes courantes du bâtiment sont en stock&nbsp;: RAL&nbsp;7016, 7022, 9005, 9010, 9016 et 8019. Toutes les autres teintes RAL Classic demandent 5&nbsp;jours ouvrés de plus. Nous thermolaquons en mat ou en satiné. Comme la teinte affichée à l’écran n’est qu’une indication, nous vous envoyons une plaquette peinte sur demande.</p></details>
+          <details><summary><span class="n">04</span>Quand ma pièce sera-t-elle prête&nbsp;?<span class="pm" aria-hidden="true"></span></summary><p>Le calcul en ligne affiche une date indicative. Nous la comptons en jours ouvrés à partir du jour où nous recevons le plan, et un plan reçu après 11&nbsp;h compte pour le jour ouvré suivant. Prévoyez de 5 à 7 jours ouvrés pour une pièce pliée sans peinture, et de 7 à 10 avec thermolaquage. Une pièce simplement découpée est prête 2&nbsp;jours plus tôt. Comptez 2&nbsp;jours de plus pour une pièce soudée, et un peu plus pour une grande série. Le devis confirme la date.</p></details>
+          <details><summary><span class="n">05</span>Le prix affiché est-il définitif&nbsp;?<span class="pm" aria-hidden="true"></span></summary><p>Non. C’est une estimation calculée sur votre plan, à 10&nbsp;% près. Le prix qui compte est celui du devis, vérifié par l’atelier.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec sec--suite" id="contact" aria-labelledby="h-co">
+      <div class="wrap">
+        <div class="cta">
+          <div class="in">
+            <h2 class="t-display" id="h-co">Envoyez-nous votre plan</h2>
+            <p>Envoyez un fichier, un croquis ou une coupe cotés à la main, ou une photo avec les mesures. Nous répondons dans la journée, du lundi au vendredi. Vous pouvez aussi appeler le <a class="tel" href="tel:+33353014720">03&nbsp;53&nbsp;01&nbsp;47&nbsp;20</a>.</p>
+            <form class="cform" id="contact-form" novalidate>
+              <div class="field"><span class="label" id="ct-plan-l">Votre plan, croquis ou photo</span>
+                <label class="filebox" data-filebox><input type="file" id="ct-plan" name="plan" accept=".dxf,.dwg,.step,.stp,.pdf,.jpg,.jpeg,.png,.heic" aria-labelledby="ct-plan-l" aria-describedby="ct-plan-n ct-plan-h ct-plan-err"><span class="filebox-t" aria-hidden="true">Choisir un fichier</span><span class="filebox-n" id="ct-plan-n" data-fname>Aucun fichier choisi</span></label>
+                <p class="hint" id="ct-plan-h">DXF, DWG, STEP, PDF, JPG, PNG ou HEIC. Le fichier est facultatif&nbsp;: nous pouvons d’abord vous rappeler.</p>
+                <p class="err" id="ct-plan-err" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg><span></span></p></div>
+              <div class="field"><label class="label" for="ct">Téléphone ou e-mail</label><input class="input" id="ct" name="contact" autocomplete="email" aria-describedby="ct-err"><p class="err" id="ct-err" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.5"/></svg><span></span></p></div>
+              <button class="btn" type="submit" data-send>Envoyer <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg></button>
+            </form>
+            <div class="notice" id="ct-ok" role="status" hidden tabindex="-1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg><p></p></div>
+          </div>
+          <figure class="plan-cote" id="plan-cote" aria-hidden="true"></figure>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot ou-sombre" data-hors-menu>
+    <div class="wrap">
+      <dl class="f-plaque" data-calme>
+        <div><dt>Adresse</dt><dd>Ourlet<br>Zone d’activités<br>25110 Baume-les-Dames</dd></div>
+        <div><dt>Horaires</dt><dd>Du lundi au vendredi,<br>de 7&nbsp;h&nbsp;30 à 17&nbsp;h&nbsp;30</dd></div>
+        <div><dt>Téléphone</dt><dd><a class="tel" href="tel:+33353014720" aria-label="Appeler l’atelier au 03&nbsp;53&nbsp;01&nbsp;47&nbsp;20">03&nbsp;53&nbsp;01&nbsp;47&nbsp;20</a></dd></div>
+        <div><dt>Visite</dt><dd>Le vendredi à 14&nbsp;h, sans <span class="nw">rendez-vous</span></dd></div>
+      </dl>
+      <div class="f-mark" role="img" aria-label="Ourlet" data-plaque-logo><svg data-sig aria-hidden="true" viewBox="19.0 -9.4 4412.3 748.2"></svg></div>
+      <div class="f-bottom" data-calme>
+        <p>Ourlet est une entreprise inventée par Topiary pour montrer son travail. Les chiffres, les prix et les dates sont fictifs. Le numéro de téléphone appartient à une plage réservée à la fiction. Les photos de pièces sont générées par IA.</p>
+        <div class="f-end"><span>©&nbsp;2026 Ourlet</span><a class="top-link" href="#top">Haut de page <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M8 13V3M4 7l4-4 4 4"/></svg></a></div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script type="module">
+import { LOGO, svg } from './lib/marque.js';
+import { jardiniere } from './lib/pieces.js';
+import { flatSVG } from './lib/part-v7.js';
+import { mountDeveloppe } from './lib/developpe-v7.js';
+import { mountFilm } from './lib/film-atelier-v11.js';
+import { mountOutil } from './lib/outil-v8.js';
+import { analyse, chiffrer, dateDispo, fmtDate, eur } from './lib/chiffrage.js';
+import { mountPlaque } from './lib/plaque-v7.js';
+import { MOTION, prefersReduced, observateur } from './lib/motion.js';
+import { TOKENS, P } from './tokens/tokens-v2.js';
+
+document.querySelectorAll('[data-logo]').forEach((el) => { el.innerHTML = svg(LOGO, 'aria-hidden="true" fill="currentColor"'); });
+const params = new URLSearchParams(location.search);
+const NB = ' ';
+const RM = prefersReduced();
+const FIGE = params.get('fige') === '1';
+const RAL7016 = TOKENS.ral.find((r) => r.code === '7016');
+const ENCRE = { fond: P['creme-50'], traitFond: P['creme-50'], trait0: P['taupe-500'], trait1: P.encre };
+const ICON_REJOUER = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.3-5.6"/><path d="M4 4v4.4h4.4"/></svg>';
+const ICON_ARRET = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/></svg>';
+const ICON_PAUSE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6.5" y="5" width="3.5" height="14" rx="1"/><rect x="14" y="5" width="3.5" height="14" rx="1"/></svg>';
+const ICON_LIRE = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.2v13.6a.8.8 0 0 0 1.2.7l10.6-6.8a.8.8 0 0 0 0-1.4L9.2 4.5A.8.8 0 0 0 8 5.2z"/></svg>';
+const allerA = (sel) => { const el = document.querySelector(sel); if (el) el.scrollIntoView({ behavior: RM ? 'auto' : 'smooth', block: 'start' }); };
+
+// ---------- En-tête : repère de la section en cours, menu du téléphone ----------
+{
+  const nav = document.querySelector('.nav'), ind = nav.querySelector('.ind'), links = [...nav.querySelectorAll('.links a')];
+  const menuLinks = [...document.querySelectorAll('[data-menu] ul a')];
+  const ids = links.map((a) => a.getAttribute('href').slice(1)), secs = ids.map((id) => document.getElementById(id));
+  let cur = null, first = true;
+  const HEM = 11;
+  function place() {
+    const a = cur === null ? null : links[cur];
+    if (!a || !a.offsetParent) { ind.style.setProperty('--k', 0); ind.style.setProperty('--o', 0); return; }
+    const x = Math.round(a.offsetLeft + 14), w = Math.round(a.offsetWidth - 28);
+    if (first) { ind.classList.add('fixe'); requestAnimationFrame(() => requestAnimationFrame(() => ind.classList.remove('fixe'))); first = false; }
+    ind.style.setProperty('--x', `${x}px`); ind.style.setProperty('--k', ((w - HEM) / 100).toFixed(4)); ind.style.setProperty('--hx', `${x + w - HEM}px`); ind.style.setProperty('--o', 1);
+  }
+  function setCur(i) {
+    if (i === cur) return; cur = i;
+    links.forEach((a, k) => (k === i ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    menuLinks.forEach((a) => (a.getAttribute('href') === (i === null ? '' : `#${ids[i]}`) ? a.setAttribute('aria-current', 'true') : a.removeAttribute('aria-current')));
+    place();
+  }
+  const seen = new Map();
+  const io = observateur((es) => { es.forEach((e) => seen.set(e.target, e.isIntersecting)); const i = secs.findIndex((s) => seen.get(s)); setCur(i < 0 ? null : i); }, { rootMargin: '-45% 0px -50% 0px' });
+  secs.forEach((s) => s && io.observe(s));
+  new ResizeObserver(() => { ind.classList.add('fixe'); place(); requestAnimationFrame(() => ind.classList.remove('fixe')); }).observe(nav);
+
+  const btn = document.querySelector('[data-menu-btn]'), menu = document.querySelector('[data-menu]'), scrim = document.querySelector('[data-scrim]'), pbar = document.getElementById('pbar');
+  const outside = [...document.querySelectorAll('[data-hors-menu]')];
+  let open = false, closeT = 0;
+  const focusables = () => [...document.querySelector('.hdr').querySelectorAll('a[href], button')].filter((el) => el.offsetParent !== null || el === btn);
+  function ouvrir() {
+    if (open) return; open = true; clearTimeout(closeT);
+    menu.hidden = false; scrim.hidden = false;
+    btn.setAttribute('aria-expanded', 'true'); btn.setAttribute('aria-label', 'Fermer le menu');
+    outside.forEach((el) => { el.inert = true; }); pbar.removeAttribute('data-on');
+    document.documentElement.classList.add('menu-ouvert');
+    requestAnimationFrame(() => requestAnimationFrame(() => { menu.setAttribute('data-open', ''); scrim.setAttribute('data-open', ''); }));
+    menu.querySelector('a').focus({ preventScroll: true });
+  }
+  function fermer(rendre = true) {
+    if (!open) return; open = false;
+    menu.removeAttribute('data-open'); scrim.removeAttribute('data-open');
+    btn.setAttribute('aria-expanded', 'false'); btn.setAttribute('aria-label', 'Ouvrir le menu');
+    outside.forEach((el) => { el.inert = false; });
+    document.documentElement.classList.remove('menu-ouvert');
+    const done = () => { if (!open) { menu.hidden = true; scrim.hidden = true; } };
+    if (RM) done(); else closeT = setTimeout(done, MOTION.presse.approche.ms + 40);
+    if (rendre) btn.focus({ preventScroll: true });
+  }
+  btn.addEventListener('click', () => (open ? fermer() : ouvrir()));
+  scrim.addEventListener('click', () => fermer());
+  menu.addEventListener('click', (e) => { if (e.target.closest('a')) fermer(false); });
+  document.addEventListener('keydown', (e) => {
+    if (!open) return;
+    if (e.key === 'Escape') { e.preventDefault(); fermer(); return; }
+    if (e.key === 'Tab') { const f = focusables(), i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
+  });
+  matchMedia('(min-width: 761px)').addEventListener('change', (m) => { if (m.matches) fermer(false); });
+}
+
+// ---------- Prix en ligne : l'outil (monté tôt : le premier écran lui passe les fichiers) ----------
+const pbar = document.getElementById('pbar'), pbPu = document.getElementById('pbar-pu'), pbQ = document.getElementById('pbar-q');
+let inSec = false, priceSeen = false;
+function upd() { const on = inSec && !priceSeen && !('none' in pbar.dataset) && !document.documentElement.classList.contains('menu-ouvert'); if (on) pbar.dataset.on = ''; else delete pbar.dataset.on; }
+const outil = mountOutil(document.getElementById('outil'), {
+  onPrix(p) { if (!p) { pbar.dataset.none = ''; upd(); return; } delete pbar.dataset.none; pbPu.textContent = `${p.pu} HT`; pbQ.textContent = `la pièce, pour ${p.qte.toLocaleString('fr-FR').replace(/[   ]/g, NB)}${NB}pièce${p.qte > 1 ? 's' : ''}`; upd(); },
+});
+window.__outil = outil;
+if (params.has('piece')) outil.choisir(+params.get('piece'));
+observateur((es) => { inSec = es[0].isIntersecting; upd(); }, { rootMargin: '-30% 0px -30% 0px' }).observe(document.querySelector('.bench'));
+observateur((es) => { priceSeen = es[0].isIntersecting; upd(); }).observe(document.querySelector('.quote'));
+// un fichier venu d'ailleurs (premier écran, dépôt sur la page) : l'outil le lit, la page descend jusqu'à lui
+const versOutil = (f) => { outil.lire(f); allerA('#prix'); document.dispatchEvent(new CustomEvent('ou-fichier')); };
+
+// ---------- Premier écran : la jardinière sur son bon ----------
+{
+  const piece = jardiniere(), QTE = 4;
+  const c = chiffrer(analyse(piece), { matiere: 'acier', ep: piece.t, qte: QTE, finition: 'ral', ral: '7016' });
+  const ht = Math.round(c.unit * 100) / 100;
+  document.querySelector('[data-bon-prix]').innerHTML = `${eur(ht)}${NB}HT<small>soit ${eur(ht * 1.2)}${NB}TTC</small>`;
+  // la date : la borne haute du délai, en jours ouvrés depuis aujourd'hui (plan reçu après 11 h : le jour ouvré suivant)
+  document.querySelector('[data-bon-date]').textContent = fmtDate(dateDispo(c.delai[1], new Date()));
+  const host = document.querySelector('[data-bon-vue]'), btn = document.querySelector('[data-bon-rejouer]');
+  const etat = (on) => { btn.innerHTML = on ? ICON_ARRET : ICON_REJOUER; btn.setAttribute('aria-label', on ? 'Arrêter le pliage' : 'Rejouer le pliage'); };
+  const bon = mountDeveloppe(host, piece, { couleurs: ENCRE, teinte: RAL7016.value, oriente: true, autoplay: !FIGE && !params.has('t'), cotes: true,
+    onFrame: ({ phase }) => { if (phase === 'fin' && btn.dataset.on) { delete btn.dataset.on; etat(false); } } });
+  window.__bon = bon;
+  if (params.has('t')) bon.seek(+params.get('t')); else if (FIGE) bon.seek(bon.T.end);
+  if (bon.playing) { btn.dataset.on = '1'; etat(true); } else etat(false);
+  if (RM) btn.hidden = true;
+  btn.addEventListener('click', () => { if (bon.playing) { bon.stop(); delete btn.dataset.on; etat(false); } else { bon.play(); btn.dataset.on = '1'; etat(bon.playing); } });
+  document.querySelector('[data-bon-fichier]').addEventListener('change', (e) => { const f = e.target.files[0]; if (f) versOutil(f); e.target.value = ''; });
+}
+
+// ---------- Le dépôt sur toute la page : un fichier lâché n'importe où arrive dans l'outil ----------
+{
+  const voile = document.querySelector('[data-depose]');
+  let n = 0;
+  const fichiers = (e) => e.dataTransfer && [...e.dataTransfer.types].includes('Files');
+  const local = (e) => e.target.closest && e.target.closest('[data-drop], [data-filebox]'); // l'outil et le contact gardent leur propre dépôt
+  addEventListener('dragenter', (e) => { if (!fichiers(e) || local(e)) return; n++; voile.hidden = false; });
+  addEventListener('dragleave', (e) => { if (!fichiers(e)) return; n = Math.max(0, n - 1); if (!n || !e.relatedTarget) { n = 0; voile.hidden = true; } });
+  addEventListener('dragover', (e) => { if (!fichiers(e) || local(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+  addEventListener('drop', (e) => { n = 0; voile.hidden = true; if (!fichiers(e) || local(e)) return; e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) versOutil(f); });
+}
+
+// ---------- Le film des quatre postes ----------
+{
+  const fig = document.querySelector('.film'), scene = fig.querySelector('[data-film]'), val = fig.querySelector('[data-valeurs]');
+  const chap = fig.querySelector('[data-chap]'), btns = [...chap.querySelectorAll('button')], ind = chap.querySelector('.chap-ind'), pauseBtn = fig.querySelector('[data-pause]');
+  const HEM = 11;
+  const marquer = (id) => {
+    const b = btns.find((x) => x.dataset.ch === id) || btns[0];
+    btns.forEach((x) => (x === b ? x.setAttribute('aria-current', 'step') : x.removeAttribute('aria-current')));
+    const x = Math.round(b.offsetLeft + 12), w = Math.round(b.offsetWidth - 24);
+    ind.style.setProperty('--x', `${x}px`); ind.style.setProperty('--k', ((w - HEM) / 100).toFixed(4)); ind.style.setProperty('--hx', `${w - HEM}px`);
+  };
+  let film = null;
+  const etroit = matchMedia('(max-width: 480px)'); // téléphone : la phrase courte de la ligne de valeurs
+  // la ligne de valeurs : quand la phrase change, l'ancienne s'efface et la nouvelle arrive (geste micro) ; les chiffres qui
+  // défilent dans une même phrase s'écrivent sans fondu (sinon la ligne clignoterait à chaque dixième)
+  const gabarit = (t) => t.replace(/[\d,.\u00a0\s°]+/g, '#');
+  let valGab = null, valAnim = null, valSuite = '';
+  const ecrire = (txt, court) => {
+    const t = court && etroit.matches ? court : txt, g = gabarit(t);
+    const arret = !film || !film.playing; // à l'arrêt (pause, choix d'un poste, image fixe) : la phrase s'écrit tout de suite
+    if (RM || arret || valGab === null || g === valGab || !val.animate) { valGab = g; valSuite = t; if (valAnim && arret) { valAnim.cancel(); valAnim = null; } if (!valAnim) val.textContent = t; return; }
+    valGab = g; valSuite = t;
+    if (valAnim) return; // un fondu est en cours : il écrira la dernière phrase reçue
+    valAnim = val.animate([{ opacity: 1 }, { opacity: 0 }], { duration: MOTION.micro.ms / 2, easing: 'linear', fill: 'forwards' });
+    valAnim.onfinish = () => {
+      val.textContent = valSuite;
+      const a = val.animate([{ opacity: 0 }, { opacity: 1 }], { duration: MOTION.micro.ms, easing: 'linear' });
+      valAnim.cancel(); valAnim = a; a.onfinish = () => { valAnim = null; val.textContent = valSuite; };
+    };
+  };
+  const peindrePause = () => { const on = film && film.playing; pauseBtn.innerHTML = on ? ICON_PAUSE : ICON_LIRE; pauseBtn.setAttribute('aria-label', on ? 'Mettre le film en pause' : 'Reprendre le film'); };
+  const monter = () => {
+    if (film) return;
+    film = mountFilm(scene, { couleurs: ENCRE, teinte: RAL7016.value, autoplay: !FIGE, onValeurs: ecrire, onChapitre: marquer });
+    window.__film = film; peindrePause();
+    if (FIGE) film.seek(film.KEYS.decoupe);
+  };
+  // montage à l'approche (un écran avant), pas au chargement : la page s'affiche sans attendre le film
+  const io = observateur((es) => { if (es.some((e) => e.isIntersecting)) { io.disconnect(); monter(); } }, { rootMargin: '100% 0px' });
+  io.observe(scene);
+  if (FIGE || params.has('film')) monter();
+  pauseBtn.addEventListener('click', () => { monter(); film.playing ? film.pause() : film.play(); peindrePause(); });
+  btns.forEach((b) => b.addEventListener('click', () => { monter(); film.chapitre(b.dataset.ch); marquer(b.dataset.ch); }));
+  if (RM) { pauseBtn.hidden = true; fig.querySelector('[data-reduit]').hidden = false; }
+  new ResizeObserver(() => marquer((btns.find((x) => x.getAttribute('aria-current')) || btns[0]).dataset.ch)).observe(chap);
+  peindrePause();
+}
+
+// ---------- Contact : le développé coté de la jardinière, à l'échelle de son cadre (cotes à 15 px), traits de 1 et 2 px ----------
+{
+  const host = document.getElementById('plan-cote'), p = jardiniere();
+  let lastW = 0;
+  const draw = () => {
+    const W = Math.round(host.clientWidth); if (!W || W === lastW) return; lastW = W;
+    const make = (fs) => flatSVG(p, { ink: 'currentColor', font: "'Mona Sans', sans-serif", fs, thin: 1, thick: 2, pad: Math.max(26, fs * 2.6), px: true, axe: '14 3 2 3', bendLabels: false });
+    let f = make(17); for (let k = 0; k < 6; k++) f = make(15.8 / (W / f.w));
+    host.innerHTML = `<svg viewBox="0 0 ${f.w} ${f.h}" preserveAspectRatio="xMidYMid meet">${f.svg}</svg>`;
+  };
+  new ResizeObserver(draw).observe(host);
+}
+
+// ---------- Contact : le formulaire (démonstration : rien n'est envoyé) ----------
+{
+  const form = document.getElementById('contact-form'), file = document.getElementById('ct-plan'), box = form.querySelector('[data-filebox]'), fname = form.querySelector('[data-fname]');
+  const ferr = document.getElementById('ct-plan-err'), ct = document.getElementById('ct'), cerr = document.getElementById('ct-err'), send = form.querySelector('[data-send]'), ok = document.getElementById('ct-ok');
+  const EXT = ['dxf', 'dwg', 'step', 'stp', 'pdf', 'jpg', 'jpeg', 'png', 'heic'], MAX = 20 * 1024 * 1024;
+  const erreur = (el, input, txt) => { el.querySelector('span').textContent = txt; el.hidden = !txt; if (input) input.setAttribute('aria-invalid', String(!!txt)); };
+  const deTool = () => (!file.files[0] && outil.fichier ? outil.fichier : null);
+  const majNom = () => { const f = file.files[0] || deTool(); fname.textContent = f ? (file.files[0] ? f.name : `${f.name}, déposé plus haut`) : 'Aucun fichier choisi'; };
+  file.addEventListener('change', () => { majNom(); verifFichier(); });
+  document.querySelector('[data-file]').addEventListener('change', () => requestAnimationFrame(majNom));
+  document.addEventListener('ou-fichier', () => requestAnimationFrame(majNom));
+  function verifFichier() {
+    const f = file.files[0]; box.removeAttribute('data-err');
+    if (!f) { erreur(ferr, null, ''); return true; }
+    const ext = (f.name.split('.').pop() || '').toLowerCase();
+    const txt = !EXT.includes(ext) ? 'Nous ne lisons pas ce type de fichier. Envoyez un DXF, un DWG, un STEP, un PDF ou une photo.' : f.size > MAX ? `${f.name} dépasse 20${NB}Mo. Envoyez-le compressé, ou appelez-nous.` : '';
+    erreur(ferr, null, txt); if (txt) box.setAttribute('data-err', ''); return !txt;
+  }
+  ct.addEventListener('input', () => { if (ct.getAttribute('aria-invalid') === 'true') verifContact(); });
+  function verifContact() {
+    const v = ct.value.trim(), bon = /@.+\./.test(v) || v.replace(/\D/g, '').length >= 10;
+    erreur(cerr, ct, bon ? '' : v ? 'Ce téléphone ou cet e-mail semble incomplet. Vérifiez-le.' : 'Indiquez un téléphone ou un e-mail pour que nous puissions vous répondre.');
+    return bon;
+  }
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (send.getAttribute('aria-busy') === 'true') return;
+    const okF = verifFichier(), okC = verifContact();
+    if (!okF) { file.focus(); return; }
+    if (!okC) { ct.focus(); return; }
+    const lab = send.innerHTML; send.setAttribute('aria-busy', 'true'); send.disabled = true; send.textContent = 'Envoi…';
+    await new Promise((r) => setTimeout(r, MOTION.presse.appui.ms));
+    send.removeAttribute('aria-busy'); send.disabled = false; send.innerHTML = lab;
+    const f = file.files[0] || deTool();
+    ok.querySelector('p').textContent = `${f ? `${f.name} bien reçu. ` : 'Demande bien reçue. '}L’atelier vous répondrait dans la journée. Ce site est une démonstration${NB}: rien n’a été envoyé.`;
+    form.hidden = true; ok.hidden = false; ok.focus();
+  });
+}
+
+// ---------- Pied de page : la plaque d'acier brossé ; le nom y est déjà tracé ; à l'entrée, le laser le découpe d'un seul geste (le L et son ourlet en dernier), un reflet traverse le nom, puis la lumière suit le pointeur ----------
+{
+  const fige = params.get('fige') === '1', num = (k, d) => (params.has(k) ? +params.get(k) : d);
+  const light = params.has('x') || params.has('y') || fige ? { x: num('x', 0.3), y: num('y', 0.68) } : null;
+  window.__plaque = mountPlaque(document.querySelector('.foot'), { t: params.has('t') ? +params.get('t') : null, light, still: fige });
+}
+</script>
+</body></html>

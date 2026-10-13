@@ -1,0 +1,15 @@
+/* Auvent · la carte vivante : couches et stations. Couleurs : rôles --av-map-* et --av-accent des tokens. */
+.av-ciel { position: relative; overflow: hidden; background: var(--av-map-sea); contain: strict; }
+.av-ciel > canvas { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; display: block; }
+.av-ciel-stations { position: absolute; inset: 0; pointer-events: none; }
+.av-station { position: absolute; left: 0; top: 0; width: 0; height: 0; will-change: transform; }
+.av-station svg { position: absolute; left: -40px; top: -40px; width: 80px; height: 80px; max-width: none; overflow: visible; }
+.av-station-rond { fill: var(--av-map-land); stroke: var(--av-map-ink); stroke-width: 1.25; }
+.av-station-nom { display: none; }
+.av-ciel.noms .av-station-nom { display: block; }
+.av-station-pluie path { stroke: var(--av-map-ink); stroke-width: 1.1; fill: none; }
+.av-station-barbule path { stroke: var(--av-map-ink); stroke-width: 1.15; fill: var(--av-map-ink); stroke-linecap: round; stroke-linejoin: round; }
+.av-station-nom { position: absolute; left: 10px; top: 4px; font: 500 15px/1 var(--av-font); font-stretch: var(--av-width-donnees); color: var(--av-text); white-space: nowrap;
+  text-shadow: 0 0 3px var(--av-map-land), 0 0 3px var(--av-map-land), 0 0 2px var(--av-map-land); }
+.av-station.est-choisie .av-station-rond { stroke: var(--av-accent); stroke-width: 2.4; }
+.av-station.est-choisie .av-station-nom { font-weight: 640; color: var(--av-text); }

@@ -1,0 +1,148 @@
+/* Ourlet · composants de base (v0.1). Uniquement les tokens --ou-* de tokens/tokens.css, et les rôles --ou-color-* dans les composants.
+   Règles de la marque : angles vifs (la tôle), aplats sans dégradé, un seul bouton principal par écran, texte jamais sous 15 px,
+   pas de micro-libellés en capitales, pas de pastilles devant les textes. */
+
+*, *::before, *::after { box-sizing: border-box; }
+.ou-root { font-family: var(--ou-font-sans); font-size: var(--ou-text-body); line-height: var(--ou-leading-body); color: var(--ou-color-text); background: var(--ou-color-bg); font-stretch: 100%; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.ou-root ::selection { background: var(--ou-color-selection-bg); color: var(--ou-color-selection-text); }
+.ou-root :focus-visible { outline: var(--ou-focus-width) solid var(--ou-color-focus); outline-offset: var(--ou-focus-offset); }
+.ou-wrap { max-width: var(--ou-container); margin-inline: auto; padding-inline: var(--ou-gutter); }
+.ou-theme-atelier, .ou-theme-anthracite { color: var(--ou-color-text); }
+
+/* Typographie */
+.ou-display { font-size: var(--ou-text-display); line-height: var(--ou-leading-display); letter-spacing: var(--ou-tracking-display); font-weight: var(--ou-weight-display); font-stretch: var(--ou-stretch-display); text-wrap: balance; margin: 0; }
+.ou-h1 { font-size: var(--ou-text-title-1); line-height: var(--ou-leading-title-1); letter-spacing: var(--ou-tracking-title-1); font-weight: var(--ou-weight-title-1); font-stretch: var(--ou-stretch-title-1); text-wrap: balance; margin: 0; }
+.ou-h2 { font-size: var(--ou-text-title-2); line-height: var(--ou-leading-title-2); letter-spacing: var(--ou-tracking-title-2); font-weight: var(--ou-weight-title-2); font-stretch: var(--ou-stretch-title-2); text-wrap: balance; margin: 0; }
+.ou-h3 { font-size: var(--ou-text-title-3); line-height: var(--ou-leading-title-3); font-weight: var(--ou-weight-title-3); margin: 0; }
+.ou-lead { font-size: var(--ou-text-lead); line-height: var(--ou-leading-lead); letter-spacing: var(--ou-tracking-lead); max-width: 40ch; margin: 0; }
+.ou-small { font-size: var(--ou-text-small); line-height: var(--ou-leading-small); }
+.ou-muted { color: var(--ou-color-text-muted); }
+.ou-code { font-family: var(--ou-font-code); font-size: var(--ou-text-code); letter-spacing: var(--ou-tracking-code); font-weight: var(--ou-weight-code); font-variant-numeric: tabular-nums; }
+
+/* Boutons : rectangle net. Au survol, le bouton se peint en RAL 6019 de gauche à droite, comme sous le pistolet à poudre. */
+.ou-btn { --_bg: var(--ou-color-action); --_fg: var(--ou-color-action-text); --_paint: var(--ou-color-action-hover); --_paint-fg: var(--ou-color-action-hover-text);
+  position: relative; isolation: isolate; display: inline-flex; align-items: center; gap: var(--ou-space-3); min-height: var(--ou-control-height);
+  padding: 0 var(--ou-space-5); background: var(--_bg); color: var(--_fg); border: 0; border-radius: var(--ou-radius-none);
+  font: inherit; font-weight: 620; font-stretch: 104%; letter-spacing: -0.005em; text-decoration: none; white-space: nowrap; cursor: pointer; overflow: hidden;
+  transition: color var(--ou-duration-base) var(--ou-ease-presse); }
+.ou-btn::before { content: ""; position: absolute; inset: 0; z-index: -1; background: var(--_paint); transform: scaleX(0); transform-origin: left center; transition: transform var(--ou-duration-base) var(--ou-ease-presse); }
+@media (hover: hover) { .ou-btn:hover { color: var(--_paint-fg); } .ou-btn:hover::before { transform: scaleX(1); } }
+.ou-btn:focus-visible { color: var(--_paint-fg); }
+.ou-btn:focus-visible::before { transform: scaleX(1); }
+.ou-btn:active::before { transition-duration: var(--ou-duration-instant); }
+.ou-btn--line { --_bg: transparent; --_fg: var(--ou-color-text); box-shadow: inset 0 0 0 var(--ou-border-strong) var(--ou-color-text); }
+.ou-btn--line::before { inset: var(--ou-border-strong); }
+.ou-btn svg { width: 1.1em; height: 1.1em; flex: none; }
+.ou-link { color: inherit; text-decoration: underline; text-decoration-thickness: 1.5px; text-underline-offset: 0.22em; font-weight: 560; }
+@media (hover: hover) { .ou-link:hover { text-decoration-thickness: 3px; } }
+[hidden] { display: none !important; }
+
+/* Bouton icône (rejouer, fermer) */
+.ou-icon-btn { display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 0; background: var(--ou-color-surface); color: var(--ou-color-text); cursor: pointer; border-radius: var(--ou-radius-round); box-shadow: inset 0 0 0 1.5px var(--ou-color-border-strong); }
+.ou-icon-btn svg { width: 1.2rem; height: 1.2rem; }
+
+/* Le filet ourlé : une ligne qui finit par un ourlet (bout arrondi, fendu). Hauteur par --_h. */
+.ou-filet { --_h: 10px; display: block; height: var(--_h); background: currentColor; border-radius: 0 calc(var(--_h) / 2) calc(var(--_h) / 2) 0; position: relative; }
+.ou-filet::after { content: ""; position: absolute; right: calc(var(--_h) / 2); top: calc(50% - var(--_h) * 0.08); height: calc(var(--_h) * 0.16); width: calc(var(--_h) * 1.7); background: var(--_bg, var(--ou-color-bg)); border-radius: 0 999px 999px 0; }
+
+/* En-tête du site */
+.ou-head { display: flex; align-items: center; gap: var(--ou-space-6); min-height: 4.75rem; }
+.ou-head .ou-logo { width: 9.5rem; flex: none; color: var(--ou-color-text); display: block; }
+.ou-head .ou-logo svg { display: block; width: 100%; height: auto; }
+.ou-head nav { margin-left: auto; }
+.ou-head nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--ou-space-5); }
+.ou-head nav a { color: inherit; text-decoration: none; font-weight: 520; }
+@media (hover: hover) { .ou-head nav a:hover { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.3em; } }
+.ou-head .ou-tel { font-family: var(--ou-font-code); font-variant-numeric: tabular-nums; white-space: nowrap; color: inherit; text-decoration: none; }
+
+/* ===================== Formulaires ===================== */
+.ou-field { display: grid; gap: var(--ou-space-2); min-width: 0; }
+.ou-label { font-weight: 600; font-size: var(--ou-text-body); }
+.ou-help { font-size: var(--ou-text-small); color: var(--ou-color-text-muted); margin: 0; }
+.ou-input, .ou-select { width: 100%; min-height: var(--ou-control-height); padding: 0 var(--ou-space-4); font: inherit; color: var(--ou-color-text); background: var(--ou-color-surface);
+  border: 1.5px solid var(--ou-color-border-strong); border-radius: var(--ou-radius-xs); }
+.ou-input:hover, .ou-select:hover { border-color: var(--ou-color-text); }
+.ou-input:focus-visible, .ou-select:focus-visible { outline: var(--ou-focus-width) solid var(--ou-color-focus); outline-offset: 1px; border-color: var(--ou-color-text); }
+.ou-input[aria-invalid="true"] { border-color: var(--ou-color-danger-text); border-width: 2px; }
+.ou-select { appearance: none; background-image: none; padding-right: var(--ou-space-7); }
+.ou-select-wrap { position: relative; }
+.ou-select-wrap::after { content: ""; position: absolute; right: var(--ou-space-4); top: 50%; width: 0.6rem; height: 0.6rem; border-right: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: translateY(-70%) rotate(45deg); pointer-events: none; }
+.ou-unit { position: relative; }
+.ou-unit .ou-input { padding-right: 4.5rem; }
+.ou-unit span { position: absolute; right: var(--ou-space-4); top: 50%; transform: translateY(-50%); color: var(--ou-color-text-muted); pointer-events: none; }
+.ou-error { display: flex; gap: var(--ou-space-2); align-items: flex-start; color: var(--ou-color-danger-text); font-size: var(--ou-text-small); font-weight: 560; margin: 0; }
+.ou-error svg, .ou-status svg { width: 1.15rem; height: 1.15rem; flex: none; margin-top: 0.15em; }
+
+/* Choix en tuiles (matière) : la tuile sélectionnée prend un contour fort et une coche */
+.ou-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: var(--ou-space-3); border: 0; padding: 0; margin: 0; min-width: 0; }
+.ou-tile { position: relative; display: grid; grid-template-columns: 2.75rem minmax(0, 1fr); gap: var(--ou-space-3); align-items: center; padding: var(--ou-space-3); background: var(--ou-color-surface); box-shadow: inset 0 0 0 1.5px var(--ou-color-border-strong); cursor: pointer; }
+.ou-tile input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.ou-tile i { width: 2.75rem; height: 2.75rem; display: block; box-shadow: inset 0 0 0 1px rgb(0 0 0 / .14); }
+.ou-tile strong { display: block; font-weight: 620; }
+.ou-tile small { display: block; font-size: var(--ou-text-small); color: var(--ou-color-text-muted); }
+.ou-tile:has(input:checked) { box-shadow: inset 0 0 0 2.5px var(--ou-color-text); }
+.ou-tile:has(input:checked)::after { content: ""; position: absolute; top: var(--ou-space-2); right: var(--ou-space-3); width: 0.45rem; height: 0.8rem; border-right: 2.5px solid var(--ou-color-text); border-bottom: 2.5px solid var(--ou-color-text); transform: rotate(45deg); }
+.ou-tile:has(input:focus-visible) { outline: var(--ou-focus-width) solid var(--ou-color-focus); outline-offset: var(--ou-focus-offset); }
+@media (hover: hover) { .ou-tile:hover { box-shadow: inset 0 0 0 2px var(--ou-color-text); } }
+
+/* Valeurs en segments (épaisseur) */
+.ou-seg { display: flex; flex-wrap: wrap; gap: 0; border: 0; padding: 0 0 0 1px; margin: 0; min-width: 0; }
+.ou-seg label { position: relative; }
+.ou-seg input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.ou-seg span { display: grid; place-items: center; min-width: 3.25rem; min-height: 2.75rem; padding: 0 var(--ou-space-3); box-shadow: inset 0 0 0 1px var(--ou-color-border-strong); margin-left: -1px; font-weight: 520; cursor: pointer; background: var(--ou-color-surface); }
+.ou-seg input:checked + span { background: var(--ou-color-action); color: var(--ou-color-action-text); box-shadow: none; position: relative; z-index: 1; }
+.ou-seg input:focus-visible + span { outline: var(--ou-focus-width) solid var(--ou-color-focus); outline-offset: 2px; position: relative; z-index: 2; }
+.ou-seg input:disabled + span { color: var(--ou-color-text-muted); background: var(--ou-color-surface-raised); text-decoration: line-through; cursor: not-allowed; }
+
+/* Dépôt de plan : un trait de coupe en pointillé, qui devient plein quand un fichier survole */
+.ou-drop { position: relative; display: grid; justify-items: center; text-align: center; gap: var(--ou-space-3); padding: var(--ou-space-7) var(--ou-space-5); background: var(--ou-color-surface); outline: 2px dashed var(--ou-color-graphic-soft); outline-offset: -2px; transition: background-color var(--ou-duration-fast) var(--ou-ease-standard); }
+.ou-drop[data-over] { outline-style: solid; outline-color: var(--ou-color-text); background: var(--ou-color-brand); color: var(--ou-color-on-brand); }
+.ou-drop svg.ico { width: 3rem; height: 3rem; }
+.ou-drop strong { font-size: var(--ou-text-title-3); font-weight: 650; }
+.ou-drop p { margin: 0; color: var(--ou-color-text-muted); max-width: 36ch; }
+.ou-drop[data-over] p { color: inherit; }
+
+/* Ligne d'état : une icône dessinée et un texte, jamais une pastille */
+.ou-status { display: flex; gap: var(--ou-space-2); align-items: flex-start; margin: 0; }
+.ou-status.ok { color: var(--ou-color-success-text); }
+.ou-status.warn { color: var(--ou-color-warning-text); }
+.ou-status.err { color: var(--ou-color-danger-text); }
+.ou-status span { color: var(--ou-color-text); }
+
+/* Bloc de prix : la fourchette en grand, ce qu'elle comprend, qui la confirme */
+.ou-price { display: grid; gap: var(--ou-space-3); padding: var(--ou-space-6); background: var(--ou-color-accent); color: var(--ou-color-on-accent); container-type: inline-size; }
+.ou-price .k { font-weight: 620; }
+.ou-price .v { font-size: clamp(2.5rem, 19cqi, var(--ou-text-numeral-xl)); white-space: nowrap; line-height: var(--ou-leading-numeral-xl); letter-spacing: var(--ou-tracking-numeral-xl); font-weight: var(--ou-weight-numeral-xl); font-stretch: var(--ou-stretch-numeral-xl); font-variant-numeric: tabular-nums; }
+.ou-price .v small { display: block; white-space: normal; font-size: var(--ou-text-body); line-height: 1.4; font-weight: 600; letter-spacing: 0; font-stretch: 100%; margin-top: var(--ou-space-2); }
+.ou-price p { margin: 0; }
+
+/* Tableau de données */
+.ou-table { width: 100%; border-collapse: collapse; }
+.ou-table th, .ou-table td { text-align: left; padding: var(--ou-space-3) var(--ou-space-4) var(--ou-space-3) 0; border-bottom: 1px solid var(--ou-color-border); vertical-align: top; }
+.ou-table thead th { font-weight: 650; border-bottom: 2px solid var(--ou-color-text); }
+.ou-table .num { text-align: right; padding-right: 0; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.ou-table .num + th, .ou-table .num + td { padding-left: var(--ou-space-6); }
+.ou-table tfoot td { font-weight: 650; border-bottom: 0; }
+
+/* Onglets */
+.ou-tabs { display: flex; flex-wrap: wrap; gap: 0 var(--ou-space-5); border-bottom: 1px solid var(--ou-color-border-strong); }
+.ou-tabs button { all: unset; cursor: pointer; padding: var(--ou-space-3) 0; font-weight: 560; position: relative; }
+.ou-tabs button[aria-selected="true"] { font-weight: 680; }
+.ou-tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 4px; background: var(--ou-color-text); }
+.ou-tabs button:focus-visible { outline: var(--ou-focus-width) solid var(--ou-color-focus); outline-offset: 2px; }
+
+/* Avis (après un envoi) */
+.ou-notice { display: flex; gap: var(--ou-space-3); align-items: flex-start; padding: var(--ou-space-4) var(--ou-space-5); background: var(--ou-palette-anthra-900); color: var(--ou-palette-tole-100); }
+.ou-notice svg { width: 1.3rem; height: 1.3rem; flex: none; color: var(--ou-palette-vert-300); margin-top: 0.1em; }
+.ou-notice p { margin: 0; }
+
+/* Fiche (liste de caractéristiques) */
+.ou-spec { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--ou-space-2) var(--ou-space-5); margin: 0; }
+.ou-spec dt { color: var(--ou-color-text-muted); }
+.ou-spec dd { margin: 0; font-weight: 560; }
+
+/* Pied de page */
+.ou-foot { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: var(--ou-space-6); padding-block: var(--ou-space-8); }
+.ou-foot p { margin: 0; }
+
+@media (prefers-reduced-motion: reduce) { .ou-btn, .ou-btn::before, .ou-drop { transition: none; } }

@@ -1,0 +1,411 @@
+/* HYPHA — le site, v12 (chantier B1, 2026-10-11). Marque fictive, un Original de Topiary.
+   La page suit la vie de la paire, et change de fond à chaque temps :
+   1. la chambre (noir) : neuf jours de pousse que le défilement natif fait passer (suite agrandie en 2K), sous une règle vivante
+      des neuf jours ; à l'ouverture, un aperçu de la pousse ; de la poussière en suspension, un reflet final ;
+   2. le drop (aplat de la souche) : une affiche. Le titre à l'échelle de l'affiche, la paire tirée en deux encres par-dessus, une
+      loupe pour la regarder de près, et le bloc d'achat traité comme une étiquette de boîte ;
+   3. chaque paire (noir) : son empreinte de spores sur papier noir, sa marque au centre, et la règle des 500 paires du drop ;
+   4. la vôtre (papier, plein jour) : ce qui suit la réservation, la planche contact des neuf matins, six questions ;
+   5. la rendre (noir) : la coupe du sol en pleine largeur, que le défilement fait passer en 90 jours, pendant de la chambre,
+      avec sa règle des 90 jours ; à la fin, une touffe de pleurotes faite de fils ;
+   6. le réseau (noir) : le mot-symbole et le réseau vivant.
+   Tokens d'HYPHA seulement (../tokens/tokens.css), couleurs par rôles. Les composants de base viennent de ../components/hypha.css
+   (dont la règle vivante .hy-tl et le compteur à rouleaux .hy-odo, script ../components/rule.js) ;
+   ceux d'ici (.hs-) sont propres au site. Rien sous 15 px. Défilement natif, jamais détourné. */
+
+@font-face { font-family: 'Bodoni Moda'; font-style: normal; font-weight: 400 900; font-display: swap; src: url('fonts/bodoni-moda-latin-opsz-normal.woff2') format('woff2-variations'); }
+@font-face { font-family: 'Bodoni Moda'; font-style: italic; font-weight: 400 900; font-display: swap; src: url('fonts/bodoni-moda-latin-opsz-italic.woff2') format('woff2-variations'); }
+@font-face { font-family: 'Archivo'; font-style: normal; font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; src: url('fonts/archivo-latin-wdth-normal.woff2') format('woff2-variations'); }
+
+*, *::before, *::after { box-sizing: border-box; }
+html { --hs-head: 4rem; --hs-max: 92rem; background: var(--hy-color-bg); scroll-behavior: smooth; scroll-padding-top: var(--hs-head); -webkit-text-size-adjust: 100%; }
+html.is-calm { scroll-behavior: auto; }
+body { margin: 0; overflow-x: clip; }
+p, h1, h2, h3, ol, ul, dl, dd, figure, fieldset { margin: 0; }
+ol, ul { padding: 0; list-style: none; }
+a { color: inherit; }
+canvas, img { display: block; }
+button { font: inherit; color: inherit; }
+.hs-wrap { width: 100%; max-width: calc(var(--hs-max) + 2 * var(--hy-gutter)); margin-inline: auto; padding-inline: var(--hy-gutter); }
+.hs-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.hs-skip { position: absolute; left: 1rem; top: -5rem; z-index: 50; padding: 0.75rem 1rem; background: var(--hy-color-action); color: var(--hy-color-action-text); text-decoration: none; font-weight: 600; }
+.hs-skip:focus { top: 1rem; outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: var(--hy-focus-offset); }
+:where(a, button, summary, input):focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: var(--hy-focus-offset); }
+/* Les grands titres : une taille optique fixe. À la taille optique automatique, les déliés de Bodoni Moda tombent sous un quart de
+   pixel à ces corps et s'effacent sur un écran ordinaire. */
+.hs-scene .hy-display, .hs-ground .hy-display, .hs-sec :is(.hy-display, .hy-title-1) { font-variation-settings: 'opsz' 40; }
+/* Sur papier, le texte secondaire prend un neutre plus sombre que le rôle de la charte (6,70:1) : 9:1 et plus. À reporter dans
+   build-tokens.mjs avec la charte. */
+.hs-sec.hy-theme-daylight, .hs-label { --hy-color-text-muted: var(--hy-palette-myc-800); }
+.hs-sec { position: relative; background: var(--hy-color-bg); color: var(--hy-color-text); padding-block: var(--hy-section); }
+
+/* ---------- Composants du site ---------- */
+/* Le bouton : un bloc plein. Au survol, la souche le gagne depuis le point où on le touche, comme une colonie depuis son point
+   d'inoculation (--mx, --my : la position du pointeur, posée par le script ; le centre au clavier). */
+.hs-btn { position: relative; isolation: isolate; overflow: hidden; display: inline-flex; align-items: center; justify-content: center; gap: 0.85em;
+  min-height: 3.25rem; padding: 0 1.6rem; margin: 0; border: 0; border-radius: var(--hy-radius-none);
+  font-family: var(--hy-font-text); font-size: 1.0625rem; font-weight: 600; letter-spacing: 0.01em; line-height: 1.2; white-space: nowrap; text-decoration: none;
+  color: var(--hy-color-action-text); background: var(--hy-color-action); cursor: pointer; -webkit-tap-highlight-color: transparent;
+  transition: color var(--hy-duration-fast) var(--hy-ease-standard); }
+.hs-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--hy-color-action-hover); pointer-events: none;
+  clip-path: circle(0% at var(--mx, 50%) var(--my, 50%)); transition: clip-path var(--hy-duration-slow) var(--hy-ease-out); }
+@media (hover: hover) {
+  .hs-btn:not(:disabled):hover { color: var(--hy-color-action-hover-text); }
+  .hs-btn:not(:disabled):hover::before { clip-path: circle(150% at var(--mx, 50%) var(--my, 50%)); }
+}
+.hs-btn:not(:disabled):is(:focus-visible, :active) { color: var(--hy-color-action-hover-text); }
+.hs-btn:not(:disabled):is(:focus-visible, :active)::before { clip-path: circle(150% at var(--mx, 50%) var(--my, 50%)); }
+.hs-btn--compact { min-height: 2.75rem; padding-inline: 1.15rem; font-size: 1rem; }
+.hs-btn--wide { width: 100%; }
+/* Dans un bouton, une précision (le prix, le numéro) derrière un filet */
+.hs-btn > span { display: inline-flex; align-items: center; gap: 0.85em; font-stretch: 62%; font-weight: 800; font-size: 1.25em; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+.hs-btn > span::before { content: ''; width: 1px; height: 1.1em; background: currentColor; opacity: 0.45; }
+@media (forced-colors: active) { .hs-btn { border: 1px solid ButtonText; } }
+
+/* Le lien d'action : sous son libellé, le filet gras-maigre des Didones (un trait fort, un délié). Au survol, les deux traits
+   fusionnent, comme deux hyphes qui se rejoignent. */
+.hs-more { position: relative; display: inline-flex; align-items: center; min-height: 2.75rem; padding: 0.4rem 0 0.8rem; margin: 0; border: 0; background: none;
+  font-family: var(--hy-font-text); font-size: 1.0625rem; font-weight: 600; letter-spacing: 0.01em; line-height: 1.2; color: var(--hy-color-text); text-decoration: none; cursor: pointer; }
+.hs-more::before, .hs-more::after { content: ''; position: absolute; left: 0; right: 0; background: currentColor; }
+.hs-more::before { bottom: 0.3125rem; height: 2px; }
+.hs-more::after { bottom: 0; height: 1px; transition: transform var(--hy-duration-base) var(--hy-ease-out); }
+@media (hover: hover) { .hs-more:hover::after { transform: translateY(calc(-0.3125rem + 1px)); } }
+.hs-more:is(:focus-visible, :active)::after { transform: translateY(calc(-0.3125rem + 1px)); }
+
+/* Les règles graduées : un filet, ses graduations, la souche qui le remplit jusqu'à --p (de 0 à 1) */
+.hs-rule { --p: 0; position: relative; height: 0.75rem; }
+.hs-rule::before { content: ''; position: absolute; left: 0; right: 0; top: calc(50% - 0.5px); height: 1px; background: var(--hy-color-border-strong); }
+.hs-rule > b { position: absolute; left: 0; top: calc(50% - 1px); width: 100%; height: 2px; background: var(--hy-color-accent-graphic); transform-origin: 0 50%; transform: scaleX(var(--p)); }
+.hs-rule > i { position: absolute; top: 0; width: 1px; height: 100%; margin-left: -0.5px; background: var(--hy-color-border-strong); transition: background-color var(--hy-duration-base) var(--hy-ease-standard); }
+.hs-rule > i:is(:first-of-type, :last-of-type) { top: -0.1875rem; height: calc(100% + 0.375rem); }
+.hs-rule > i.is-past { background: var(--hy-color-accent-graphic); }
+@media (forced-colors: active) { .hs-rule { forced-color-adjust: none; } .hs-rule::before, .hs-rule > i { background: CanvasText; } .hs-rule > b, .hs-rule > i.is-past { background: Highlight; } }
+/* Une règle que l'on saisit : sa tête est une pointe de mycélium (une aiguille claire et, sur le filet, une perle de la souche).
+   Le curseur natif reste dessus, transparent : il porte le geste, le clavier, le focus et les annonces. Le filet, ses graduations
+   et la tête courent sur la même course que lui (--kw : sa largeur ; --h : la position de la tête, de 0 à 1). */
+.hs-range-wrap { --kw: 1.5rem; --h: 1; position: relative; height: 2.75rem; margin-inline: calc(var(--kw) / -2); }
+.hs-range { -webkit-appearance: none; appearance: none; position: relative; z-index: 1; display: block; width: 100%; height: 100%; margin: 0; background: none; cursor: ew-resize; }
+.hs-range::-webkit-slider-runnable-track { height: 100%; background: none; }
+.hs-range::-webkit-slider-thumb { -webkit-appearance: none; width: var(--kw); height: 2.75rem; border: 0; background: none; }
+.hs-range::-moz-range-track, .hs-range::-moz-range-progress { background: none; }
+.hs-range::-moz-range-thumb { width: var(--kw); height: 2.75rem; border: 0; border-radius: 0; background: none; }
+.hs-range-run { position: absolute; top: 0; bottom: 0; left: calc(var(--kw) / 2); right: calc(var(--kw) / 2); pointer-events: none; }
+.hs-range-run .hs-rule { position: absolute; left: 0; right: 0; top: calc(50% - 0.375rem); }
+.hs-range-head { position: absolute; top: 0; bottom: 0; left: calc(var(--h) * 100%); width: 0; }
+.hs-range-head::before { content: ''; position: absolute; left: -1px; top: calc(50% - 1.125rem); width: 2px; height: 2.25rem; border-radius: 1px; background: var(--hy-color-text); }
+.hs-range-head::after { content: ''; position: absolute; left: -0.375rem; top: calc(50% - 0.375rem); width: 0.75rem; height: 0.75rem; border-radius: 50%; background: var(--hy-color-accent-graphic);
+  box-shadow: 0 0 0 2px var(--hy-color-bg); transition: transform var(--hy-duration-fast) var(--hy-ease-out); }
+@media (hover: hover) { .hs-range:hover ~ .hs-range-run .hs-range-head::after { transform: scale(1.35); } }
+.hs-range:is(:focus-visible, :active) ~ .hs-range-run .hs-range-head::after { transform: scale(1.35); }
+@media (forced-colors: active) { .hs-range-run { forced-color-adjust: none; } .hs-range-head::before { background: CanvasText; } .hs-range-head::after { background: Highlight; box-shadow: none; } }
+
+/* ---------- La barre : elle prend le fond de la section qu'elle survole (classe de thème posée par le script) ---------- */
+.hs-head { position: sticky; top: 0; z-index: 30; height: var(--hs-head); background: var(--hy-color-bg); color: var(--hy-color-text);
+  transition: background-color var(--hy-duration-fast) var(--hy-ease-standard), color var(--hy-duration-fast) var(--hy-ease-standard); }
+.hs-head .hs-wrap { display: flex; align-items: center; gap: clamp(1rem, 2.4vw, 2.25rem); height: 100%; }
+.hs-brand { display: inline-flex; align-items: center; min-height: 2.75rem; color: inherit; text-decoration: none; }
+.hs-brand .hy-wordmark { font-size: 1.25rem; white-space: nowrap; }
+.hs-nav { display: flex; gap: clamp(1rem, 2.2vw, 2rem); margin-left: auto; }
+.hs-nav a { display: inline-flex; align-items: center; min-height: 2.75rem; color: inherit; text-decoration: none; white-space: nowrap;
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 0.55rem) / 0 1px no-repeat; transition: background-size var(--hy-duration-base) var(--hy-ease-out); }
+@media (hover: hover) { .hs-nav a:hover { background-size: 100% 1px; } }
+.hs-nav a[aria-current="true"] { background-size: 100% 1px; }
+.hs-left { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hs-left b { font-stretch: 62%; font-weight: 800; font-size: 1.2em; letter-spacing: 0.01em; }
+@media (max-width: 61.99rem) { .hs-nav { display: none; } .hs-left { margin-left: auto; } }
+@media (max-width: 23.99rem) { .hs-left { display: none; } .hs-head .hs-btn { margin-left: auto; } }
+
+/* Le relevé : le jour (compteur), puis ce qui se passe. Une phrase part vers le haut quand la suivante monte ; en remontant le
+   temps, l'inverse. Jamais deux phrases l'une sur l'autre. */
+.hs-cap { display: grid; justify-items: end; text-align: right; transition: opacity var(--hy-duration-base) var(--hy-ease-standard); }
+html:not(.js) .hs-cap, html:not(.js) .hs-cue { display: none; }
+.hs-cap.is-off { opacity: 0; }
+.hs-cap-day { margin-bottom: 0.2rem; font-stretch: 62%; font-weight: 800; font-size: var(--hy-text-numeral); line-height: 1.2; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; white-space: nowrap; color: var(--hy-color-accent-text); }
+.hs-cap-lines { display: grid; width: 100%; }
+.hs-cap-lines > p { grid-area: 1 / 1; align-self: end; font-size: var(--hy-text-lead); line-height: 1.42; opacity: 0; transform: translateY(0.7rem);
+  transition: opacity var(--hy-duration-fast) var(--hy-ease-standard), transform var(--hy-duration-base) var(--hy-ease-standard); }
+.hs-cap-lines > p.is-past { transform: translateY(-0.7rem); }
+.hs-cap-lines > p.is-on { opacity: 1; transform: none; transition: opacity var(--hy-duration-base) var(--hy-ease-out) 140ms, transform var(--hy-duration-slow) var(--hy-ease-out) 140ms; }
+
+/* ---------- 1. La chambre : tenue à l'écran pendant un peu plus de trois écrans de défilement, puis un écran où le drop monte
+   et la recouvre ----------
+   La paire est une suite de 150 images (agrandie en 2K puis mise au noir par tools/build-media.py ; un seul fichier par taille,
+   tools/build-packs.py) dessinée sur un canvas, fondue d'une image à la suivante. Elle reste noire quel que soit le thème. En
+   bas : à gauche ce que l'on vend et le titre ; à droite le relevé du jour (sur téléphone, sous la paire, comme un cartel) ;
+   dessous, la règle des neuf jours ; au centre, l'invitation à défiler, tant que la pousse n'est pas partie. */
+.hs-scene { --pin-h: calc(100svh - var(--hs-head)); position: relative; height: calc(320svh + 2 * var(--pin-h)); background: var(--hy-color-bg); color: var(--hy-color-text); }
+.hs-pin { position: sticky; top: var(--hs-head); height: var(--pin-h); overflow: hidden; display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto); grid-template-rows: minmax(0, 1fr) auto auto; grid-template-areas: "stage stage" "copy side" "rule rule";
+  column-gap: 2.5rem; padding: 1rem max(var(--hy-gutter), (100% - var(--hs-max)) / 2) 1.25rem; }
+.hs-set { position: absolute; z-index: 1; left: var(--set-x, 5%); top: var(--set-y, 8%); width: var(--set-w, 90%); height: var(--set-h, 56%); transform-origin: 50% 58%; }
+.hs-set :is(canvas, img) { position: absolute; max-width: none; pointer-events: none; }
+.hs-still.is-gone { visibility: hidden; }
+/* La poussière de la chambre, devant la paire, derrière le texte */
+.hs-dust { position: absolute; inset: 0; z-index: 1; width: 100%; height: 100%; pointer-events: none; }
+.is-calm .hs-dust { display: none; }
+/* Au neuvième jour, la paire est finie : un reflet la traverse, une fois, lentement. En incrustation et à faible dose : il fait
+   briller le duvet, et ne lève le noir de la chambre que de quelques niveaux, sans qu'on voie de bande. Il n'existe que le temps
+   de passer : aucun mélange à calculer pendant la pousse. */
+.hs-scene.is-done .hs-set::after { content: ''; position: absolute; inset: -14% -8%; pointer-events: none; mix-blend-mode: overlay; opacity: 0;
+  background: linear-gradient(102deg, transparent 30%, color-mix(in oklab, var(--hy-color-text) 40%, transparent) 50%, transparent 70%) -90% 0 / 60% 100% no-repeat; animation: hs-glint 2800ms var(--hy-ease-grow) 250ms; }
+.is-calm .hs-scene .hs-set::after { content: none; }
+@keyframes hs-glint { from { opacity: 1; background-position: -90% 0; } to { opacity: 1; background-position: 260% 0; } }
+.hs-pin > :is(.hs-cap, .hs-copy, .hs-end, .hy-tl) { position: relative; z-index: 2; }
+.hs-copy { grid-area: copy; align-self: end; display: grid; gap: clamp(0.75rem, 1.6svh, 1.25rem); min-width: 0; }
+.hs-kicker { max-width: 30ch; font-family: var(--hy-font-text); font-size: var(--hy-text-lead); font-weight: 400; line-height: 1.4; color: var(--hy-color-text-muted); text-wrap: balance; }
+.hs-kicker b { font-weight: 600; color: var(--hy-color-text); }
+.hs-titles { display: grid; }
+.hs-titles > * { grid-area: 1 / 1; align-self: end; font-size: min(var(--hy-text-display), max(6.4vw, 3.5rem), 13svh); white-space: nowrap; }
+/* Chaque ligne d'un titre monte derrière son propre cache ; celles du titre final attendent dessous (le script les amène) */
+.hs-l { display: block; overflow: hidden; padding-bottom: 0.14em; margin-bottom: -0.14em; }
+.hs-l > span { display: block; }
+.hs-title .hs-l > span { transform: translateY(110%); }
+/* (le relevé est assez étroit pour que chaque phrase tienne en deux lignes équilibrées : le bloc ne change pas de hauteur) */
+.hs-pin > .hs-cap { grid-area: side; align-self: end; width: min(19rem, 32vw); }
+.hs-pin > .hs-cap .hs-cap-lines > p { text-wrap: balance; }
+.hs-end { grid-area: side; align-self: end; justify-self: end; padding-bottom: 0.35rem; opacity: 0; visibility: hidden; transform: translateY(0.5rem);
+  transition: opacity var(--hy-duration-base) var(--hy-ease-standard), transform var(--hy-duration-base) var(--hy-ease-standard), visibility 0s linear var(--hy-duration-base); }
+.hs-end.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity var(--hy-duration-base) var(--hy-ease-out), transform var(--hy-duration-slow) var(--hy-ease-out), visibility 0s; }
+.hs-pin > .hy-tl { grid-area: rule; margin-top: 1rem; }
+/* L'invitation à défiler : un fil, le long duquel une goutte de lumière descend */
+.hs-cue { position: absolute; z-index: 2; left: 50%; bottom: 6.75rem; display: grid; justify-items: center; gap: 0.7rem; margin: 0; transform: translateX(-50%); font-size: 1rem; line-height: 1.2; white-space: nowrap; pointer-events: none; }
+.hs-cue i { order: 2; position: relative; display: block; width: 1px; height: 3rem; overflow: hidden; background: var(--hy-color-border-strong); }
+.hs-cue i::after { content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 50%; background: linear-gradient(transparent, var(--hy-color-accent-graphic) 70%, var(--hy-color-text)); animation: hs-cue 2400ms var(--hy-ease-grow) infinite; }
+@keyframes hs-cue { from { transform: translateY(-100%); } 62%, to { transform: translateY(205%); } }
+@media (max-width: 47.99rem) {
+  .hs-pin { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto auto auto; grid-template-areas: "stage" "side" "copy" "rule"; padding: 0.5rem var(--hy-gutter) 1rem; }
+  .hs-pin > .hs-cap { width: auto; max-width: 22rem; min-height: 6.6rem; align-self: start; justify-items: start; text-align: left; margin-bottom: clamp(0.75rem, 2.4svh, 1.5rem); }
+  .hs-pin > .hs-cap .hs-cap-lines > p { align-self: start; }
+  .hs-cap.is-off { opacity: 1; }
+  .hs-titles > * { font-size: clamp(2.75rem, 14.5vw, 4rem); }
+  .hs-end { display: none; }
+  .hs-pin > .hy-tl { margin-top: 0.75rem; }
+  /* L'invitation se range à droite du jour, sur une ligne */
+  .hs-cue { position: relative; left: auto; bottom: auto; transform: none; grid-area: side; align-self: start; justify-self: end; grid-auto-flow: column; align-items: center; gap: 0.6rem; padding-top: 0.4rem; }
+  .hs-cue i { height: 1.5rem; }
+}
+/* Écrans bas : la ligne de présentation laisse la place à la paire */
+@media (max-height: 34rem) { .hs-kicker { display: none; } .hs-cue { display: none; } }
+/* Figé ou animations réduites : la scène tient en un écran, à son état final, et ne reste pas à l'écran */
+.is-calm .hs-scene { height: auto; }
+.is-calm .hs-pin { position: relative; top: 0; height: min(100svh - var(--hs-head), 58rem); min-height: 36rem; }
+.is-calm .hs-cue { display: none; }
+/* L'ouverture (une fois les polices et la première image là) : la paire sort du noir, le titre monte ligne à ligne, la règle se
+   trace, le relevé arrive, puis l'invitation. Rien n'est caché sans script ni en animations réduites. */
+.js:not(.is-calm) .hs-scene:not(.is-in) :is(.hs-set, .hs-kicker, .hs-cap, .hy-tl) { opacity: 0; }
+.js:not(.is-calm) .hs-scene:not(.is-in) .hs-cue { visibility: hidden; }
+.js:not(.is-calm) .hs-scene:not(.is-in) .hs-intro .hs-l > span { transform: translateY(105%); }
+.js:not(.is-calm) .hs-scene.is-in .hs-set { animation: hs-fade 1600ms var(--hy-ease-standard) backwards; }
+.js:not(.is-calm) .hs-scene.is-in .hs-intro .hs-l > span { animation: hs-rise 1000ms var(--hy-ease-out) backwards; }
+.js:not(.is-calm) .hs-scene.is-in .hs-intro .hs-l + .hs-l > span { animation-delay: 110ms; }
+.js:not(.is-calm) .hs-scene.is-in .hs-kicker { animation: hs-fade 700ms var(--hy-ease-standard) 420ms backwards; }
+.js:not(.is-calm) .hs-scene.is-in .hs-cap { animation: hs-fade 700ms var(--hy-ease-standard) 620ms backwards; }
+.js:not(.is-calm) .hs-scene.is-in .hy-tl { animation: hs-draw 1300ms var(--hy-ease-grow) 300ms backwards; }
+.js:not(.is-calm) .hs-scene.is-in .hs-cue { animation: hs-fade 900ms var(--hy-ease-standard) 3700ms backwards; }
+@keyframes hs-fade { from { opacity: 0; } }
+@keyframes hs-rise { from { transform: translateY(105%); } }
+@keyframes hs-draw { from { opacity: 0; clip-path: inset(-1rem 100% -2rem -1rem); } to { opacity: 1; clip-path: inset(-1rem -1rem -2rem -1rem); } }
+
+/* ---------- 2. Le drop : une affiche. L'aplat de la souche monte et recouvre la chambre (simple défilement) ----------
+   Le titre occupe toute la largeur de l'affiche. La paire est tirée par-dessus en deux encres : le noir (le négatif de la
+   dernière image, en multiplication : le blanc disparaît, l'encre reste) et un blanc (le positif, en éclaircissement), décalé
+   d'un rien comme un passage mal repéré. Rien ne doit créer de contexte d'empilement entre ces images et l'aplat : ni opacité, ni
+   transformation, ni z-index sur leurs parents, sinon le mélange se fait dans le vide. La loupe suit le pointeur, ou se pose sur
+   un des trois détails. À gauche, le bloc d'achat : une étiquette de boîte, sur papier. */
+.hs-drop { z-index: 5; margin-top: calc(-1 * (100svh - var(--hs-head))); padding-block: clamp(2rem, 6svh, 3.75rem) clamp(3rem, 9svh, 6rem); overflow: clip; }
+.is-calm .hs-drop, [data-seul] .hs-drop { margin-top: 0; }
+.hs-poster { container-type: inline-size; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--hy-gutter); align-items: start; }
+.hs-poster-k { grid-column: 1 / -1; line-height: 1.15; }
+.hs-poster-k .hy-latin { font-weight: 400; font-stretch: 100%; font-size: 0.88em; letter-spacing: 0; white-space: nowrap; }
+.hs-poster-t { grid-column: 1 / -1; margin: 0.05em 0 0 -0.04em; font-family: var(--hy-font-display); font-weight: 400; font-variation-settings: 'opsz' 72;
+  font-size: 16.6cqi; line-height: 0.9; letter-spacing: -0.035em; white-space: nowrap; }
+.hs-poster-t .hs-l { display: inline-block; vertical-align: bottom; padding-bottom: 0.24em; margin-bottom: -0.24em; }
+.hs-print { grid-column: 5 / -1; grid-row: 3; position: relative; margin: -6.4cqi calc(-1 * var(--hy-gutter) - 1.5cqi) 0 -4.5cqi; }
+.hs-print-img { position: relative; aspect-ratio: 2202 / 951; }
+.hs-ink { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; pointer-events: none; }
+.hs-ink--w { mix-blend-mode: screen; opacity: 0.75; transform: translate(-0.32%, -0.62%); }
+.hs-ink--k { mix-blend-mode: multiply; }
+/* Les trois repères de la planche : un disque d'encre, son chiffre en réserve (lisible sur l'aplat comme sur le noir du tirage) */
+.hs-pt { position: absolute; left: var(--x); top: var(--y); display: grid; place-items: center; width: 1.5rem; height: 1.5rem; margin: -0.75rem 0 0 -0.75rem; border-radius: 50%;
+  background: var(--hy-color-text); color: var(--hy-color-accent); font-style: normal; font-stretch: 62%; font-weight: 800; font-size: 1rem; line-height: 1; pointer-events: none;
+  transition: transform var(--hy-duration-base) var(--hy-ease-out); }
+.hs-pt.is-on { transform: scale(1.3); }
+/* La loupe : un rond de l'affiche, agrandi 2,4 fois. --lx, --ly : son centre sur la planche ; --fx, --fy : le point regardé
+   (fractions) ; --pw, --ph : la taille de la planche (posés par le script). */
+.hs-loupe { --ld: clamp(9rem, 15cqi, 14rem); --zoom: 2.4; position: absolute; left: var(--lx, 50%); top: var(--ly, 50%); z-index: 3; width: var(--ld); height: var(--ld);
+  margin: calc(var(--ld) / -2) 0 0 calc(var(--ld) / -2); border-radius: 50%; overflow: hidden; isolation: isolate; background: var(--hy-color-accent);
+  box-shadow: 0 0 0 1.5px var(--hy-color-text); opacity: 0; transform: scale(0.5); pointer-events: none;
+  transition: opacity var(--hy-duration-fast) var(--hy-ease-standard), transform var(--hy-duration-base) var(--hy-ease-out); }
+.hs-loupe.is-on { opacity: 1; transform: none; }
+.hs-loupe-in { position: absolute; width: calc(var(--pw, 100px) * var(--zoom)); height: calc(var(--ph, 43px) * var(--zoom));
+  left: calc(var(--ld) / 2 - var(--fx, 0.5) * var(--pw, 100px) * var(--zoom)); top: calc(var(--ld) / 2 - var(--fy, 0.5) * var(--ph, 43px) * var(--zoom)); }
+@media (hover: hover) { .hs-print-img { cursor: zoom-in; } }
+/* Les trois détails : un filet, le chiffre du repère, le nom, la phrase. Le survol, le focus ou l'appui posent la loupe dessus. */
+.hs-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--hy-gutter); row-gap: 0.25rem; margin: 1.5rem calc(var(--hy-gutter) + 1.5cqi) 0 4.5cqi; }
+.hs-detail { position: relative; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 0.75rem; row-gap: 0.1rem; width: 100%; margin: 0; padding: 0.85rem 0 0.5rem; border: 0;
+  border-top: 1px solid var(--hy-color-text); background: none; text-align: left; line-height: 1.4; cursor: zoom-in; }
+.hs-detail::before { content: ''; position: absolute; left: 0; right: 0; top: -1px; height: 3px; background: currentColor; transform: scaleX(0); transform-origin: 0 50%; transition: transform var(--hy-duration-base) var(--hy-ease-out); }
+.hs-detail i { grid-row: 1 / span 2; font-style: normal; font-stretch: 62%; font-weight: 800; font-size: 1.375rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.hs-detail b { font-weight: 600; font-size: 1.0625rem; }
+@media (hover: hover) { .hs-detail:hover::before { transform: scaleX(1); } }
+.hs-detail:is(:focus-visible, .is-on)::before { transform: scaleX(1); }
+/* La colonne de gauche : le texte, puis l'étiquette */
+.hs-poster-side { grid-column: 1 / span 4; grid-row: 3; position: relative; z-index: 2; display: grid; gap: 1.5rem; padding-top: 3.2cqi; }
+.hs-poster-side .hy-lead { color: var(--hy-color-text); max-width: 26rem; }
+/* L'étiquette de boîte : sur papier, le nom et la souche, le prix, les tailles, ce qu'il reste, le bouton */
+.hs-label { display: grid; gap: 1.15rem; padding: 1.35rem 1.4rem 1.3rem; background: var(--hy-color-bg); color: var(--hy-color-text); }
+.hs-label-head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: 0.8rem; border-bottom: 2px solid var(--hy-color-text); }
+.hs-label-head b { font-size: var(--hy-text-title-3); font-weight: 600; letter-spacing: -0.005em; line-height: 1.2; }
+.hs-label-head span { color: var(--hy-color-text-muted); white-space: nowrap; }
+.hs-price { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.35rem 1rem; }
+.hs-price b { font-stretch: 62%; font-weight: 800; font-size: clamp(3.25rem, 2.5rem + 2.4vw, 4.75rem); line-height: 0.85; font-variant-numeric: tabular-nums; letter-spacing: 0.005em; }
+.hs-price span:last-child { color: var(--hy-color-text-muted); }
+.hs-label .hy-sizes legend { margin-bottom: 0.55rem; }
+.hs-label .hy-sizes-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.375rem; }
+.hs-label .hy-size span { min-width: 0; width: 100%; height: 3rem; padding: 0; font-size: 1.25rem; }
+/* Une taille épuisée : barrée d'un trait de coin à coin, pas d'un trait de texte */
+.hs-label .hy-size input:disabled + span { text-decoration: none; opacity: 1; color: var(--hy-color-text-muted); box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border);
+  background: linear-gradient(to top right, transparent calc(50% - 0.6px), currentColor calc(50% - 0.6px), currentColor calc(50% + 0.6px), transparent calc(50% + 0.6px)); }
+.hs-edition { display: grid; gap: 0.55rem; }
+.hs-edition p { display: flex; justify-content: space-between; gap: 1rem; font-variant-numeric: tabular-nums; }
+.hs-edition p b { font-weight: 600; }
+.hs-buy-notes { display: grid; gap: 0.35rem; }
+.hs-status { font-weight: 600; }
+.hs-status:empty { display: none; }
+.hs-label.is-error .hy-sizes-grid { outline: 2px solid var(--hy-color-danger-text); outline-offset: 0.375rem; }
+/* L'arrivée de l'affiche, une fois : le titre monte, le noir se pose, puis le blanc, puis l'étiquette */
+.js:not(.is-calm) .hs-poster:not(.is-in) .hs-poster-t .hs-l > span { transform: translateY(105%); }
+.js:not(.is-calm) .hs-poster:not(.is-in) .hs-print .hs-print-img > .hs-ink { opacity: 0; }
+.js:not(.is-calm) .hs-poster:not(.is-in) :is(.hs-poster-side, .hs-details, .hs-pt) { opacity: 0; }
+.js:not(.is-calm) .hs-poster.is-in .hs-poster-t .hs-l > span { animation: hs-rise 1000ms var(--hy-ease-out) backwards; }
+.js:not(.is-calm) .hs-poster.is-in .hs-poster-t .hs-l + .hs-l > span { animation-delay: 120ms; }
+.js:not(.is-calm) .hs-poster .hs-print-img > .hs-ink { transition: opacity 900ms var(--hy-ease-standard) 250ms; }
+.js:not(.is-calm) .hs-poster .hs-print-img > .hs-ink--w { transition-delay: 800ms; }
+.js:not(.is-calm) .hs-poster.is-in :is(.hs-poster-side, .hs-details, .hs-pt) { animation: hs-fade 700ms var(--hy-ease-standard) 700ms backwards; }
+@media (max-width: 63.99rem) {
+  .hs-poster-t { font-size: 23.4cqi; line-height: 0.86; white-space: normal; }
+  .hs-poster-t .hs-l { display: block; }
+  .hs-print { grid-column: 1 / -1; grid-row: auto; margin: -7cqi calc(-1 * var(--hy-gutter) - 6cqi) 0 -2cqi; }
+  .hs-details { margin: 1.25rem calc(var(--hy-gutter) + 6cqi) 0 2cqi; }
+  .hs-poster-side { grid-column: 1 / -1; grid-row: auto; padding-top: 2.5rem; max-width: 34rem; }
+}
+@media (max-width: 39.99rem) { .hs-details { grid-template-columns: minmax(0, 1fr); } .hs-detail { padding-bottom: 0.75rem; } }
+
+/* ---------- 3. Chaque paire : sur papier noir, l'empreinte que sa souche a laissée (une sporée blanche se prend sur du noir),
+   sa marque au centre. La règle parcourt les 500 paires du drop : celles déjà semées, la prochaine, celles qui attendent. ---------- */
+.hs-pairs { overflow: clip; }
+.hs-pairs-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--hy-gutter); row-gap: 2.5rem; align-items: center; }
+.hs-specimen { grid-column: 1 / span 7; justify-self: start; width: min(100%, 46rem, 86svh); margin-left: clamp(-2.5rem, -2vw, 0rem); }
+.hs-disc { position: relative; aspect-ratio: 1; }
+.hs-disc canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hs-disc .hs-disc-h { inset: 31%; width: 38%; height: 38%; }
+.hs-pairs-copy { grid-column: 8 / -1; display: grid; gap: 1.5rem; justify-items: start; min-width: 0; }
+.hs-pairs-copy .hy-lead { color: var(--hy-color-text); }
+.hs-pair-id { width: 100%; display: grid; gap: 0.4rem; padding-top: 1.25rem; border-top: 2px solid var(--hy-color-text); }
+.hs-pair-no { display: flex; align-items: baseline; gap: 0.9rem; }
+.hs-pair-no b { font-stretch: 62%; font-weight: 800; font-size: var(--hy-text-numeral-xl); line-height: 0.88; font-variant-numeric: tabular-nums; letter-spacing: 0.005em; color: var(--hy-color-accent-text); }
+.hs-pair-no span:last-child { color: var(--hy-color-text-muted); }
+.hs-pair-state { min-height: 1.5lh; font-size: var(--hy-text-lead); line-height: 1.4; }
+.hs-pair-rule { width: 100%; display: grid; }
+.hs-pair-ends { display: flex; justify-content: space-between; font-stretch: 62%; font-weight: 800; font-size: 1.125rem; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; color: var(--hy-color-text-muted); }
+.hs-pairs-act { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 2rem; }
+@media (max-width: 63.99rem) {
+  .hs-specimen { grid-column: 1 / -1; justify-self: center; width: min(100%, 34rem, 78svh); margin-left: 0; }
+  .hs-pairs-copy { grid-column: 1 / -1; }
+}
+
+/* ---------- 4. La vôtre : sur papier, en plein jour. Ce qui suit la réservation (trois temps datés), la planche contact des neuf
+   matins d'une paire déjà partie, puis six questions. ---------- */
+.hs-yours { display: grid; gap: clamp(3.5rem, 9svh, 6.5rem); }
+.hs-yours-top { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--hy-gutter); row-gap: 2rem; align-items: end; }
+.hs-yours-top h2 { grid-column: 1 / span 7; font-size: min(var(--hy-text-display), 8vw); line-height: var(--hy-leading-display); letter-spacing: var(--hy-tracking-display); }
+.hs-yours-top .hy-lead { grid-column: 9 / -1; color: var(--hy-color-text); padding-bottom: 0.5rem; }
+.hs-steps { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); column-gap: var(--hy-gutter); margin-top: clamp(1rem, 3svh, 2rem); border-top: 2px solid var(--hy-color-text); }
+.hs-steps li { display: grid; gap: 0.5rem; align-content: start; padding: 1.1rem 1.5rem 0 0; }
+.hs-steps .hy-numeral { color: var(--hy-color-accent-text); }
+@media (max-width: 63.99rem) { .hs-yours-top h2, .hs-yours-top .hy-lead { grid-column: 1 / -1; } .hs-yours-top h2 { font-size: clamp(3rem, 12vw, 6rem); } }
+@media (max-width: 47.99rem) { .hs-steps { grid-template-columns: minmax(0, 1fr); border-top: 0; } .hs-steps li { padding: 1rem 0 1.1rem; border-top: var(--hy-border-hairline) solid var(--hy-color-border-strong); } .hs-steps li:first-child { border-top: 2px solid var(--hy-color-text); } }
+/* La planche contact : neuf tirages de la suite, un par matin, sur une bande noire comme une amorce de film */
+.hs-sheet { display: grid; gap: 1.25rem; }
+.hs-sheet-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 2rem; }
+.hs-sheet-head p { color: var(--hy-color-text-muted); }
+.hs-strip { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 3px; padding: 3px; background: var(--hy-palette-myc-950); }
+.hs-strip li { display: grid; background: var(--hy-palette-myc-950); color: var(--hy-palette-myc-100); }
+.hs-strip img { width: 100%; height: auto; aspect-ratio: 3 / 2; }
+.hs-strip p { display: grid; gap: 0.1rem; padding: 0.6rem 0.7rem 0.75rem; line-height: 1.25; }
+.hs-strip b { font-stretch: 62%; font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; color: var(--hy-palette-pink-400); }
+.hs-strip span { font-size: var(--hy-text-small); color: var(--hy-palette-myc-300); }
+@media (max-width: 71.99rem) { .hs-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* Six questions. Le filet gras-maigre ouvre la liste ; le plus de chaque question est un trait fort et un délié, qui fusionnent
+   quand elle s'ouvre. */
+.hs-wear-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--hy-gutter); row-gap: 2rem; align-items: start; scroll-margin-top: calc(var(--hs-head) + 1.5rem); }
+.hs-wear-grid h2 { grid-column: 1 / span 4; font-size: var(--hy-text-title-1); line-height: var(--hy-leading-title-1); letter-spacing: var(--hy-tracking-title-1); }
+.hs-faq { grid-column: 6 / -1; border-top: 2px solid var(--hy-color-text); padding-top: 0.25rem; }
+.hs-faq::before { content: ''; display: block; height: 1px; background: var(--hy-color-text); }
+.hs-faq details { border-bottom: var(--hy-border-hairline) solid var(--hy-color-border-strong); interpolate-size: allow-keywords; }
+.hs-faq summary { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; min-height: 4.25rem; padding: 0.9rem 0; cursor: pointer; list-style: none;
+  font-size: var(--hy-text-title-3); font-weight: 600; line-height: var(--hy-leading-title-3); }
+.hs-faq summary::-webkit-details-marker { display: none; }
+.hs-faq summary i { position: relative; flex: none; width: 1.25rem; height: 1.25rem; }
+.hs-faq summary i::before, .hs-faq summary i::after { content: ''; position: absolute; background: currentColor; transition: transform var(--hy-duration-base) var(--hy-ease-out); }
+.hs-faq summary i::before { left: 0; right: 0; top: calc(50% - 1px); height: 2px; }
+.hs-faq summary i::after { top: 0; bottom: 0; left: calc(50% - 0.5px); width: 1px; }
+.hs-faq details[open] summary i::after { transform: rotate(90deg); }
+.hs-faq details::details-content { block-size: 0; overflow: clip; transition: block-size var(--hy-duration-base) var(--hy-ease-out), content-visibility var(--hy-duration-base) allow-discrete; }
+.hs-faq details[open]::details-content { block-size: auto; }
+.hs-faq details p { max-width: 38rem; padding: 0 3rem 1.5rem 0; font-size: var(--hy-text-lead); line-height: var(--hy-leading-lead); }
+@media (max-width: 63.99rem) { .hs-wear-grid h2, .hs-faq { grid-column: 1 / -1; } }
+
+/* ---------- 5. La rendre : la coupe du sol (soil.js, WebGL 2), en pleine largeur, tenue à l'écran pendant que le défilement fait
+   passer 90 jours. Le pendant de la chambre : là-haut le texte était en bas et la paire en haut ; ici le texte est en l'air, et
+   tout se passe sous la ligne du sol. Le script place la ligne du sol sous le texte. En bas, la règle des 90 jours, sur un voile
+   qui la détache du sol. ---------- */
+.hs-ground { --pin-h: calc(100svh - var(--hs-head)); position: relative; height: calc(340svh + var(--pin-h)); background: var(--hy-color-bg); color: var(--hy-color-text); }
+.hs-ground-pin { position: sticky; top: var(--hs-head); height: var(--pin-h); overflow: hidden; display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto); grid-template-rows: auto minmax(0, 1fr) auto; grid-template-areas: "copy side" ". ." "rule rule";
+  column-gap: 2.5rem; padding: clamp(1.25rem, 4svh, 2.75rem) max(var(--hy-gutter), (100% - var(--hs-max)) / 2) 1.25rem; }
+.hs-ground-pin > canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hs-ground-pin::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 9rem; background: linear-gradient(to top, var(--hy-color-bg) 8%, transparent); opacity: 0.9; pointer-events: none; }
+.hs-ground-pin > :not(canvas) { position: relative; z-index: 1; }
+.hs-ground-copy { grid-area: copy; display: grid; gap: 0.9rem; align-content: start; max-width: 24rem; }
+.hs-ground-copy h2 { font-size: min(var(--hy-text-display), max(6.4vw, 3.5rem), 13svh); line-height: var(--hy-leading-display); letter-spacing: var(--hy-tracking-display); white-space: nowrap; }
+.hs-ground-copy .hy-lead { color: var(--hy-color-text); }
+.hs-ground-side { grid-area: side; justify-self: end; display: grid; justify-items: end; align-content: start; gap: 1.25rem; width: min(22rem, 30vw); padding-top: 0.5rem; text-align: right; }
+.hs-ground-side .hs-cap { width: 100%; }
+.hs-ground-side .hs-cap-lines > p { align-self: start; }
+.hs-ground-pin > .hy-tl { grid-area: rule; }
+.hs-ground-end { opacity: 0; visibility: hidden; transform: translateY(0.5rem);
+  transition: opacity var(--hy-duration-base) var(--hy-ease-standard), transform var(--hy-duration-base) var(--hy-ease-standard), visibility 0s linear var(--hy-duration-base); }
+.hs-ground-end.is-on { opacity: 1; visibility: visible; transform: none; transition: opacity var(--hy-duration-base) var(--hy-ease-out), transform var(--hy-duration-slow) var(--hy-ease-out), visibility 0s; }
+@media (max-width: 47.99rem) {
+  .hs-ground-pin { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto minmax(0, 1fr) auto; grid-template-areas: "copy" "side" "." "rule"; row-gap: 0.75rem; padding: 1rem var(--hy-gutter) 1rem; }
+  .hs-ground-copy h2 { font-size: clamp(2.75rem, 14.5vw, 4rem); }
+  .hs-ground-copy .hy-lead { display: none; }
+  .hs-ground-side { justify-self: start; justify-items: start; width: auto; padding-top: 0; text-align: left; }
+  .hs-ground-side .hs-cap { min-height: 5.6rem; justify-items: start; text-align: left; }
+  .hs-ground-end { display: none; }
+}
+.is-calm .hs-ground { height: auto; }
+.is-calm .hs-ground-pin { position: relative; top: 0; height: min(100svh - var(--hs-head), 54rem); min-height: 36rem; }
+
+/* ---------- 6. Le pied de page : le mot-symbole sur toute la largeur, sa marque vivante, et le réseau (../landing/network.js)
+   qui contourne ses lettres. Dessous : l'alerte de la prochaine souche et la mention de fiction. ---------- */
+.hs-foot { position: relative; isolation: isolate; overflow: hidden; padding-block: clamp(3rem, 7vw, 5.5rem) 2rem; background: var(--hy-color-bg); color: var(--hy-color-text); border-top: var(--hy-border-hairline) solid var(--hy-color-border); }
+.hs-net { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; pointer-events: none; }
+.hs-foot-word { --fw: 10vw; margin: 0 0 clamp(2.5rem, 5vw, 4rem); font-family: var(--hy-font-display); font-size: var(--fw); font-weight: 560; font-variation-settings: 'opsz' 22; line-height: 0.75; letter-spacing: 0.01em; white-space: nowrap; }
+.hs-foot-slot { position: relative; display: inline-block; width: 0.74em; height: 0.75em; margin-right: 0.035em; vertical-align: baseline; }
+.hs-foot-slot canvas { position: absolute; max-width: none; }
+.hs-foot-grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--hy-gutter); row-gap: 2.5rem; padding-top: 2rem; border-top: var(--hy-border-hairline) solid var(--hy-color-border-strong); }
+.hs-news { grid-column: 1 / span 6; display: grid; gap: 0.9rem; align-content: start; max-width: 34rem; }
+.hs-news label { font-size: var(--hy-text-lead); line-height: 1.4; }
+.hs-news label b { font-weight: 600; }
+.hs-news-row { display: flex; gap: 0.75rem; }
+.hs-news-row .hy-input { flex: 1 1 auto; min-width: 0; }
+.hs-fiction { grid-column: 8 / -1; display: grid; gap: 0.75rem; align-content: start; color: var(--hy-color-text-muted); }
+.hs-fiction b { font-weight: 600; color: var(--hy-color-text); }
+@media (max-width: 63.99rem) { .hs-news, .hs-fiction { grid-column: 1 / -1; } }
+@media (max-width: 29.99rem) { .hs-news-row { flex-direction: column; } .hs-news-row .hs-btn { align-self: start; } }
+
+/* Captures : ?seul=<id> ne garde qu'une section */
+[data-seul] main > section:not(.is-seul), [data-seul] .hs-foot { display: none; }
+[data-seul="foot"] main { display: none; } [data-seul="foot"] .hs-foot { display: block; }

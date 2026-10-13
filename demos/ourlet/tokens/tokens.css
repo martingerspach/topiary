@@ -1,0 +1,218 @@
+/* Ourlet — tokens v0.1.0 · territoire Nuancier · Mona Sans et Hubot Sans
+   Fichier généré par design/ourlet/tokens/build-tokens.mjs : modifier le script, pas ce fichier.
+   Entreprise fictive, un Original de Topiary. Préfixe --ou- : aucun conflit avec Topiary ni HYPHA.
+   Thèmes : .ou-theme-atelier (par défaut, clair) ou .ou-theme-anthracite (sections sombres).
+   Aplats de métier : .ou-tint-6019, -1016, -6034, -3012, -7016 (fond RAL, texte lisible dessus).
+   Polices : Mona Sans et Hubot Sans (SIL OFL), servies en local depuis design/ourlet/fonts/. */
+
+@font-face { font-family: 'Mona Sans'; src: url('../fonts/mona-sans-latin-standard-normal.woff2') format('woff2'); font-weight: 200 900; font-stretch: 75% 125%; font-display: swap; }
+@font-face { font-family: 'Hubot Sans'; src: url('../fonts/hubot-sans-latin-standard-normal.woff2') format('woff2'); font-weight: 200 900; font-stretch: 75% 125%; font-display: swap; }
+
+:root {
+  /* Palette : gammes générées en OKLCH ; vert, soufre, turquoise et beige partent de leur RAL */
+  --ou-palette-tole-50: #F6F7F2; --ou-palette-tole-100: #ECEDE6; --ou-palette-tole-200: #DCDED5; --ou-palette-tole-300: #C3C5BD; --ou-palette-tole-400: #A7A9A1; --ou-palette-tole-500: #8B8D86; --ou-palette-tole-600: #6B6D66; --ou-palette-tole-700: #575953; --ou-palette-tole-800: #42433E; --ou-palette-tole-850: #353631; --ou-palette-tole-900: #272824; --ou-palette-tole-950: #181915;
+  --ou-palette-anthra-50: #F6F7F7; --ou-palette-anthra-100: #ECEDED; --ou-palette-anthra-200: #D9DBDC; --ou-palette-anthra-300: #C1C5C6; --ou-palette-anthra-400: #A4A8AA; --ou-palette-anthra-500: #888D8F; --ou-palette-anthra-600: #666D70; --ou-palette-anthra-700: #52595C; --ou-palette-anthra-800: #3C4447; --ou-palette-anthra-850: #2F3739; --ou-palette-anthra-900: #23292B; --ou-palette-anthra-950: #181C1E;
+  --ou-palette-vert-50: #F4F8F2; --ou-palette-vert-100: #E8F0E3; --ou-palette-vert-200: #D2E0C9; --ou-palette-vert-300: #B9CEAC; --ou-palette-vert-400: #9CAF90; --ou-palette-vert-500: #819377; --ou-palette-vert-600: #627159; --ou-palette-vert-700: #4F5D47; --ou-palette-vert-800: #3B4733; --ou-palette-vert-850: #2E3927; --ou-palette-vert-900: #212B1B; --ou-palette-vert-950: #131B0D;
+  --ou-palette-soufre-50: #FCF8D9; --ou-palette-soufre-100: #F7F0AE; --ou-palette-soufre-200: #EEDB3C; --ou-palette-soufre-300: #D9C72B; --ou-palette-soufre-400: #BBAA05; --ou-palette-soufre-500: #9C8E06; --ou-palette-soufre-600: #796D06; --ou-palette-soufre-700: #635901; --ou-palette-soufre-800: #4B4300; --ou-palette-soufre-850: #3C3601; --ou-palette-soufre-900: #2D2801; --ou-palette-soufre-950: #1C1900;
+  --ou-palette-turquoise-50: #F2F8F8; --ou-palette-turquoise-100: #E4F0EF; --ou-palette-turquoise-200: #CBE0DF; --ou-palette-turquoise-300: #ABCCCA; --ou-palette-turquoise-400: #7FB0AE; --ou-palette-turquoise-500: #699694; --ou-palette-turquoise-600: #4D7473; --ou-palette-turquoise-700: #3B605E; --ou-palette-turquoise-800: #284948; --ou-palette-turquoise-850: #1D3B3A; --ou-palette-turquoise-900: #112D2C; --ou-palette-turquoise-950: #031D1C;
+  --ou-palette-beige-50: #FCF5F2; --ou-palette-beige-100: #F8E9E4; --ou-palette-beige-200: #EFD4CA; --ou-palette-beige-300: #E2BAAB; --ou-palette-beige-400: #C5856D; --ou-palette-beige-500: #B87B64; --ou-palette-beige-600: #915D49; --ou-palette-beige-700: #7A4A38; --ou-palette-beige-800: #603626; --ou-palette-beige-850: #50291B; --ou-palette-beige-900: #3F1D0F; --ou-palette-beige-950: #2C0E04;
+  --ou-palette-green-50: #F3F8F5; --ou-palette-green-100: #E6F0E9; --ou-palette-green-200: #CDE0D3; --ou-palette-green-300: #AFCDB8; --ou-palette-green-400: #8AB497; --ou-palette-green-500: #649B77; --ou-palette-green-600: #337D51; --ou-palette-green-700: #20673F; --ou-palette-green-800: #0C502D; --ou-palette-green-850: #024122; --ou-palette-green-900: #003118; --ou-palette-green-950: #011F0D;
+  --ou-palette-red-50: #FFF4F2; --ou-palette-red-100: #FDE7E4; --ou-palette-red-200: #F8D0CA; --ou-palette-red-300: #EFB3AA; --ou-palette-red-400: #E18E83; --ou-palette-red-500: #D1695D; --ou-palette-red-600: #BA362E; --ou-palette-red-700: #9E231D; --ou-palette-red-800: #7E0C0C; --ou-palette-red-850: #6A0204; --ou-palette-red-900: #510102; --ou-palette-red-950: #360001;
+  --ou-palette-amber-50: #FBF6F0; --ou-palette-amber-100: #F6EBDF; --ou-palette-amber-200: #EBD7C1; --ou-palette-amber-300: #DDBE9C; --ou-palette-amber-400: #CA9F6D; --ou-palette-amber-500: #B67F3B; --ou-palette-amber-600: #955E04; --ou-palette-amber-700: #7B4C01; --ou-palette-amber-800: #5E3901; --ou-palette-amber-850: #4C2E02; --ou-palette-amber-900: #3A2100; --ou-palette-amber-950: #251400;
+
+  /* font */
+  --ou-font-sans: 'Mona Sans', 'Helvetica Neue', Arial, sans-serif;
+  --ou-font-code: 'Hubot Sans', 'Mona Sans', 'Helvetica Neue', Arial, sans-serif;
+
+  /* type */
+  --ou-text-display: clamp(2.875rem, 1.5000rem + 6.1111vw, 7rem);
+  --ou-family-display: var(--ou-font-sans);
+  --ou-leading-display: 0.94;
+  --ou-tracking-display: -0.03em;
+  --ou-weight-display: 720;
+  --ou-stretch-display: 118%;
+  --ou-text-title-1: clamp(2.25rem, 1.6667rem + 2.5926vw, 4rem);
+  --ou-family-title-1: var(--ou-font-sans);
+  --ou-leading-title-1: 1;
+  --ou-tracking-title-1: -0.025em;
+  --ou-weight-title-1: 700;
+  --ou-stretch-title-1: 112%;
+  --ou-text-title-2: clamp(1.6875rem, 1.4167rem + 1.2037vw, 2.5rem);
+  --ou-family-title-2: var(--ou-font-sans);
+  --ou-leading-title-2: 1.08;
+  --ou-tracking-title-2: -0.015em;
+  --ou-weight-title-2: 680;
+  --ou-stretch-title-2: 106%;
+  --ou-text-title-3: clamp(1.25rem, 1.1667rem + 0.3704vw, 1.5rem);
+  --ou-family-title-3: var(--ou-font-sans);
+  --ou-leading-title-3: 1.25;
+  --ou-tracking-title-3: -0.005em;
+  --ou-weight-title-3: 620;
+  --ou-stretch-title-3: 100%;
+  --ou-text-lead: clamp(1.1875rem, 1.1250rem + 0.2778vw, 1.375rem);
+  --ou-family-lead: var(--ou-font-sans);
+  --ou-leading-lead: 1.5;
+  --ou-tracking-lead: -0.003em;
+  --ou-weight-lead: 420;
+  --ou-stretch-lead: 100%;
+  --ou-text-body: clamp(1.0625rem, 1.0417rem + 0.0926vw, 1.125rem);
+  --ou-family-body: var(--ou-font-sans);
+  --ou-leading-body: 1.6;
+  --ou-tracking-body: 0;
+  --ou-weight-body: 400;
+  --ou-stretch-body: 100%;
+  --ou-text-small: clamp(0.9375rem, 0.9167rem + 0.0926vw, 1rem);
+  --ou-family-small: var(--ou-font-sans);
+  --ou-leading-small: 1.5;
+  --ou-tracking-small: 0;
+  --ou-weight-small: 400;
+  --ou-stretch-small: 100%;
+  --ou-text-code: clamp(0.9375rem, 0.8958rem + 0.1852vw, 1.0625rem);
+  --ou-family-code: var(--ou-font-code);
+  --ou-leading-code: 1.4;
+  --ou-tracking-code: 0.005em;
+  --ou-weight-code: 460;
+  --ou-stretch-code: 100%;
+  --ou-text-numeral: clamp(1.75rem, 1.5000rem + 1.1111vw, 2.5rem);
+  --ou-family-numeral: var(--ou-font-sans);
+  --ou-leading-numeral: 1;
+  --ou-tracking-numeral: -0.01em;
+  --ou-weight-numeral: 680;
+  --ou-stretch-numeral: 108%;
+  --ou-text-numeral-xl: clamp(3.25rem, 2.1667rem + 4.8148vw, 6.5rem);
+  --ou-family-numeral-xl: var(--ou-font-sans);
+  --ou-leading-numeral-xl: 0.92;
+  --ou-tracking-numeral-xl: -0.03em;
+  --ou-weight-numeral-xl: 720;
+  --ou-stretch-numeral-xl: 112%;
+
+  /* space */
+  --ou-space-0: 0;
+  --ou-space-1: 0.25rem;
+  --ou-space-2: 0.5rem;
+  --ou-space-3: 0.75rem;
+  --ou-space-4: 1rem;
+  --ou-space-5: 1.5rem;
+  --ou-space-6: 2rem;
+  --ou-space-7: 3rem;
+  --ou-space-8: 4rem;
+  --ou-space-9: 6rem;
+  --ou-space-10: 8rem;
+
+  /* layout */
+  --ou-measure: 64ch;
+  --ou-container: 84rem;
+  --ou-gutter: clamp(1rem, 0.3333rem + 2.9630vw, 3rem);
+  --ou-section: clamp(4rem, 2.3333rem + 7.4074vw, 9rem);
+  --ou-control-height: 3.25rem;
+
+  /* radius */
+  --ou-radius-none: 0;
+  --ou-radius-xs: 2px;
+  --ou-radius-round: 999px;
+
+  /* border */
+  --ou-border-hairline: 1px;
+  --ou-border-strong: 2px;
+  --ou-focus-width: 3px;
+  --ou-focus-offset: 3px;
+
+  /* hem */
+  --ou-hem-gap: 0.16;
+  --ou-hem-return: 1.7;
+
+  /* motion */
+  --ou-duration-instant: 100ms;
+  --ou-duration-fast: 180ms;
+  --ou-duration-base: 320ms;
+  --ou-duration-slow: 600ms;
+  --ou-duration-presse: 900ms;
+  --ou-duration-fold: 1600ms;
+  --ou-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ou-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ou-ease-presse: cubic-bezier(0.65, 0, 0.35, 1);
+  --ou-ease-linear: linear;
+}
+
+/* Thème Atelier (par défaut) */
+:root, .ou-theme-atelier {
+  color-scheme: light;
+  --ou-color-bg: var(--ou-palette-tole-100); /* Fond de page */
+  --ou-color-surface: var(--ou-palette-tole-50); /* Surfaces : panneaux, champs, fiches */
+  --ou-color-surface-raised: var(--ou-palette-tole-200); /* Zones en retrait, survols */
+  --ou-color-text: var(--ou-palette-anthra-900); /* Texte principal */
+  --ou-color-text-muted: var(--ou-palette-anthra-800); /* Texte secondaire (7:1 au moins) */
+  --ou-color-border: var(--ou-palette-tole-300); /* Filets de séparation */
+  --ou-color-border-strong: var(--ou-palette-anthra-600); /* Contours de contrôles, 3:1 au moins */
+  --ou-color-focus: var(--ou-palette-anthra-900); /* Anneau de focus clavier */
+  --ou-color-action: var(--ou-palette-anthra-900); /* Bouton principal */
+  --ou-color-action-text: var(--ou-palette-tole-50); /* Texte du bouton principal */
+  --ou-color-action-hover: var(--ou-palette-vert-300); /* Bouton principal au survol : il se peint en RAL 6019 */
+  --ou-color-action-hover-text: var(--ou-palette-anthra-900); /* Texte du bouton au survol */
+  --ou-color-brand: var(--ou-palette-vert-300); /* RAL 6019 en aplat : la marque */
+  --ou-color-on-brand: var(--ou-palette-anthra-900); /* Texte sur le RAL 6019 */
+  --ou-color-accent: var(--ou-palette-soufre-200); /* RAL 1016 en aplat : prix, repères */
+  --ou-color-on-accent: var(--ou-palette-anthra-900); /* Texte sur le RAL 1016 */
+  --ou-color-graphic: var(--ou-palette-anthra-900); /* Trait des dessins cotés */
+  --ou-color-graphic-soft: var(--ou-palette-anthra-600); /* Traits secondaires : lignes de pli, cotes */
+  --ou-color-success-text: var(--ou-palette-green-800); /* Succès, conforme */
+  --ou-color-danger-text: var(--ou-palette-red-800); /* Erreur */
+  --ou-color-warning-text: var(--ou-palette-amber-800); /* Avertissement */
+  --ou-color-selection-bg: var(--ou-palette-soufre-200); /* Sélection de texte */
+  --ou-color-selection-text: var(--ou-palette-anthra-900); /* Texte sélectionné */
+}
+
+/* Thème Anthracite : sections sombres */
+.ou-theme-anthracite {
+  color-scheme: dark;
+  --ou-color-bg: var(--ou-palette-anthra-900); /* Fond de section */
+  --ou-color-surface: var(--ou-palette-anthra-850); /* Surfaces */
+  --ou-color-surface-raised: var(--ou-palette-anthra-800); /* Zones en retrait, survols */
+  --ou-color-text: var(--ou-palette-tole-100); /* Texte principal */
+  --ou-color-text-muted: var(--ou-palette-tole-200); /* Texte secondaire (7:1 au moins) */
+  --ou-color-border: var(--ou-palette-anthra-700); /* Filets de séparation */
+  --ou-color-border-strong: var(--ou-palette-tole-500); /* Contours de contrôles, 3:1 au moins */
+  --ou-color-focus: var(--ou-palette-vert-300); /* Anneau de focus clavier */
+  --ou-color-action: var(--ou-palette-vert-300); /* Bouton principal */
+  --ou-color-action-text: var(--ou-palette-anthra-900); /* Texte du bouton principal */
+  --ou-color-action-hover: var(--ou-palette-soufre-200); /* Bouton principal au survol */
+  --ou-color-action-hover-text: var(--ou-palette-anthra-900); /* Texte du bouton au survol */
+  --ou-color-brand: var(--ou-palette-vert-300); /* RAL 6019 en aplat */
+  --ou-color-on-brand: var(--ou-palette-anthra-900); /* Texte sur le RAL 6019 */
+  --ou-color-accent: var(--ou-palette-soufre-200); /* RAL 1016 en aplat */
+  --ou-color-on-accent: var(--ou-palette-anthra-900); /* Texte sur le RAL 1016 */
+  --ou-color-graphic: var(--ou-palette-tole-100); /* Trait des dessins cotés */
+  --ou-color-graphic-soft: var(--ou-palette-tole-500); /* Traits secondaires */
+  --ou-color-success-text: var(--ou-palette-green-300); /* Succès, conforme */
+  --ou-color-danger-text: var(--ou-palette-red-200); /* Erreur */
+  --ou-color-warning-text: var(--ou-palette-amber-200); /* Avertissement */
+  --ou-color-selection-bg: var(--ou-palette-soufre-200); /* Sélection de texte */
+  --ou-color-selection-text: var(--ou-palette-anthra-900); /* Texte sélectionné */
+}
+
+/* Aplat RAL 1016 Jaune soufre (Découpe laser) */
+.ou-tint-1016 { --ou-color-tint: var(--ou-palette-soufre-200); --ou-color-on-tint: var(--ou-palette-anthra-900); background: var(--ou-color-tint); color: var(--ou-color-on-tint); }
+
+/* Aplat RAL 3012 Rouge beige (Assemblage) */
+.ou-tint-3012 { --ou-color-tint: var(--ou-palette-beige-400); --ou-color-on-tint: var(--ou-palette-anthra-900); background: var(--ou-color-tint); color: var(--ou-color-on-tint); }
+
+/* Aplat RAL 6019 Vert blanc (Pliage) */
+.ou-tint-6019 { --ou-color-tint: var(--ou-palette-vert-300); --ou-color-on-tint: var(--ou-palette-anthra-900); background: var(--ou-color-tint); color: var(--ou-color-on-tint); }
+
+/* Aplat RAL 6034 Turquoise pastel (Soudure) */
+.ou-tint-6034 { --ou-color-tint: var(--ou-palette-turquoise-400); --ou-color-on-tint: var(--ou-palette-anthra-900); background: var(--ou-color-tint); color: var(--ou-color-on-tint); }
+
+/* Aplat RAL 7016 Gris anthracite (Thermolaquage) */
+.ou-tint-7016 { --ou-color-tint: var(--ou-palette-anthra-900); --ou-color-on-tint: var(--ou-palette-tole-50); background: var(--ou-color-tint); color: var(--ou-color-on-tint); }
+
+/* Animations réduites : durées à 1 ms ; les pliages s'affichent directement dans leur état final (côté script). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ou-duration-instant: 1ms;
+    --ou-duration-fast: 1ms;
+    --ou-duration-base: 1ms;
+    --ou-duration-slow: 1ms;
+    --ou-duration-presse: 1ms;
+    --ou-duration-fold: 1ms;
+  }
+}

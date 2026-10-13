@@ -1,0 +1,182 @@
+/* HYPHA — composants v0.1. Marque fictive, un Original de Topiary.
+   Dépend de ../tokens/tokens.css et n'utilise que les tokens --hy-* (couleurs : rôles --hy-color-* seulement).
+   Survol réservé aux souris (hover: hover) ; le focus clavier reprend l'effet du survol. Animations réduites : par les tokens.
+   Pas d'ombre portée, pas de soulèvement, pas de pilule : les boutons sont carrés et la souche pousse dedans. */
+
+/* ---------- Base ---------- */
+.hy-root { background: var(--hy-color-bg); color: var(--hy-color-text); font-family: var(--hy-font-text); font-stretch: 100%;
+  font-size: var(--hy-text-body); line-height: var(--hy-leading-body); -webkit-font-smoothing: antialiased; }
+.hy-root ::selection { background: var(--hy-color-selection-bg); color: var(--hy-color-selection-text); }
+
+/* ---------- Typographie ---------- */
+.hy-display, .hy-title-1, .hy-title-2 { margin: 0; font-family: var(--hy-font-display); font-weight: 400; text-wrap: balance; }
+.hy-display { font-size: var(--hy-text-display); line-height: var(--hy-leading-display); letter-spacing: var(--hy-tracking-display); }
+.hy-title-1 { font-size: var(--hy-text-title-1); line-height: var(--hy-leading-title-1); letter-spacing: var(--hy-tracking-title-1); }
+.hy-title-2 { font-size: var(--hy-text-title-2); line-height: var(--hy-leading-title-2); letter-spacing: var(--hy-tracking-title-2); }
+.hy-display i, .hy-title-1 i, .hy-title-2 i { font-style: italic; }
+.hy-title-3 { margin: 0; font-family: var(--hy-font-text); font-size: var(--hy-text-title-3); font-weight: var(--hy-weight-title-3); line-height: var(--hy-leading-title-3); letter-spacing: var(--hy-tracking-title-3); }
+.hy-lead { margin: 0; font-size: var(--hy-text-lead); line-height: var(--hy-leading-lead); color: var(--hy-color-text-muted); max-width: var(--hy-measure); }
+.hy-small { font-size: var(--hy-text-small); line-height: var(--hy-leading-small); color: var(--hy-color-text-muted); }
+.hy-numeral-xl, .hy-numeral { font-family: var(--hy-font-text); font-stretch: 62%; font-weight: 800; font-variant-numeric: tabular-nums; }
+.hy-numeral-xl { font-size: var(--hy-text-numeral-xl); line-height: var(--hy-leading-numeral-xl); }
+.hy-numeral { font-size: var(--hy-text-numeral); line-height: var(--hy-leading-numeral); letter-spacing: var(--hy-tracking-numeral); }
+.hy-latin { font-family: var(--hy-font-display); font-style: italic; }
+.hy-wordmark { font-family: var(--hy-font-display); font-weight: var(--hy-weight-wordmark); letter-spacing: var(--hy-tracking-wordmark); margin-right: calc(-1 * var(--hy-tracking-wordmark)); line-height: 1; }
+/* Sous 32 px, le nom garde ses déliés : graisse 600 et taille optique 9 */
+.hy-wordmark--small, .hy-nav .hy-wordmark { font-weight: 600; font-variation-settings: 'opsz' 9; }
+
+/* ---------- Boutons ---------- */
+.hy-btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 0.6em;
+  min-height: var(--hy-control-height); padding: 0 1.6rem; margin: 0; border: 0; border-radius: var(--hy-radius-none);
+  font: inherit; font-size: 1.0625rem; font-weight: 600; letter-spacing: 0.01em; line-height: 1.2; white-space: nowrap; text-decoration: none;
+  color: var(--hy-color-text); background: transparent; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.hy-btn::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.hy-btn:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: var(--hy-focus-offset); }
+
+/* Principal : au survol, la souche pousse dans le bouton, du bas vers le haut */
+.hy-btn--primary { color: var(--hy-color-action-text); background: var(--hy-color-action); transition: color var(--hy-duration-fast) var(--hy-ease-standard); }
+.hy-btn--primary::before { background: var(--hy-color-action-hover); transform: scaleY(0); transform-origin: 50% 100%; transition: transform var(--hy-duration-base) var(--hy-ease-grow); }
+@media (hover: hover) {
+  .hy-btn--primary:not(:disabled, [aria-disabled="true"]):hover { color: var(--hy-color-action-hover-text); }
+  .hy-btn--primary:not(:disabled, [aria-disabled="true"]):hover::before { transform: scaleY(1); }
+}
+.hy-btn--primary:not(:disabled, [aria-disabled="true"]):is(:focus-visible, :active) { color: var(--hy-color-action-hover-text); }
+.hy-btn--primary:not(:disabled, [aria-disabled="true"]):is(:focus-visible, :active)::before { transform: scaleY(1); }
+
+/* Souche : l'appel d'un drop, dans sa couleur ; au survol, le bouton principal reprend la main */
+.hy-btn--strain { color: var(--hy-color-on-accent); background: var(--hy-color-accent); transition: color var(--hy-duration-fast) var(--hy-ease-standard); }
+.hy-btn--strain::before { background: var(--hy-color-action); transform: scaleY(0); transform-origin: 50% 100%; transition: transform var(--hy-duration-base) var(--hy-ease-grow); }
+@media (hover: hover) {
+  .hy-btn--strain:not(:disabled, [aria-disabled="true"]):hover { color: var(--hy-color-action-text); }
+  .hy-btn--strain:not(:disabled, [aria-disabled="true"]):hover::before { transform: scaleY(1); }
+}
+.hy-btn--strain:not(:disabled, [aria-disabled="true"]):is(:focus-visible, :active) { color: var(--hy-color-action-text); }
+.hy-btn--strain:not(:disabled, [aria-disabled="true"]):is(:focus-visible, :active)::before { transform: scaleY(1); }
+
+/* Secondaire : un contour fin, qui se renforce au survol */
+.hy-btn--secondary { box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border-strong);
+  transition: box-shadow var(--hy-duration-fast) var(--hy-ease-standard), background-color var(--hy-duration-fast) var(--hy-ease-standard); }
+@media (hover: hover) { .hy-btn--secondary:not(:disabled, [aria-disabled="true"]):hover { box-shadow: inset 0 0 0 var(--hy-border-strong) var(--hy-color-text); background: var(--hy-color-surface-raised); } }
+.hy-btn--secondary:not(:disabled, [aria-disabled="true"]):is(:focus-visible, :active) { box-shadow: inset 0 0 0 var(--hy-border-strong) var(--hy-color-text); background: var(--hy-color-surface-raised); }
+
+.hy-btn--compact { min-height: 2.75rem; padding-inline: 1.1rem; font-size: 1rem; }
+.hy-btn:is(:disabled, [aria-disabled="true"]) { color: var(--hy-color-text-muted); background: var(--hy-color-surface-raised); box-shadow: none; cursor: not-allowed; }
+
+/* Lien : souligné simple ; en souche pour un chiffre ou un appel discret */
+.hy-link { color: var(--hy-color-text); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.3em; transition: text-decoration-thickness var(--hy-duration-fast) var(--hy-ease-standard); }
+@media (hover: hover) { .hy-link:hover { text-decoration-thickness: 2px; } }
+.hy-link:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 2px; }
+.hy-link--strain { color: var(--hy-color-accent-text); }
+
+/* Groupe de choix exclusifs (thème, souche, vue) : un bouton pressé prend le fond du bouton principal */
+.hy-seg { display: inline-flex; flex-wrap: wrap; box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border-strong); }
+.hy-seg button { min-height: 2.75rem; padding: 0 1rem; border: 0; border-radius: 0; font: inherit; font-size: 1rem; font-weight: 600; color: var(--hy-color-text); background: transparent; cursor: pointer;
+  transition: background-color var(--hy-duration-fast) var(--hy-ease-standard), color var(--hy-duration-fast) var(--hy-ease-standard); }
+@media (hover: hover) { .hy-seg button:not([aria-pressed="true"]):hover { background: var(--hy-color-surface-raised); } }
+.hy-seg button[aria-pressed="true"] { background: var(--hy-color-action); color: var(--hy-color-action-text); }
+.hy-seg button:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 2px; position: relative; z-index: 1; }
+
+/* ---------- Champs ---------- */
+.hy-field { display: grid; gap: 0.5rem; align-content: start; }
+.hy-field label, .hy-label { font-weight: 600; font-size: 1rem; }
+.hy-input { width: 100%; min-height: var(--hy-control-height); padding: 0 1rem; margin: 0; font: inherit; font-size: 1.0625rem; color: var(--hy-color-text);
+  background: var(--hy-color-surface); border: var(--hy-border-hairline) solid var(--hy-color-border-strong); border-radius: var(--hy-radius-xs);
+  transition: border-color var(--hy-duration-fast) var(--hy-ease-standard); }
+.hy-input::placeholder { color: var(--hy-color-text-muted); opacity: 1; }
+@media (hover: hover) { .hy-input:hover { border-color: var(--hy-color-text); } }
+.hy-input:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 2px; border-color: var(--hy-color-text); }
+.hy-help { font-size: var(--hy-text-small); line-height: var(--hy-leading-small); color: var(--hy-color-text-muted); }
+.hy-field[data-state="error"] .hy-input { border-color: var(--hy-color-danger-text); box-shadow: inset 0 0 0 1px var(--hy-color-danger-text); }
+.hy-error { font-size: var(--hy-text-small); line-height: var(--hy-leading-small); color: var(--hy-color-danger-text); }
+.hy-inline { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.hy-inline .hy-input { flex: 1 1 14rem; width: auto; }
+
+/* Tailles : des cases carrées ; la taille choisie prend le fond du bouton principal, une taille épuisée est barrée */
+.hy-sizes { border: 0; margin: 0; padding: 0; min-width: 0; }
+.hy-sizes legend { padding: 0; margin-bottom: 0.75rem; font-weight: 600; }
+.hy-sizes .hy-help { margin: 0.75rem 0 0; }
+.hy-sizes-grid { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.hy-size { position: relative; display: block; }
+.hy-size input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.hy-size span { display: grid; place-items: center; min-width: 3.25rem; height: 3.25rem; padding: 0 0.5rem; font-stretch: 62%; font-weight: 800; font-size: 1.375rem; font-variant-numeric: tabular-nums;
+  color: var(--hy-color-text); box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border-strong);
+  transition: background-color var(--hy-duration-fast) var(--hy-ease-standard), color var(--hy-duration-fast) var(--hy-ease-standard); }
+@media (hover: hover) { .hy-size input:not(:checked, :disabled):hover + span { box-shadow: inset 0 0 0 var(--hy-border-strong) var(--hy-color-text); } }
+.hy-size input:checked + span { background: var(--hy-color-action); color: var(--hy-color-action-text); box-shadow: none; }
+.hy-size input:focus-visible + span { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: var(--hy-focus-offset); }
+.hy-size input:disabled { cursor: not-allowed; }
+.hy-size input:disabled + span { color: var(--hy-color-text-muted); text-decoration: line-through; box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border); }
+.hy-on-strain .hy-size input:disabled + span { opacity: 0.5; }
+
+/* ---------- Jauge des neuf jours ---------- */
+.hy-gauge { display: grid; gap: 0.6rem; }
+.hy-gauge-cells { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px; max-width: 22rem; }
+.hy-gauge-cells i { height: 0.875rem; box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border-strong); }
+.hy-gauge-cells i.is-grown { background: var(--hy-color-accent-graphic); box-shadow: none; }
+.hy-gauge p { margin: 0; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* ---------- Drop : numéro, souche, état. En cours de pousse, la carte prend l'aplat de sa souche. ---------- */
+.hy-drop { display: grid; gap: 0.35rem; align-content: start; padding: 1.25rem 1.5rem 1.5rem; color: var(--hy-color-text); box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border-strong); }
+.hy-drop .hy-numeral-xl { color: var(--hy-color-accent-text); }
+.hy-drop-name { margin: 0; font-family: var(--hy-font-display); font-size: var(--hy-text-title-2); line-height: var(--hy-leading-title-2); }
+.hy-drop-status { margin: 0; color: var(--hy-color-text-muted); }
+.hy-drop.is-growing { background: var(--hy-color-accent); color: var(--hy-color-on-accent); box-shadow: none; }
+.hy-drop.is-growing .hy-numeral-xl, .hy-drop.is-growing .hy-drop-status { color: inherit; }
+
+/* ---------- Fiche de la paire ---------- */
+.hy-record { display: grid; margin: 0; }
+.hy-record div { display: grid; grid-template-columns: minmax(7rem, 38%) minmax(0, 1fr); gap: 1rem; padding: 0.7rem 0; border-top: var(--hy-border-hairline) solid var(--hy-color-border); }
+.hy-record dt { color: var(--hy-color-text-muted); }
+.hy-record dd { margin: 0; font-variant-numeric: tabular-nums; }
+
+/* ---------- Cycle : neuf jours, des années, quatre-vingt-dix jours ---------- */
+.hy-cycle { container-type: inline-size; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: var(--hy-border-hairline) solid var(--hy-color-border-strong); }
+.hy-cycle p { margin: 0; padding: 1.1rem 1.25rem 1.25rem 0; color: var(--hy-color-text-muted); }
+.hy-cycle p + p { padding-left: 1.25rem; border-left: var(--hy-border-hairline) solid var(--hy-color-border); }
+.hy-cycle b { display: block; font-family: var(--hy-font-display); font-weight: 400; font-size: min(var(--hy-text-title-2), 7.2cqi); line-height: 1.1; white-space: nowrap; color: var(--hy-color-text); }
+
+/* ---------- Navigation ---------- */
+.hy-nav { display: flex; align-items: center; gap: 1.75rem; min-height: 4.5rem; padding-inline: var(--hy-gutter); border-bottom: var(--hy-border-hairline) solid var(--hy-color-border); }
+.hy-nav .hy-wordmark { font-size: 1.375rem; color: var(--hy-color-text); text-decoration: none; }
+.hy-nav-links { display: flex; gap: 1.6rem; margin: 0 0 0 auto; padding: 0; list-style: none; }
+.hy-nav-links a { color: var(--hy-color-text-muted); text-decoration: none; transition: color var(--hy-duration-fast) var(--hy-ease-standard); }
+@media (hover: hover) { .hy-nav-links a:hover { color: var(--hy-color-text); } }
+.hy-nav-links a[aria-current="page"] { color: var(--hy-color-text); text-decoration: underline; text-underline-offset: 0.4em; }
+.hy-nav-links a:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 3px; }
+@media (max-width: 47.99rem) { .hy-nav-links { display: none; } .hy-nav .hy-btn { margin-left: auto; } }
+
+[hidden] { display: none !important; }
+
+/* ---------- La règle vivante (.hy-tl) : les neuf jours de la chambre, les 90 jours du sol (script : rule.js). Elle remplace
+   la jauge en cases (.hy-gauge, que garde l'ancienne landing). ----------
+   Une règle d'instrument : des graduations fines qui montent du filet (les grandes aux jours), le filet que la souche remplit
+   jusqu'à la tête, la tête (une aiguille claire, une perle de la souche), les nombres dessous. Le script lève et éclaire les
+   graduations au passage de la tête, en continu. On la saisit (appui, glissement, flèches) : elle est annoncée comme un curseur. */
+.hy-tl { --hx: 0; position: relative; display: grid; gap: 0.5rem; padding-top: 0.75rem; cursor: ew-resize; touch-action: pan-y; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; }
+.hy-tl:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 0.5rem; }
+.hy-tl-run { position: relative; height: 1.75rem; }
+.hy-tl-run::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--hy-color-border-strong); }
+.hy-tl-run > i { position: absolute; bottom: 0; width: 1px; height: 0.4375rem; margin-left: -0.5px; background: var(--hy-color-text); opacity: 0.34; transform-origin: 50% 100%; }
+.hy-tl-run > i.is-major { height: 0.75rem; }
+.hy-tl-fill { position: absolute; left: 0; right: 0; bottom: -0.5px; height: 2px; background: var(--hy-color-accent-graphic); transform-origin: 0 50%; transform: scaleX(0); }
+.hy-tl-head { position: absolute; left: 0; bottom: 0; width: 0; height: 100%; }
+.hy-tl-head::before { content: ''; position: absolute; left: -0.5px; bottom: 0; width: 1px; height: 100%; background: var(--hy-color-text); }
+.hy-tl-head::after { content: ''; position: absolute; left: -0.3125rem; bottom: -0.3125rem; width: 0.625rem; height: 0.625rem; border-radius: 50%; background: var(--hy-color-accent-graphic);
+  box-shadow: 0 0 0 3px var(--hy-color-bg), 0 0 1rem 0.125rem color-mix(in oklab, var(--hy-color-accent-graphic) 50%, transparent); transition: transform var(--hy-duration-base) var(--hy-ease-out); }
+.hy-tl-ghost { position: absolute; left: calc(var(--hx) * 100%); bottom: 0; width: 1px; height: 1.25rem; margin-left: -0.5px; background: var(--hy-color-text); opacity: 0; transition: opacity var(--hy-duration-fast) var(--hy-ease-standard); }
+@media (hover: hover) { .hy-tl:hover .hy-tl-ghost { opacity: 0.4; } .hy-tl:hover .hy-tl-head::after { transform: scale(1.25); } }
+.hy-tl.is-drag .hy-tl-ghost { opacity: 0; }
+.hy-tl:is(.is-drag, :focus-visible) .hy-tl-head::after { transform: scale(1.4); }
+.hy-tl-nums { position: relative; height: 1.25rem; font-stretch: 62%; font-weight: 800; font-size: 1rem; line-height: 1.25rem; font-variant-numeric: tabular-nums; letter-spacing: 0.01em; }
+.hy-tl-nums span { position: absolute; top: 0; transform: translateX(-50%); opacity: 0.6; transition: color var(--hy-duration-base) var(--hy-ease-standard); }
+.hy-tl-nums span.is-now { color: var(--hy-color-accent-text); }
+@media (forced-colors: active) { .hy-tl { forced-color-adjust: none; } .hy-tl-run::before, .hy-tl-run > i, .hy-tl-head::before, .hy-tl-ghost { background: CanvasText; } .hy-tl-fill, .hy-tl-head::after { background: Highlight; box-shadow: none; } .hy-tl-nums { color: CanvasText; } }
+
+/* Le compteur à rouleaux : chaque chiffre est une bande derrière sa fenêtre ; le script la place, la transition la fait rouler */
+.hy-odo { display: inline-flex; vertical-align: top; height: 1.2em; overflow: hidden; -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent); }
+.hy-odo-c { display: block; height: 1.2em; max-width: 1.5ch; overflow: hidden; transition: max-width var(--hy-duration-base) var(--hy-ease-out); }
+.hy-odo-c.is-empty { max-width: 0; }
+.hy-odo-c > span { display: block; transition: transform 560ms var(--hy-ease-out); }
+.hy-odo-c i { display: block; height: 1.2em; line-height: 1.2; font-style: normal; }
+.is-calm :is(.hy-odo-c, .hy-odo-c > span) { transition: none; }
+@media (prefers-reduced-motion: reduce) { :is(.hy-odo-c, .hy-odo-c > span) { transition: none; } }

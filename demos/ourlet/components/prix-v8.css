@@ -1,0 +1,225 @@
+/* Ourlet · section « Chiffrez votre pièce », itération 8 (2026-10-10) : la carte du prix, sa courbe, ses postes, sa frise.
+   Liée après les styles de la page : chaque règle porte « .prix » devant elle pour l'emporter, sans !important (sauf mouvements réduits).
+   Langue graphique, celle du dessin d'atelier : un trait plein pour une valeur, une hachure à 45° pour une zone (aire sous la
+   courbe, fourchette du devis, jours d'imprévus), des filets fins pour les règles, des chiffres tabulaires alignés à droite.
+   Sur le taupe, tout texte est en givre (7,49:1 ; le givre-2 n'y fait que 5,3:1) : la hiérarchie passe par la taille, la graisse
+   et l'espace. Couleurs, durées et courbes : tokens seulement. Rien sous 15 px. */
+
+.prix .quote {
+  --q-pad: var(--ou-space-5);
+  --q-fond: var(--ou-p-taupe-700);
+  --q-filet: color-mix(in srgb, var(--ou-p-givre) 20%, transparent);
+  --q-filet-fort: color-mix(in srgb, var(--ou-p-givre) 52%, transparent);
+  /* le voile : un ton plus sombre que le taupe (survol, ligne repérée, encadrés) ; un voile clair ferait tomber le givre à 5,9:1, celui-ci le porte à 9,2:1 */
+  --q-voile: color-mix(in srgb, var(--ou-p-charbon-950) 24%, transparent);
+  --q-barre: var(--ou-p-givre);
+  /* la hachure : un trait de 1 px tous les 5 px, à 45° (un motif, pas un fondu) */
+  --q-trame: repeating-linear-gradient(135deg, color-mix(in srgb, var(--ou-p-givre) 62%, transparent) 0 1px, transparent 1px 5px);
+  /* la carte ne colle plus en entier (elle est devenue plus haute que l'écran) : son en-tête, le prix, colle sous la capsule de
+     navigation, et le reste défile dessous. « overflow: clip » coupe sans créer de zone de défilement (le collant reste rapporté à la page). */
+  position: relative; top: auto; display: block; padding: 0; overflow: clip;
+}
+.prix .quote > * { margin-inline: var(--q-pad); }
+.prix .quote p { margin: 0; }
+.prix .quote .num { font-feature-settings: 'tnum' 1; white-space: nowrap; }
+/* une commande de la carte qui prend le focus ne reste pas sous l'en-tête collé (WCAG 2.4.11) */
+.prix .quote :is(a, button, summary, input, select, textarea) { scroll-margin-top: 12.5rem; }
+.prix .quote h3, .prix .date-q { margin: 0; font-size: 1.0625rem; line-height: 1.3; font-weight: 600; font-stretch: 108%; letter-spacing: -0.005em; text-wrap: balance; }
+
+/* ---------- L'en-tête qui colle : le prix, ou le message qui le remplace le temps d'une attente ---------- */
+.prix .tete { position: sticky; top: 5.5rem; z-index: 3; margin: 0; background: var(--q-fond); box-shadow: 0 1px 0 var(--q-filet); }
+/* au-dessus de l'en-tête collé, la carte continue en taupe uni sous la capsule : ce qui défile n'y reparaît pas */
+.prix .tete::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 6rem; background: var(--q-fond); }
+/* ce qui passe sous l'en-tête s'efface sur 12 px au lieu d'être tranché net (au repos, ce fondu couvre une marge vide) */
+.prix .tete::after { content: ""; position: absolute; left: 0; right: 0; top: calc(100% + 1px); height: 0.75rem; background: linear-gradient(var(--q-fond), color-mix(in srgb, var(--q-fond) 0%, transparent)); pointer-events: none; }
+@media (max-height: 699px) { .prix .tete { position: relative; top: auto; } .prix .tete::after { display: none; } }
+.prix .quote[data-famille="message"] .tete { position: relative; top: auto; box-shadow: none; }
+.prix .quote[data-famille="message"] .tete::before, .prix .quote[data-famille="message"] .tete::after { display: none; }
+.prix .tete-in { display: flow-root; }
+.prix .price { display: grid; gap: 0.3rem; margin: 0; padding: var(--q-pad) var(--q-pad) var(--ou-space-4); container-type: inline-size; }
+.prix .price .k { font-weight: 560; }
+/* le grand montant : chiffres proportionnels (les chiffres tabulaires de la Mona Sans ont un zéro barré, réservé aux colonnes) ;
+   --n, le nombre de signes, vient du script : un prix à quatre chiffres tient encore sur un téléphone de 320 px */
+.prix .price .v { font-size: clamp(2.25rem, min(19cqi, calc(100cqi / (var(--n, 8) * 0.53))), 5.25rem); line-height: 0.92; letter-spacing: -0.035em; font-weight: 560; font-stretch: 125%; white-space: nowrap; font-variant-numeric: lining-nums; }
+.prix .price .v small { display: block; margin-top: 0.7rem; font-size: var(--ou-text-small); line-height: var(--ou-leading-small); letter-spacing: 0; font-stretch: 100%; font-weight: 500; white-space: normal; }
+
+/* une case par signe (voir le script) : le signe à gauche de sa case, la case à la largeur du signe, approche comprise ;
+   la case est une fenêtre (clip-path : ni la mise en page ni la ligne de base ne changent) où l'ancien signe sort et le nouveau entre */
+/* overflow-anchor : un signe qui roule ne doit pas servir d'ancre de défilement (la page le suivrait de 50 px) */
+.prix .cz { display: inline-block; letter-spacing: 0; white-space: pre; text-align: left; overflow-anchor: none; }
+.prix .cz-a, .prix .cz-b { display: inline-block; }
+/* le temps du roulement seulement (au repos, les cases sont du texte ordinaire : aucun calque de peinture de plus) */
+.prix [data-roule] .cz { position: relative; clip-path: inset(-0.06em -1em -0.08em -1em); }
+.prix [data-roule] .cz-a { position: relative; }
+.prix [data-roule] .cz-b { position: absolute; left: 0; top: 0; }
+.prix .cz-sonde { position: absolute; left: 0; top: 0; visibility: hidden; white-space: pre; pointer-events: none; }
+.prix .cz-sonde i { display: block; width: max-content; font-style: normal; }
+
+/* ---------- Le total et la fourchette ---------- */
+.prix .q-corps { margin: 0; }
+.prix .somme { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.7rem; margin-inline: var(--q-pad); padding-block: var(--ou-space-4) var(--ou-space-5); font-size: var(--ou-text-small); line-height: var(--ou-leading-small); align-content: start; }
+/* la fourchette du devis, à 10 % près : une zone de tolérance hachurée entre ses deux bornes, le prix affiché au milieu */
+.prix .tol { display: grid; grid-template-columns: max-content minmax(1.5rem, 1fr) max-content; align-items: center; gap: 0.75rem; font-weight: 520; }
+.prix .tol .num { display: inline-block; overflow-anchor: none; }
+.prix .tol .num:first-child { text-align: right; }
+.prix .tol i { position: relative; height: 0.625rem; background: var(--q-trame); box-shadow: inset 1px 0 0 var(--ou-p-givre), inset -1px 0 0 var(--ou-p-givre); }
+.prix .tol i::before { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; margin-top: -0.5px; background: var(--q-filet-fort); }
+.prix .tol i::after { content: ""; position: absolute; left: calc(50% - 1px); top: -0.25rem; bottom: -0.25rem; width: 2px; background: var(--ou-p-givre); }
+.prix .somme .ml { font-weight: 520; }
+
+/* ---------- La date et sa frise : les jours ouvrés, poste par poste ---------- */
+.prix .delai { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-3); margin-inline: var(--q-pad); padding-block: var(--ou-space-5); border-top: 1px solid var(--q-filet); font-size: var(--ou-text-small); line-height: var(--ou-leading-small); }
+.prix .date-q + p, .prix .delai .livr { font-size: var(--ou-text-small); }
+.prix .frise { --fr-lib: 5.75rem; --fr-val: 3.75rem; --fr-gap: 0.75rem; position: relative; display: grid; margin-block: 0.15rem 0.1rem; }
+/* une rangée entre et sort en hauteur : ses marges sont portées par ses cellules, pour qu'elle puisse se replier jusqu'à zéro */
+.prix .jr { display: grid; grid-template-columns: var(--fr-lib) minmax(0, 1fr) var(--fr-val); column-gap: var(--fr-gap); align-items: center; overflow: clip; }
+.prix .jr .lib, .prix .jr .val { padding-block: 0.16rem; }
+.prix .jr .lib { font-weight: 520; white-space: nowrap; }
+.prix .jr .val { text-align: right; font-weight: 520; }
+.prix .jr .piste { height: 0.5rem; }
+/* une barre est un fond de sa piste : le script pose sa place et sa largeur en pixels (background-position, background-size) */
+.prix .jr .piste, .prix .poste .piste { --q-plein: linear-gradient(var(--q-barre), var(--q-barre)); background: var(--q-plein) 0 0 / 0 100% no-repeat; }
+/* les jours d'imprévus : une zone, pas un travail : hachurée comme la fourchette, entre quatre filets */
+.prix .jr[data-id="imprevus"] .piste { background-image: var(--q-plein), var(--q-plein), var(--q-plein), var(--q-plein), var(--q-trame); background-repeat: no-repeat; }
+/* la grille des jours : un filet par jour ouvré, derrière les barres */
+.prix .fr-grille { position: absolute; left: calc(var(--fr-lib) + var(--fr-gap)); right: calc(var(--fr-val) + var(--fr-gap)); top: 0; bottom: 2.35rem; pointer-events: none;
+  --q-jour: linear-gradient(var(--q-filet), var(--q-filet)); background-repeat: no-repeat; }
+.prix .jr--tot { grid-template-columns: minmax(0, 1fr) max-content; margin-top: 0.35rem; padding-top: 0.2rem; height: 2rem; border-top: 1px solid var(--q-filet-fort); font-weight: 650; }
+.prix .jr--tot .lib, .prix .jr--tot .val { font-weight: 650; }
+
+/* ---------- Demander le devis ---------- */
+.prix .agir { display: grid; gap: var(--ou-space-4); margin-inline: var(--q-pad); padding-bottom: var(--q-pad); }
+.prix .etat { margin: var(--q-pad); background: var(--q-voile); }
+.prix .quote[data-famille="attente"] .etat { margin-bottom: var(--ou-space-4); }
+.prix .quote .notice { background: var(--q-voile); }
+.prix .ask .input { background: var(--q-voile); border-color: var(--q-filet-fort); }
+/* sur le taupe, le rouge clair ne fait que 5,1:1 : le message d'erreur s'écrit en givre, son signe reste rouge clair */
+.prix .ask .err { color: var(--ou-p-givre); }
+.prix .ask .err svg { color: var(--ou-p-rouge-clair); }
+
+/* ---------- Le prix à la pièce, poste par poste : chaque poste porte sa part sur son filet, l'une après l'autre ---------- */
+.prix .postes, .prix .courbe { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--ou-space-3); margin-inline: var(--q-pad); padding-block: var(--ou-space-5) var(--ou-space-3); border-top: 1px solid var(--q-filet); }
+.prix .courbe { padding-bottom: var(--ou-space-3); }
+.prix .gamme { display: grid; container-type: inline-size; font-size: var(--ou-text-small); line-height: var(--ou-leading-small); }
+.prix .poste { display: grid; grid-template-columns: minmax(0, 1fr) 3.25rem 5.25rem; column-gap: 0.5rem; align-items: baseline; overflow: clip; }
+.prix .poste > .lib, .prix .poste > .part, .prix .poste > .val { padding-block: 0.45rem 0.4rem; }
+.prix .poste .lib { font-weight: 520; text-wrap: pretty; }
+.prix .poste .part, .prix .poste .val { text-align: right; }
+.prix .poste .val { font-weight: 600; }
+@container (max-width: 23rem) { .prix .poste { grid-template-columns: minmax(0, 1fr) 5.25rem; } .prix .poste .part { display: none; } }
+/* la piste : la dernière ligne de la rangée ; sa barre et son filet sont deux fonds */
+.prix .poste .piste { grid-column: 1 / -1; height: 5px; background-image: var(--q-plein), linear-gradient(var(--q-filet), var(--q-filet)); background-size: 0 100%, 100% 1px; background-position: 0 0, 0 100%; }
+.prix .poste--tot > .lib, .prix .poste--tot > .part, .prix .poste--tot > .val { padding-block: 0.6rem 0.45rem; }
+.prix .poste--tot .lib, .prix .poste--tot .val { font-weight: 650; }
+/* le total : la barre pleine, entaillée à chaque limite de poste (six entailles posées par le script, puis le plein) */
+.prix .poste--tot .piste { height: 9px; --q-entaille: linear-gradient(var(--q-fond), var(--q-fond));
+  background-image: var(--q-entaille), var(--q-entaille), var(--q-entaille), var(--q-entaille), var(--q-entaille), var(--q-entaille), var(--q-plein); background-size: 100% 100%; background-position: 0 0; }
+
+/* ---------- La courbe : le prix à la pièce selon la quantité ---------- */
+.prix .courbe .plot { position: relative; margin-top: 0.1rem; border-radius: var(--ou-radius-xs); }
+.prix .courbe svg { display: block; width: 100%; height: auto; overflow: visible; cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent; user-select: none;
+  font: 460 15px var(--ou-font-sans); font-variant-numeric: lining-nums; }
+.prix .courbe svg text { fill: var(--ou-p-givre); }
+.prix .c-trame { stroke: color-mix(in srgb, var(--ou-p-givre) 36%, transparent); stroke-width: 1; }
+.prix .c-grad { stroke: var(--q-filet); stroke-width: 1; }
+.prix .c-regle { stroke: var(--ou-p-givre); stroke-width: 1; }
+.prix .c-tic { stroke: color-mix(in srgb, var(--ou-p-givre) 55%, transparent); stroke-width: 1; }
+.prix .c-tic--pal, .prix .c-tic--dec { stroke: var(--ou-p-givre); }
+.prix .c-dec { font-weight: 600; }
+.prix .c-aire { stroke: none; }
+.prix .c-ligne { fill: none; stroke: var(--ou-p-givre); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.prix .c-pt { fill: var(--ou-p-givre); stroke: var(--q-fond); stroke-width: 2; }
+.prix .c-suivant { fill: var(--q-fond); stroke: var(--ou-p-givre); stroke-width: 1.5; }
+.prix .c-fil { stroke: var(--ou-p-givre); stroke-width: 1; }
+.prix .c-halo { fill: var(--q-fond); }
+.prix .c-anneau { fill: var(--ou-p-sauge); stroke: var(--ou-p-givre); stroke-width: 2.5; }
+.prix .c-etiq { font-weight: 650; }
+.prix .c-cross { stroke: var(--ou-p-givre); stroke-width: 1; }
+.prix .c-sonde { fill: var(--q-fond); stroke: var(--ou-p-givre); stroke-width: 2; }
+.prix .c-tete { fill: var(--ou-i-chaud); stroke: none; }
+/* le clavier et les lecteurs d'écran passent par un vrai curseur, posé sur la courbe sans se voir */
+.prix .plot-clavier { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
+.prix .plot-focus { position: absolute; inset: -4px; border-radius: var(--ou-radius-xs); pointer-events: none; }
+.prix .plot-clavier:focus-visible + .plot-focus { outline: 2px solid var(--ou-p-givre); }
+.prix .tip { position: absolute; left: 0; top: 0; transform: none; z-index: 2; display: grid; gap: 0.05rem; padding: 0.5rem 0.75rem; border-radius: var(--ou-radius-xs); background: var(--ou-p-givre); color: var(--ou-p-encre);
+  font-size: var(--ou-text-small); line-height: 1.4; white-space: nowrap; pointer-events: none; box-shadow: var(--ou-ombre-nuit);
+  opacity: 0; visibility: hidden; }
+.prix .tip[data-on] { visibility: visible; } /* son fondu vient du script, avec celui de la sonde */
+.prix .tip strong { font-weight: 650; }
+.prix .gain { font-size: var(--ou-text-small); line-height: var(--ou-leading-small); font-weight: 520; text-wrap: pretty; }
+
+/* ---------- Les dépliants : ils s'ouvrent à la hauteur de leur tableau, comme les questions de la page ---------- */
+.prix .dep { margin-top: var(--ou-space-2); border-top: 1px solid var(--q-filet); interpolate-size: allow-keywords; }
+.prix .dep::details-content { block-size: 0; overflow: clip; transition: block-size var(--ou-dur-retour) var(--ou-ease-convoyeur), content-visibility var(--ou-dur-retour) allow-discrete; }
+.prix .dep[open]::details-content { block-size: auto; }
+.prix .dep .dep-in { padding-bottom: var(--ou-space-3); opacity: 0; transition: opacity var(--ou-dur-approche) linear; }
+.prix .dep[open] .dep-in { opacity: 1; transition: opacity var(--ou-dur-retour) linear var(--ou-dur-micro); }
+.prix .dep summary { margin-inline: -0.6rem; padding-inline: 0.6rem; min-height: 3rem; font-size: var(--ou-text-small); font-weight: 560; border-radius: var(--ou-radius-xs);
+  transition: background-color var(--ou-dur-retour) var(--ou-ease-approche); }
+.prix .dep summary .pm { transition: transform var(--ou-dur-retour) var(--ou-ease-retour); }
+@media (hover: hover) { .prix .dep summary:hover { background: var(--q-voile); transition-duration: var(--ou-dur-approche); } }
+.prix .dep summary:active .pm { transform: scale(0.82); transition: transform var(--ou-dur-approche) var(--ou-ease-appui); }
+.prix .dep summary:focus-visible { outline-offset: -2px; }
+/* les tableaux : chiffres tabulaires alignés à droite, la ligne de la quantité en cours repérée par un voile et une graisse */
+.prix .quote .tbl { font-size: var(--ou-text-small); line-height: var(--ou-leading-small); }
+.prix .quote .tbl th, .prix .quote .tbl td { padding: 0.5rem 0 0.5rem 1rem; border-bottom: 1px solid var(--q-filet); border-color: var(--q-filet); vertical-align: top; }
+.prix .quote .tbl th:first-child, .prix .quote .tbl td:first-child { padding-left: 0; }
+.prix .quote .tbl thead th { font-weight: 600; border-bottom-color: var(--q-filet-fort); }
+.prix .quote .tbl .num { text-align: right; }
+.prix .quote .tbl tbody tr:last-child > * { border-bottom: 0; }
+.prix [data-valeurs-wrap] .tbl { margin-inline: -0.6rem; width: calc(100% + 1.2rem); }
+.prix [data-valeurs-wrap] .tbl th:first-child { padding-left: 0.6rem; }
+.prix [data-valeurs-wrap] .tbl th:last-child, .prix [data-valeurs-wrap] .tbl td:last-child { padding-right: 0.6rem; }
+.prix [data-valeurs-wrap] .tbl tbody th { font-weight: 520; }
+.prix .tbl tr[aria-current="true"] > * { background: var(--q-voile); font-weight: 650; }
+.prix .quote .dep td span { display: block; font-size: var(--ou-text-small); font-weight: 460; }
+.prix .quote .tbl td strong { font-weight: 600; }
+@media (max-width: 420px) { .prix .quote .tbl th, .prix .quote .tbl td { padding-left: 0.6rem; } }
+/* sur une carte étroite (téléphone de 320 px), le calcul poste par poste passe sur deux lignes : le poste, puis ses deux
+   montants alignés à droite sous les mêmes colonnes que l'en-tête (les rôles ARIA du tableau sont écrits dans le HTML) */
+.prix .dep-in { container-type: inline-size; }
+@container (max-width: 21rem) {
+  .prix [data-detail-wrap] .tbl, .prix [data-detail-wrap] .tbl thead, .prix [data-detail-wrap] .tbl tbody { display: block; }
+  .prix [data-detail-wrap] .tbl tr { display: grid; grid-template-columns: minmax(0, 1fr) 5.25rem 6.5rem; padding-block: 0.5rem; border-bottom: 1px solid var(--q-filet); }
+  .prix [data-detail-wrap] .tbl thead tr { border-bottom-color: var(--q-filet-fort); }
+  .prix [data-detail-wrap] .tbl tbody tr:last-child { border-bottom: 0; }
+  .prix [data-detail-wrap] .tbl th, .prix [data-detail-wrap] .tbl td, .prix [data-detail-wrap] tr.tot td { padding: 0; border: 0; }
+  .prix [data-detail-wrap] .tbl tr > :first-child { grid-column: 1 / -1; }
+  .prix [data-detail-wrap] .tbl tr > .num { grid-row: 2; padding-top: 0.15rem; }
+  .prix [data-detail-wrap] .tbl tr > .num:nth-child(2) { grid-column: 2; }
+  .prix [data-detail-wrap] .tbl tr > .num:nth-child(3) { grid-column: 3; }
+  .prix [data-detail-wrap] .tbl tr.tot { border-top: 1px solid var(--q-filet-fort); }
+}
+.prix .quote tr.tot td { font-weight: 650; border-top: 1px solid var(--q-filet-fort); }
+
+@media (max-width: 640px) { .prix .quote { --q-pad: var(--ou-space-4); padding: 0; } .prix .frise { --fr-lib: 5.6rem; --fr-val: 3.6rem; --fr-gap: 0.6rem; } }
+
+/* ---------- La barre de prix du téléphone : même ombre que les fiches de la section ---------- */
+.prix .pbar { box-shadow: 0 0 0 1px color-mix(in srgb, var(--ou-p-givre) 14%, transparent), var(--ou-ombre-nuit); }
+
+/* ---------- Mouvements réduits : aucune transition ; le script pose les états finaux ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .prix .dep::details-content, .prix .dep .dep-in, .prix .dep summary, .prix .dep summary .pm { transition: none !important; }
+  .prix .dep summary:active .pm { transform: none; }
+}
+/* ---------- Couleurs forcées : traits, barres et hachures dans la couleur de texte du système ---------- */
+@media (forced-colors: active) {
+  .prix .quote { --q-fond: Canvas; --q-filet: CanvasText; --q-filet-fort: CanvasText; --q-voile: transparent; --q-trame: repeating-linear-gradient(135deg, CanvasText 0 1px, transparent 1px 5px); --q-barre: CanvasText; border: 1px solid CanvasText; }
+  .prix .tete { box-shadow: none; border-bottom: 1px solid CanvasText; }
+  .prix .tete::after { display: none; }
+  .prix .piste, .prix .tol i, .prix .tol i::after, .prix .fr-grille { forced-color-adjust: none; }
+  .prix .tol i::after { background: CanvasText; }
+  .prix .tol i { box-shadow: inset 0 0 0 1px CanvasText; }
+  .prix .courbe svg text { fill: CanvasText; }
+  .prix .c-trame, .prix .c-grad, .prix .c-regle, .prix .c-tic, .prix .c-ligne, .prix .c-fil, .prix .c-cross { stroke: CanvasText; }
+  .prix .c-suivant { fill: Canvas; stroke: CanvasText; }
+  .prix .c-pt { fill: CanvasText; stroke: Canvas; }
+  .prix .c-halo { fill: Canvas; }
+  .prix .c-anneau { fill: Highlight; stroke: CanvasText; }
+  .prix .c-sonde { fill: Canvas; stroke: CanvasText; }
+  .prix .c-tete { fill: CanvasText; }
+  .prix .tip { border: 1px solid CanvasText; }
+  .prix .tbl tr[aria-current="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
+  /* le grand prix : sans la plaque de fond que le système glisse sous chaque texte (elle mordait sur le libellé du dessus) */
+  .prix .price .v { forced-color-adjust: none; color: CanvasText; }
+}

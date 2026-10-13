@@ -1,0 +1,221 @@
+/* Auvent · « C'est vous qui fixez les limites » : la démonstration jouable (landing/limites.js).
+   À gauche, le titre et les trois gestes dans l'ordre. À droite, une fenêtre de l'application (du contenu : une surface
+   pleine, pas du verre), même construction que celle du planning (cadre de 6 px, barre de titre, panneau intérieur au
+   rayon concentrique). Dedans, de haut en bas et à toutes les largeurs : la tâche, la phrase de résultat, la semaine en
+   quatre cartes (une par jour, avec son tracé et son verdict), puis le curseur. Le curseur est en bas : sur téléphone, le
+   pouce ne cache pas le résultat. Tracés dans la langue du schéma « Ce que dit la météo » : limite en tirets bleus,
+   dépassement haché à 19,5°. Tout vient de tokens/tokens.css. */
+
+.limites { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colonne-gap); row-gap: 40px; align-items: start; }
+.limites .seuils-texte { grid-column: 1 / span 5; display: flex; flex-direction: column; gap: 20px; }
+.limites .seuils-texte > p { color: var(--av-text-muted); max-width: 30em; }
+.lim-app { grid-column: 7 / span 6; min-width: 0; }
+@media (min-width: 900px) and (max-width: 1199px) { .lim-app { grid-column: 6 / span 7; } }
+@media (max-width: 899px) {
+  .limites .seuils-texte, .lim-app { grid-column: 1 / -1; }
+  .limites { row-gap: 28px; }
+}
+html:not(.js) .lim-app { display: none; }
+
+/* ---------- Les trois gestes : une vraie suite, donc numérotée ---------- */
+.lim-etapes { list-style: none; margin: 8px 0 0; padding: 0; max-width: 26em; counter-reset: geste; }
+.lim-etapes li { counter-increment: geste; display: grid; grid-template-columns: 28px minmax(0, 1fr); align-items: baseline; padding-block: 12px; border-top: 1px solid var(--av-line); color: var(--av-text); }
+.lim-etapes li:last-child { border-bottom: 1px solid var(--av-line); }
+.lim-etapes li::before { content: counter(geste); font-variant-numeric: tabular-nums; font-weight: 500; color: var(--av-signal-300); }
+
+/* ---------- La fenêtre de l'application ---------- */
+.lim-app {
+  border-radius: var(--av-radius-l); padding: 6px;
+  color: var(--av-brume-50);
+  background: color-mix(in oklab, var(--av-ciel-800), var(--av-ciel-700) 42%);
+  box-shadow: inset 0 0 0 1px rgb(242 245 250 / 0.1), inset 0 1px 0 rgb(242 245 250 / 0.08), 0 40px 80px -44px rgb(0 0 0 / 0.75);
+}
+.lim-barre { padding: 12px 16px 14px; }
+.lim-titre { font-weight: 500; }
+.lim-sous { margin-left: 10px; font-weight: 400; color: var(--av-brume-200); white-space: nowrap; }
+.lim-corps { border-radius: calc(var(--av-radius-l) - 6px); padding: 16px 20px 12px; background: var(--av-ciel-900); box-shadow: inset 0 0 0 1px rgb(242 245 250 / 0.06); }
+
+/* ---------- La tâche : un sélecteur segmenté (de vrais boutons radio : flèches au clavier) ---------- */
+.lim-taches { position: relative; margin: 0; padding: 4px; border: 0; min-width: 0; display: flex; gap: 4px; border-radius: 12px; background: rgb(242 245 250 / 0.08); }
+/* la pastille du choix glisse d'un segment à l'autre (trois segments égaux, 4 px d'écart) : un seul objet qui se
+   déplace, pas deux fonds qui se croisent en gris */
+.lim-taches::before {
+  content: ''; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc((100% - 16px) / 3); border-radius: 9px;
+  background: var(--av-brume-50); box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+  transition: transform var(--av-duration-moyen) var(--av-ease-standard);
+}
+.lim-taches:has(.lim-tache:nth-of-type(2) input:checked)::before { transform: translateX(calc(100% + 4px)); }
+.lim-taches:has(.lim-tache:nth-of-type(3) input:checked)::before { transform: translateX(calc(200% + 8px)); }
+.lim-tache {
+  position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 6px;
+  border-radius: 9px; font-size: 16px; font-weight: 500; color: var(--av-brume-200); text-align: center; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color var(--av-duration-moyen) var(--av-ease-standard);
+}
+/* le bouton radio reste dans le libellé (clavier, lecteur d'écran) ; le segment entier est sa cible */
+.lim-tache input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.lim-tache:hover { color: var(--av-brume-50); }
+.lim-tache:has(input:checked) { color: var(--av-encre-900); }
+.lim-tache:has(input:focus-visible) { outline: 2px solid var(--av-focus); outline-offset: 2px; }
+
+/* ---------- La phrase : toutes les phrases possibles sont empilées dans la même case, une seule visible. La case garde
+   la hauteur de la plus longue : rien ne bouge sous le doigt, et changer de phrase ne coûte aucune mise en page. ---------- */
+.lim-resultat { display: grid; margin-top: 20px; font-size: var(--av-text-h3); line-height: var(--av-leading-h3); letter-spacing: var(--av-tracking-h3); color: var(--av-brume-50); text-wrap: balance; }
+.lim-resultat > span { grid-area: 1 / 1; visibility: hidden; opacity: 0; transition: opacity 120ms var(--av-ease-standard), visibility 0s linear 120ms; }
+/* l'ancienne phrase sort d'abord, la nouvelle entre ensuite : elles ne se superposent presque plus */
+.lim-resultat > span.vue { visibility: visible; opacity: 1; transition: opacity 220ms var(--av-ease-standard) 110ms, visibility 0s; }
+/* sous le doigt, la phrase change net : en fondu, elle clignotait pendant un glissement rapide */
+.lim-resultat.glisse > span, .lim-resultat.glisse > span.vue { transition: none; }
+
+/* ---------- La légende : ce que disent la courbe, les tirets et la hachure ---------- */
+.lim-legende { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 18px; font-size: 15px; color: var(--av-brume-200); }
+.lim-item { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.lim-cle { flex: none; width: 22px; height: 12px; }
+.lim-cle--courbe { background: linear-gradient(var(--av-brume-50), var(--av-brume-50)) center / 100% 1.5px no-repeat; }
+.lim-cle--limite { background: repeating-linear-gradient(90deg, var(--av-signal-300) 0 5px, transparent 5px 9px) center / 100% 1.5px no-repeat; }
+.lim-cle--arret { width: 14px; border-radius: 2px; background: repeating-linear-gradient(109.5deg, rgb(127 166 255 / 0.3) 0 2.6px, #9CB8FF 2.6px 4px); box-shadow: inset 0 0 0 1px var(--av-signal-300); }
+
+/* ---------- La semaine : une carte par jour ---------- */
+.lim-zone { position: relative; margin-top: 12px; }
+.lim-semaine { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; container: lim / inline-size; }
+.lim-jour {
+  position: relative; min-width: 0; padding: 12px 12px 12px; border-radius: 14px;
+  background: rgb(242 245 250 / 0.04); box-shadow: inset 0 0 0 1px rgb(242 245 250 / 0.1);
+  transition: background-color var(--av-duration-moyen) var(--av-ease-standard), box-shadow var(--av-duration-moyen) var(--av-ease-standard);
+}
+/* un jour d'arrêt : la carte se teinte au bleu du signal */
+.lim-jour.arret { background: rgb(127 166 255 / 0.13); box-shadow: inset 0 0 0 1px rgb(127 166 255 / 0.55); }
+.lim-jour-nom { display: flex; justify-content: space-between; gap: 4px; font-size: 15px; font-weight: 600; line-height: 1.3; color: var(--av-brume-50); white-space: nowrap; font-variant-numeric: tabular-nums; }
+/* cartes étroites : le maximum du jour est dans l'en-tête (dans le tracé, il toucherait le trait de limite) */
+.lim-max { display: none; font-weight: 500; color: var(--av-brume-200); }
+.lim-zone.etroit .lim-max { display: inline; }
+.lim-zone.etroit .lim-sommet text { display: none; }
+.lim-jour.arret .lim-max { color: var(--av-signal-300); font-weight: 600; }
+/* le tracé : sa base est le filet du bas ; le SVG commun (limites.js) se pose exactement dessus */
+.lim-trace { height: 124px; margin-top: 8px; border-bottom: 1px solid rgb(242 245 250 / 0.32); }
+/* les deux bouts de la journée, sous les repères du tracé */
+.lim-heures { display: flex; justify-content: space-between; margin-top: 7px; font-size: 15px; line-height: 1.2; color: var(--av-brume-300); font-variant-numeric: tabular-nums; }
+.lim-jour.arret .lim-heures { color: var(--av-brume-200); }
+/* le verdict : le pied de la carte, séparé du tracé par un filet */
+.lim-verdict { margin-top: 10px; padding-top: 10px; border-top: 1px solid rgb(242 245 250 / 0.1); min-height: calc(1.35em * var(--lim-lignes, 2) + 10px); font-size: 15px; line-height: 1.35; color: var(--av-brume-200); transition: opacity var(--av-duration-moyen) var(--av-ease-standard); }
+.lim-jour.arret .lim-verdict { border-top-color: rgb(127 166 255 / 0.3); }
+.lim-verdict b { display: block; font-weight: 600; color: var(--av-signal-300); }
+.lim-verdict > span { display: block; color: var(--av-brume-50); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.lim-verdict > .lim-libre { color: var(--av-brume-200); }
+.lim-court, .lim-v-court, .lim-t-court { display: none; }
+/* cartes étroites (téléphone) : le jour sans sa date, les heures en court */
+@container lim (max-width: 420px) {
+  .lim-long { display: none; }
+  .lim-court { display: inline; }
+  .lim-jour { padding: 8px 7px 10px; border-radius: 10px; }
+  .lim-heures { display: none; }
+  .lim-verdict { margin-top: 12px; }
+}
+/* très étroit (moins de 375 px d'écran) : « Possible » ne tient plus dans la carte */
+@container lim (max-width: 315px) {
+  .lim-max { display: none !important; }
+  .lim-v-long { display: none; }
+  .lim-v-court { display: inline; }
+  .lim-jour { padding-inline: 6px; }
+}
+.lim-svg { position: absolute; left: 0; width: 100%; overflow: visible; pointer-events: none; }
+/* la fresque d'un jour : un halo sous la courbe qui s'efface vers la base (pas de bloc), la courbe, ce qui dépasse la
+   limite haché au bleu du signal (la hachure de pluie de la page, à 19,5°) */
+.lim-svg .lim-aire { fill: url(#lim-aire); }
+.lim-svg .lim-hach { fill: url(#lim-hachure); }
+.lim-svg .lim-courbe { fill: none; stroke: var(--av-brume-50); stroke-width: 1.75; stroke-linejoin: round; stroke-linecap: round; }
+.lim-svg .lim-courbe--haut { stroke: var(--av-signal-300); stroke-width: 2.25; }
+.lim-svg .lim-reperes { fill: none; stroke: rgb(242 245 250 / 0.45); stroke-width: 1; shape-rendering: crispEdges; }
+/* la limite : quatre traits, un par carte, menés par un seul transform (le script) ; elle ne traverse plus les bords */
+.lim-svg .lim-limites { will-change: transform; }
+.lim-svg .lim-limites line { stroke: var(--av-signal-300); stroke-width: 1.5; stroke-dasharray: 5 4; }
+/* le sommet du jour : un point sur la courbe et sa valeur ; le liseré sombre du texte le détache du trait de limite */
+.lim-svg .lim-sommet { --lim-fond: #0F1E30; }                 /* le fond d'une carte : ciel-900 et 4 % de blanc */
+.lim-svg .lim-sommet.teinte { --lim-fond: #162844; }          /* celui d'une carte d'arrêt : ciel-900 et 13 % de signal */
+.lim-svg .lim-sommet text { font-family: var(--av-font); font-size: 15px; font-weight: 500; fill: var(--av-brume-50); font-variant-numeric: tabular-nums; paint-order: stroke; stroke: var(--lim-fond); stroke-width: 4px; stroke-linejoin: round; transition: stroke var(--av-duration-moyen) var(--av-ease-standard), transform var(--av-duration-court) var(--av-ease-standard); }
+.lim-svg .lim-sommet circle { fill: var(--av-brume-50); stroke: var(--lim-fond); stroke-width: 2; transition: stroke var(--av-duration-moyen) var(--av-ease-standard); }
+.lim-svg .lim-sommet.nul circle { display: none; }
+.lim-svg .lim-sommet.nul text { fill: var(--av-brume-200); font-weight: 400; }
+.lim-svg .lim-sommet.haut text { fill: var(--av-signal-300); font-weight: 600; }
+.lim-svg .lim-sommet.haut circle { fill: var(--av-signal-300); }
+.lim-svg .lim-hach, .lim-svg .lim-courbe--haut, .lim-svg .lim-limites, .lim-svg .lim-sommet { transition: opacity var(--av-duration-moyen) var(--av-ease-standard); }
+.lim-svg .lim-limites { transition: opacity var(--av-duration-moyen) var(--av-ease-standard); }
+/* avant l'entrée : les courbes montent d'abord, la limite, les sommets et les verdicts se posent ensuite */
+.lim-zone.attente .lim-verdict, .lim-zone.attente .lim-hach, .lim-zone.attente .lim-courbe--haut, .lim-zone.attente .lim-limites, .lim-zone.attente .lim-sommet { opacity: 0; }
+.lim-zone.attente .lim-jour.arret { background: rgb(242 245 250 / 0.04); box-shadow: inset 0 0 0 1px rgb(242 245 250 / 0.1); }
+
+/* ---------- Le réglage ---------- */
+.lim-reglage { margin-top: 16px; padding-top: 14px; border-top: 1px solid rgb(242 245 250 / 0.1); }
+.lim-reglage-tete { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.lim-etiquette { font-weight: 500; }
+.lim-valeur { font-size: var(--av-text-h3); line-height: 1.1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--av-brume-50); }
+/* Le curseur natif, habillé : piste dessinée dessous (remplie jusqu'au pouce), cible de 44 px de haut sur toute la
+   largeur, pouce de 28 px ; l'encoche de la limite habituelle est sous la piste : le pouce ne la cache jamais. */
+.lim-piste { --pouce: 28px; position: relative; height: 44px; margin-top: 2px; }
+.lim-piste::before { content: ''; position: absolute; left: calc(var(--pouce) / 2); right: calc(var(--pouce) / 2); top: 50%; height: 4px; margin-top: -2px; border-radius: 2px; background: linear-gradient(90deg, var(--av-signal-300) 0 calc(var(--v, 0.5) * 100%), rgb(242 245 250 / 0.22) 0); }
+.lim-repere { position: absolute; top: calc(50% + 15px); left: calc(var(--pouce) / 2 + (100% - var(--pouce)) * var(--p, 0.5)); width: 2px; height: 7px; margin-left: -1px; border-radius: 1px; background: var(--av-brume-200); }
+.lim-curseur { -webkit-appearance: none; appearance: none; position: relative; display: block; width: 100%; height: 44px; margin: 0; padding: 0; background: transparent; cursor: pointer; touch-action: pan-y; -webkit-tap-highlight-color: transparent; }
+.lim-curseur:focus { outline: none; }
+.lim-curseur::-webkit-slider-runnable-track { height: 44px; background: transparent; border: 0; }
+.lim-curseur::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: var(--pouce); height: var(--pouce); margin-top: 8px; border: 0; border-radius: 50%; background: var(--av-brume-50); box-shadow: 0 0 0 1px rgb(2 10 18 / 0.35), 0 2px 8px rgb(0 0 0 / 0.45); transition: transform 160ms var(--av-ease-standard), box-shadow 160ms var(--av-ease-standard); }
+.lim-curseur::-moz-range-track { height: 44px; background: transparent; border: 0; }
+.lim-curseur::-moz-range-thumb { width: var(--pouce); height: var(--pouce); border: 0; border-radius: 50%; background: var(--av-brume-50); box-shadow: 0 0 0 1px rgb(2 10 18 / 0.35), 0 2px 8px rgb(0 0 0 / 0.45); }
+.lim-curseur:hover::-webkit-slider-thumb, .lim-curseur:active::-webkit-slider-thumb { transform: scale(1.07); }
+.lim-curseur:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px var(--av-ciel-900), 0 0 0 5px var(--av-focus); }
+.lim-curseur:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 3px var(--av-ciel-900), 0 0 0 5px var(--av-focus); }
+.lim-bornes { display: flex; justify-content: space-between; margin-top: 4px; font-size: 15px; color: var(--av-brume-200); font-variant-numeric: tabular-nums; }
+.lim-habitude { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; margin-top: 2px; }
+.lim-habitude p { font-size: 15px; color: var(--av-brume-200); }
+.lim-retablir { height: 40px; padding: 0 14px; border: 0; border-radius: 10px; background: rgb(242 245 250 / 0.1); color: var(--av-brume-50); font-size: 15px; font-weight: 500; cursor: pointer; transition: background-color var(--av-duration-court) var(--av-ease-standard); }
+.lim-retablir:hover { background: rgb(242 245 250 / 0.18); }
+.lim-retablir:active { transform: scale(0.98); }
+.lim-retablir:focus-visible { outline: 2px solid var(--av-focus); outline-offset: 2px; }
+
+/* ---------- Téléphone ---------- */
+@media (max-width: 560px) {
+  .lim-barre { padding: 10px 12px 12px; }
+  .lim-sous { display: block; margin-left: 0; }
+  .lim-corps { padding: 12px 12px 8px; }
+  .lim-resultat { margin-top: 16px; font-size: var(--av-text-lead); line-height: var(--av-leading-lead); letter-spacing: var(--av-tracking-lead); font-weight: 500; }
+  .lim-legende { margin-top: 14px; }
+  .lim-semaine { gap: 6px; }
+  .lim-trace { height: 84px; }
+  .lim-valeur { font-size: var(--av-text-lead); font-weight: 500; }
+}
+@media (max-width: 374px) {
+  .lim-t-long { display: none; }
+  .lim-t-court { display: inline; }
+}
+
+/* ---------- Préférences ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .lim-resultat > span, .lim-tache, .lim-taches::before, .lim-jour, .lim-verdict, .lim-svg .lim-hach, .lim-svg .lim-courbe--haut, .lim-svg .lim-limites, .lim-svg .lim-sommet, .lim-svg .lim-sommet text, .lim-svg .lim-sommet circle, .lim-curseur::-webkit-slider-thumb { transition: none !important; }
+}
+/* Couleurs forcées : le SVG n'est pas forcé, il reçoit les couleurs du système ; le curseur garde un pouce et une piste */
+@media (forced-colors: active) {
+  .lim-app, .lim-corps { background: Canvas; border: 1px solid CanvasText; box-shadow: none; }
+  .lim-taches { border: 1px solid ButtonBorder; }
+  .lim-taches::before { forced-color-adjust: none; background: Highlight; }
+  .lim-tache:has(input:checked) { forced-color-adjust: none; color: HighlightText; }
+  .lim-jour { border: 1px solid CanvasText; box-shadow: none; background: Canvas; }
+  .lim-jour.arret { border: 2px solid Highlight; }
+  .lim-verdict b { color: Highlight; }
+  .lim-svg .lim-aire { fill: none; }
+  .lim-svg .lim-hach { fill: Highlight; }
+  .lim-svg .lim-courbe { stroke: CanvasText; }
+  .lim-svg .lim-courbe--haut { stroke: Highlight; }
+  .lim-svg .lim-limites line, .lim-svg .lim-reperes { stroke: CanvasText; }
+  .lim-svg .lim-sommet text { fill: CanvasText; stroke: Canvas; }
+  .lim-svg .lim-sommet circle { fill: CanvasText; stroke: Canvas; }
+  .lim-svg .lim-sommet.haut text, .lim-svg .lim-sommet.haut circle { fill: Highlight; }
+  .lim-cle { forced-color-adjust: none; }
+  .lim-cle--courbe { background: linear-gradient(CanvasText, CanvasText) center / 100% 1.5px no-repeat; }
+  .lim-cle--limite { background: repeating-linear-gradient(90deg, CanvasText 0 5px, transparent 5px 9px) center / 100% 1.5px no-repeat; }
+  .lim-cle--arret { background: Highlight; box-shadow: none; }
+  .lim-piste::before { background: CanvasText; forced-color-adjust: none; }
+  .lim-repere { background: CanvasText; }
+  .lim-curseur { forced-color-adjust: none; }
+  .lim-curseur::-webkit-slider-thumb { background: ButtonText; box-shadow: 0 0 0 2px Canvas; }
+  .lim-curseur:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 2px Canvas, 0 0 0 4px Highlight; }
+  .lim-retablir { border: 1px solid ButtonBorder; }
+}

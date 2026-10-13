@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en" class="hy-theme-chamber hy-strain-pink">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>HYPHA · Grown, not made.</title>
+<meta name="description" content="HYPHA grows sneakers from mycelium in nine days, and keeps them as they grew. A fictional brand by Topiary.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&display=swap">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../components/hypha.css">
+<link rel="preload" href="media/chambre-debut.jpg" as="image">
+<script>
+/* État d'affichage, posé avant le premier rendu.
+   ?theme=chamber|daylight · ?strain=pink|gold|blue · ?structure=1 (la page en gris, réduite à sa structure)
+   ?rm=1 (animations réduites) · ?fige=1 (état final, sans animation, pour les captures) · ?k=0..1 (la pousse figée à un instant)
+   ?t=<ms> (ouverture du logo figée à un instant) · ?seul=<id de section> (captures) · ?mini=1 (montrée réduite, chez Clover) */
+(function () {
+  var q = new URLSearchParams(location.search), h = document.documentElement;
+  var th = q.get('theme') === 'daylight' ? 'daylight' : 'chamber', st = ['gold', 'blue'].indexOf(q.get('strain')) >= 0 ? q.get('strain') : 'pink';
+  var calm = q.has('rm') || q.has('fige') || q.has('k') || q.has('t') || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  h.className = 'hy-theme-' + th + ' hy-strain-' + st + (q.has('structure') ? ' is-structure' : '') + (calm ? ' is-calm' : '');
+  if (q.get('seul')) h.setAttribute('data-seul', q.get('seul'));
+})();
+</script>
+<style>
+/* Landing d'HYPHA, v8 (chantier A4b, pour l'atelier de Clover ; marque fictive du chantier B1).
+   Trois écrans, puis le pied de page. 1. La chambre : neuf jours de pousse que le défilement fait passer, jusqu'au retournement (on
+   aurait pu la presser en cuir, on la garde telle qu'elle a poussé). 2. Le drop : la couleur de la souche monte et recouvre la
+   chambre ; la paire en planche annotée, et sa réservation. 3. Un diptyque : l'empreinte de chaque paire (sa sporée, sa marque qui
+   pousse au centre) et son retour à la terre (une coupe du sol sur 90 jours). Le pied de page : le mot-symbole en très grand, sa
+   marque vivante. Ce qui bouge : la pousse (au défilement), le drop qui recouvre la chambre (le défilement lui-même), l'empreinte,
+   la marque et la coupe du sol (une fois, à l'arrivée ; puis à la demande). Défilement natif, jamais détourné. Tokens et
+   composants d'HYPHA seulement. */
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--hy-color-bg); scroll-behavior: smooth; }
+.is-calm { scroll-behavior: auto; }
+body { margin: 0; }
+p, h1, h2, h3, ol, dl, dd, figure { margin: 0; }
+a { color: inherit; }
+canvas, img { display: block; }
+.lp-wrap { width: 100%; padding-inline: var(--hy-gutter); }
+.lp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.lp-skip { position: absolute; left: 1rem; top: -4rem; z-index: 40; padding: 0.75rem 1rem; background: var(--hy-color-action); color: var(--hy-color-action-text); text-decoration: none; font-weight: 600; }
+.lp-skip:focus { top: 1rem; outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: var(--hy-focus-offset); }
+
+/* ---------- Navigation : une barre fine, du même noir que la chambre ---------- */
+.lp-nav { position: sticky; top: 0; z-index: 20; background: var(--hy-color-bg); }
+.lp-nav .lp-wrap { display: flex; align-items: center; gap: 1.75rem; height: 4rem; }
+.lp-brand { display: inline-flex; align-items: center; color: var(--hy-color-text); text-decoration: none; }
+.lp-brand .hy-wordmark { font-size: 1.2rem; }
+/* Le mot-symbole : la marque tient lieu de premier H. Sa boîte et son dessin viennent de brand/mark.js (HyphaMark.lockup). */
+.lp-word { white-space: nowrap; }
+.lp-brand:focus-visible, .lp-navlink:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 4px; }
+.lp-navlink { margin-left: auto; color: var(--hy-color-text-muted); text-decoration: none; font-variant-numeric: tabular-nums; }
+@media (hover: hover) { .lp-navlink:hover { color: var(--hy-color-text); } }
+@media (max-width: 40rem) { .lp-navlink { display: none; } .lp-nav .hy-btn { margin-left: auto; } }
+
+/* ---------- 1. La chambre : tenue à l'écran pendant que l'on défile ; le défilement fait passer les neuf jours ----------
+   La paire est une suite d'images (Seedance 2.0, retouchée : fond au noir de la chambre, pousse ralentie, arrêtée sur la paire
+   hérissée) dessinée sur un canvas. La scène dure trois écrans de pousse, puis un écran pendant lequel le drop monte et la recouvre.
+   Elle reste noire quel que soit le thème. Le titre à gauche, le relevé de l'étape à droite (en haut sur téléphone), la règle des
+   jours en bas. */
+.lp-scene { --pin-h: calc(100svh - 4rem); position: relative; height: calc(300svh + 2 * var(--pin-h)); background: var(--hy-color-bg); }
+.lp-pin { position: sticky; top: 4rem; height: var(--pin-h); overflow: hidden;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr) auto auto; grid-template-areas: ". ." "copy side" "ruler ruler";
+  column-gap: 2rem; padding: 1rem var(--hy-gutter) 1.5rem; }
+.lp-set { position: absolute; z-index: 1; left: var(--set-x, 5%); top: var(--set-y, 8%); width: var(--set-w, 90%); height: var(--set-h, 56%); }
+.lp-set :is(canvas, img) { position: absolute; max-width: none; pointer-events: none; }
+.lp-still.is-gone { visibility: hidden; }
+.lp-pin > :is(.lp-cap, .lp-copy, .lp-end, .lp-ruler) { position: relative; z-index: 2; }
+/* Le relevé de l'étape : le jour, puis ce qui se passe ; jamais deux relevés l'un sur l'autre. Il laisse la place à l'appel final. */
+.lp-cap { grid-area: side; align-self: end; display: grid; width: min(24rem, 34vw); text-align: right; transition: opacity var(--hy-duration-base) var(--hy-ease-standard); }
+.lp-cap.is-off { opacity: 0; }
+.lp-cap > p { grid-area: 1 / 1; align-self: end; font-size: var(--hy-text-lead); line-height: 1.42; opacity: 0; transition: opacity var(--hy-duration-instant) var(--hy-ease-standard); }
+.lp-cap > p.is-on { opacity: 1; transition: opacity var(--hy-duration-base) var(--hy-ease-standard) var(--hy-duration-instant); }
+.lp-cap-day { display: block; margin-bottom: 0.4rem; font-family: var(--hy-font-text); font-stretch: 62%; font-weight: 800; font-size: var(--hy-text-numeral); line-height: 1; font-variant-numeric: tabular-nums; color: var(--hy-color-accent-text); }
+.lp-cap-day b { font-weight: inherit; }
+.lp-copy { grid-area: copy; display: grid; align-self: end; color: var(--hy-color-text); }
+.lp-copy > * { grid-area: 1 / 1; align-self: end; font-size: min(var(--hy-text-display), max(6.4vw, 4rem), 12svh); }
+.lp-title { opacity: 0; }
+.lp-end { grid-area: side; align-self: end; justify-self: end; padding-bottom: 0.35rem; opacity: 0; visibility: hidden;
+  transition: opacity var(--hy-duration-base) var(--hy-ease-standard), visibility 0s linear var(--hy-duration-base); }
+.lp-end.is-on { opacity: 1; visibility: visible; transition: opacity var(--hy-duration-base) var(--hy-ease-standard), visibility 0s; }
+/* La règle des jours : une graduation par jour ; elle se remplit à la couleur de la souche */
+.lp-ruler { grid-area: ruler; height: 0.6rem; margin-top: 1.4rem; }
+.lp-ruler::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: var(--hy-border-hairline) solid var(--hy-color-border-strong); }
+.lp-ruler-fill { position: absolute; left: 0; top: calc(50% - 1px); width: 100%; height: 2px; background: var(--hy-color-accent-graphic); transform-origin: 0 50%; transform: scaleX(0); }
+.lp-tick { position: absolute; top: 0; width: 1px; height: 100%; background: var(--hy-color-border-strong); }
+.lp-tick.is-past { background: var(--hy-color-accent-graphic); }
+@media (max-width: 40rem) {
+  .lp-pin { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto auto; grid-template-areas: "cap" "." "copy" "side" "ruler";
+    padding: 0.75rem var(--hy-gutter) 1.25rem; }
+  .lp-cap { grid-area: cap; align-self: start; width: auto; text-align: left; }
+  .lp-cap > p { align-self: start; }
+  .lp-copy > * { font-size: clamp(2.5rem, 14.5vw, 4rem); }
+  .lp-end { justify-self: start; margin-top: 1.25rem; padding-bottom: 0; }
+  .lp-ruler { margin-top: 1.1rem; }
+}
+/* Figé ou animations réduites : la scène tient en un écran, à son état final, et ne reste pas à l'écran */
+.is-calm .lp-scene { height: auto; }
+.is-calm .lp-pin { position: relative; top: 0; height: min(100svh - 4rem, 58rem); min-height: 36rem; }
+
+/* ---------- 2. Le drop : la couleur de la souche monte et recouvre la chambre ; un écran ----------
+   Le drop commence une hauteur d'écran plus haut que la fin de la chambre : pendant ce dernier écran, la chambre reste à l'écran et
+   l'aplat monte par-dessus, au rythme du doigt (simple défilement, rien n'est animé). Sur ordinateur, deux colonnes : à gauche le
+   drop et ses faits, à droite la planche de la paire, sa légende et la réservation. */
+.lp-drop { position: relative; z-index: 5; margin-top: calc(-1 * (100svh - 4rem)); min-height: calc(100svh - 4rem); display: grid; align-content: center;
+  padding-block: clamp(1.5rem, 5svh, 4rem); }
+.is-calm .lp-drop { margin-top: 0; }
+.lp-drop-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); grid-template-areas: "head plate" "info notes" "info form";
+  gap: 1.75rem clamp(2.5rem, 6vw, 6rem); }
+.lp-drop-head { grid-area: head; display: grid; gap: 1.25rem; align-content: start; }
+/* À côté de la planche, « Mycelium One, » tient sur une ligne */
+@media (min-width: 60.0625rem) { .lp-drop-head .hy-title-1 { font-size: min(var(--hy-text-title-1), 5.4vw); } }
+.lp-drop-head .hy-lead { color: var(--hy-color-text); }
+.lp-info { grid-area: info; display: grid; gap: 1.5rem; align-content: start; }
+.lp-gauge .hy-gauge-cells { max-width: 20rem; }
+/* Les faits du drop : une ligne par fait, le libellé à gauche, la valeur à droite */
+.lp-facts { display: grid; border-top: var(--hy-border-hairline) solid var(--hy-color-border-strong); }
+.lp-facts > div { display: flex; justify-content: space-between; align-items: baseline; gap: 1.5rem; padding-block: 0.7rem; border-bottom: var(--hy-border-hairline) solid var(--hy-color-border-strong); }
+.lp-facts dd { font-weight: 600; font-variant-numeric: tabular-nums; text-align: right; }
+/* La réservation : les tailles et le bouton sur une ligne ; la note de taille et le retour en dessous */
+.lp-form { grid-area: form; container-type: inline-size; display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.75rem 1.5rem; }
+.lp-form .hy-sizes { flex: 0 1 auto; }
+.lp-form-notes { flex: 1 0 100%; display: grid; gap: 0.25rem; }
+.lp-status { font-size: var(--hy-text-small); line-height: var(--hy-leading-small); font-weight: 600; }
+.lp-status:empty { display: none; }
+@container (max-width: 38rem) {
+  .lp-form .hy-sizes-grid { gap: 0.375rem; }
+  .lp-form .hy-size span { min-width: 2.625rem; height: 2.625rem; font-size: 1.25rem; }
+  .lp-form { column-gap: 1rem; }
+}
+/* La légende de la planche : un repère par ligne ; trois colonnes sous la planche quand elle est assez large */
+.lp-notes { grid-area: notes; display: grid; gap: 0.75rem; padding: 0; list-style: none; }
+.lp-notes li { display: grid; grid-template-columns: 2.25rem minmax(0, 1fr); gap: 0.5rem 0.875rem; align-items: center; }
+.lp-notes b { font-weight: 600; }
+.lp-notes b::after { content: ' '; }
+@media (min-width: 75rem), (min-width: 40rem) and (max-width: 60rem) {
+  .lp-notes { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.5rem; }
+  .lp-notes p { display: contents; }
+  .lp-notes p > span { grid-column: 1 / -1; }
+}
+/* Le numéro d'un repère : le même dans la légende et sur la planche */
+.lp-n { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; font-family: var(--hy-font-text); font-stretch: 62%; font-weight: 800; font-size: 1.125rem; line-height: 1;
+  font-variant-numeric: tabular-nums; color: var(--hy-color-text); box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border-strong); }
+/* La planche : la paire finale sur le noir de la chambre (ses marges noires débordent, rognées), les repères en coordonnées de la
+   planche. Les traits sont un SVG étiré (un pixel d'épaisseur à toute taille) ; les croix et les numéros sont posés en pourcentages. */
+.lp-spec { grid-area: plate; justify-self: start; position: relative; width: min(100%, calc((100svh - 27rem) * 1.9)); aspect-ratio: 1.9; background: var(--hy-color-bg); }
+.lp-spec-img { position: absolute; inset: 0; overflow: hidden; }
+.lp-spec-img img { position: absolute; width: 108.475%; height: auto; left: -4.237%; top: -8.052%; max-width: none; }
+.lp-spec svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.lp-spec line { stroke: var(--hy-color-text); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.lp-x { position: absolute; left: var(--x); top: var(--y); width: 0; height: 0; }
+.lp-x::before, .lp-x::after { content: ''; position: absolute; background: var(--hy-color-text); }
+.lp-x::before { left: -0.45rem; top: -0.5px; width: 0.9rem; height: 1px; }
+.lp-x::after { left: -0.5px; top: -0.45rem; width: 1px; height: 0.9rem; }
+.lp-spec .lp-n { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); background: var(--hy-color-bg); }
+@media (max-width: 60rem) {
+  .lp-drop-grid { grid-template-columns: minmax(0, 1fr); grid-template-areas: "head" "plate" "notes" "info" "form"; row-gap: 2rem; }
+  .lp-spec { width: 100%; margin-top: 0.5rem; }
+}
+@media (max-width: 30rem) {
+  .lp-spec .lp-n { width: 1.875rem; height: 1.875rem; font-size: 1rem; }
+  /* Sur téléphone, les sept tailles tiennent sur une ligne, en cases égales, et le bouton passe en dessous */
+  .lp-form .hy-sizes { flex-basis: 100%; }
+  .lp-drop .hy-sizes-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.375rem; }
+  .lp-drop .hy-size span { min-width: 0; padding: 0; }
+}
+
+/* ---------- 3. Chaque paire, puis sa fin : un écran en diptyque ----------
+   Deux volets construits pareil, sur une grille commune (sous-grille) : un titre en deux lignes, une planche de même format, une
+   commande, un texte ; chaque rang s'aligne d'un volet à l'autre. À gauche, l'empreinte de la paire : la sporée que sa souche a
+   laissée dans la chambre (poussière en lames rayonnantes, propre à chaque paire), sa marque qui pousse au centre. À droite, son
+   retour à la terre : une coupe du sol sur 90 jours, que l'on parcourt (ou qui se joue une fois à l'arrivée) ; la paire s'enfouit,
+   s'émiette, les fils du sol la reprennent, et la souche fructifie là où elle était. Dans le coin de chaque planche, son chiffre :
+   le numéro de la paire, le jour. */
+/* Le conteneur est la section (pas les volets : une mise en page contenue ne peut pas suivre la sous-grille) */
+.lp-last { --dip-gx: clamp(2.5rem, 6vw, 6rem); container-type: inline-size; min-height: calc(100svh - 4rem); display: grid; align-content: center; padding-block: clamp(1.5rem, 5svh, 4rem); }
+.lp-dip { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto auto; gap: clamp(1.1rem, 2.8svh, 1.9rem) var(--dip-gx); }
+.lp-panel { grid-row: span 4; display: grid; grid-template-rows: subgrid; row-gap: inherit; min-width: 0; }
+/* Le titre se pose sur la planche ; ses jambages (g, y) gardent leur place */
+.lp-panel > .hy-title-1 { align-self: end; padding-bottom: 0.18em; }
+/* Côte à côte, chaque titre tient en deux lignes (la seconde, en italique, sur une seule) */
+@media (min-width: 60.0625rem) { .lp-panel > .hy-title-1 { font-size: min(var(--hy-text-title-1), 4.5vw); } }
+/* La planche : un cadre d'un filet, la même pour les deux volets */
+/* Sa hauteur : la moitié de la largeur d'un volet, sans dépasser un tiers d'écran */
+.lp-plate { --plate-max: 34svh; position: relative; width: 100%; height: clamp(11rem, calc((100cqi - 2 * var(--hy-gutter) - var(--dip-gx)) / 4), var(--plate-max)); margin: 0; box-shadow: inset 0 0 0 var(--hy-border-hairline) var(--hy-color-border); }
+.lp-plate canvas { position: absolute; display: block; }
+/* La coupe du sol (soil.js) est opaque : elle se pose dans le filet du cadre, qui reste visible tout autour */
+.lp-plate #soil-c { inset: var(--hy-border-hairline); width: calc(100% - 2 * var(--hy-border-hairline)); height: calc(100% - 2 * var(--hy-border-hairline)); }
+.lp-print { position: absolute; top: 6%; bottom: 6%; left: 50%; aspect-ratio: 1; transform: translateX(-50%); }
+.lp-print canvas { inset: 0; width: 100%; height: 100%; }
+.lp-print .lp-print-h { inset: 31%; width: 38%; height: 38%; }
+/* Le chiffre de la planche, en haut à gauche : le numéro et la souche, ou le jour et ce qui se passe */
+.lp-plate-n { position: absolute; z-index: 1; left: clamp(0.9rem, 1.4vw, 1.5rem); top: clamp(0.8rem, 1.2vw, 1.25rem); display: grid; gap: 0.3rem; max-width: 28%; margin: 0; }
+.lp-plate-n .hy-numeral { color: var(--hy-color-text); }
+.lp-plate-n .lp-day-n { color: var(--hy-color-accent-text); }
+.lp-plate-s { font-size: var(--hy-text-small); line-height: var(--hy-leading-small); color: var(--hy-color-text-muted); }
+/* Les commandes : le bouton à gauche, la règle des jours à droite, sur le même rang */
+.lp-ctl { display: flex; align-items: center; gap: 1rem 1.5rem; min-height: 3.25rem; }
+/* La règle des 90 jours : de la famille de la règle de la chambre (un filet, ses graduations, la souche qui le remplit et allume les
+   graduations passées), suivie en continu (le jour n'est pas arrondi, ni pendant la lecture ni sous le doigt). Sa tête est une
+   pointe de mycélium : une aiguille claire et, sur le filet, une perle de la souche et sa lueur. Le curseur natif reste dessus,
+   transparent : il porte le geste, le clavier, le focus et les annonces. Le filet, ses graduations et la tête courent sur la même
+   course que lui (--kw : sa largeur), alignés au jour près. */
+.lp-day { display: block; flex: 1 1 auto; }
+/* (le curseur déborde d'une demi-largeur de chaque côté : le filet s'aligne au pixel sur les bords de la planche) */
+.lp-days { --kw: 1.5rem; --p: 1; position: relative; height: 2.75rem; margin-inline: calc(var(--kw) / -2); }
+.lp-range { -webkit-appearance: none; appearance: none; position: relative; z-index: 1; display: block; width: 100%; height: 100%; margin: 0; background: none; cursor: pointer; }
+.lp-range::-webkit-slider-runnable-track { height: 100%; background: none; }
+.lp-range::-webkit-slider-thumb { -webkit-appearance: none; width: var(--kw); height: 2.75rem; border: 0; background: none; }
+.lp-range::-moz-range-track, .lp-range::-moz-range-progress { background: none; }
+.lp-range::-moz-range-thumb { width: var(--kw); height: 2.75rem; border: 0; border-radius: 0; background: none; }
+.lp-range:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: var(--hy-focus-offset); }
+.lp-days-run { position: absolute; top: 0; bottom: 0; left: calc(var(--kw) / 2); right: calc(var(--kw) / 2); pointer-events: none; }
+.lp-days-run > * { position: absolute; left: 0; right: 0; }
+.lp-days-line { top: calc(50% - 0.5px); height: 1px; background: var(--hy-color-border-strong); }
+.lp-days-fill { top: calc(50% - 1px); height: 2px; background: var(--hy-color-accent-graphic); transform-origin: 0 50%; transform: scaleX(var(--p)); }
+.lp-ticks { top: calc(50% - 0.3125rem); height: 0.625rem; }
+.lp-ticks i { position: absolute; top: 0; width: 1px; height: 100%; margin-left: -0.5px; background: var(--hy-color-border-strong);
+  transition: background-color var(--hy-duration-base) var(--hy-ease-standard); }
+.lp-ticks i:is(:first-child, :last-child) { top: -0.1875rem; height: calc(100% + 0.375rem); }
+.lp-ticks i.is-past { background: var(--hy-color-accent-graphic); }
+/* (la tête est placée par left, pas par une translation de toute la course : une translation agrandirait la page sur téléphone) */
+.lp-days-run > .lp-days-head { top: 0; bottom: 0; left: calc(var(--p) * 100%); right: auto; width: 0; }
+.lp-days-pin { position: absolute; left: -1px; top: calc(50% - 1.125rem); width: 2px; height: 2.25rem; border-radius: 1px; background: var(--hy-color-text); opacity: 0.9; }
+.lp-days-bead { position: absolute; left: -0.3125rem; top: calc(50% - 0.3125rem); width: 0.625rem; height: 0.625rem; border-radius: 50%;
+  background: var(--hy-color-accent-graphic); box-shadow: 0 0 0 2px var(--hy-color-bg), 0 0 0.875rem 0.125rem color-mix(in srgb, var(--hy-color-accent-graphic) 55%, transparent);
+  transition: transform var(--hy-duration-fast) var(--hy-ease-out); }
+/* Sous la main ou au clavier, la perle grossit un peu : la règle se saisit */
+@media (hover: hover) { .lp-range:hover ~ .lp-days-run .lp-days-bead { transform: scale(1.3); } }
+.lp-range:is(:focus-visible, :active) ~ .lp-days-run .lp-days-bead { transform: scale(1.3); }
+@media (forced-colors: active) {
+  .lp-days-run { forced-color-adjust: none; }
+  .lp-days-line, .lp-ticks i, .lp-days-pin { background: CanvasText; }
+  .lp-days-fill, .lp-ticks i.is-past, .lp-days-bead { background: Highlight; box-shadow: none; }
+}
+.lp-txt { display: flex; flex-wrap: wrap; align-items: start; justify-content: space-between; gap: 1.25rem 2rem; }
+.lp-txt .hy-lead { flex: 1 1 18rem; max-width: 34rem; }
+@media (max-width: 60rem) {
+  .lp-dip { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; row-gap: 4.5rem; }
+  .lp-panel { grid-row: auto; grid-template-rows: none; gap: 1.25rem; }
+  .lp-plate { height: clamp(11rem, calc((100cqi - 2 * var(--hy-gutter)) / 2), 60svh); }
+  /* La légende du sol s'élargit sur la planche pleine largeur : deux lignes au plus, le sol garde sa profondeur */
+  #soil .lp-plate-n { max-width: 66%; }
+}
+/* Sur téléphone, la planche est moins allongée : la coupe du sol garde sous sa légende la place de la paire et de la touffe */
+@media (max-width: 40rem) { .lp-plate { height: clamp(13rem, calc((100cqi - 2 * var(--hy-gutter)) / 1.45), 60svh); } }
+/* Écrans bas (portables) : le diptyque tient encore en un écran */
+@media (min-width: 60.0625rem) and (max-height: 50rem) { .lp-dip { row-gap: 0.9rem; } .lp-plate { --plate-max: 30svh; } }
+
+/* ---------- Le pied de page : le mot-symbole en très grand, sa marque vivante ----------
+   Le H est la marque elle-même (le canvas de brand/mark.js), calée sur la ligne de base et la hauteur de capitale de YPHA ; le mot
+   occupe toute la largeur. Il pousse quand le pied de page arrive à l'écran. Dessous : l'état du drop et l'heure d'ouverture de la chambre,
+   le plan de la page et l'alerte de la prochaine souche (pas de compte à rebours : la charte n'en veut aucun). */
+.lp-foot { position: relative; isolation: isolate; padding-block: clamp(3rem, 7vw, 5.5rem) 2rem; border-top: var(--hy-border-hairline) solid var(--hy-color-border); overflow: hidden; }
+/* Le réseau vivant derrière le pied de page (network.js) : il contourne les lettres du mot et s'écarte de la main */
+.lp-net { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; pointer-events: none; }
+.lp-foot-word { --fw: 10vw; margin: 0 0 clamp(2rem, 4.5vw, 3.5rem); font-family: var(--hy-font-display); font-size: var(--fw); font-weight: 560; font-variation-settings: 'opsz' 22;
+  line-height: 0.75; letter-spacing: 0.01em; white-space: nowrap; color: var(--hy-color-text); }
+.lp-foot-slot { position: relative; display: inline-block; width: 0.74em; height: 0.75em; margin-right: 0.035em; vertical-align: baseline; }
+.lp-foot-h { position: absolute; max-width: none; }
+.lp-foot-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.8fr) minmax(0, 1.3fr); gap: 2.5rem clamp(2rem, 5vw, 5rem); padding-top: 2rem;
+  border-top: var(--hy-border-hairline) solid var(--hy-color-border-strong); }
+.lp-foot-grid h2 { margin: 0 0 1rem; font-family: var(--hy-font-text); font-size: 1rem; font-weight: 600; line-height: 1.4; }
+.lp-foot-grid p { color: var(--hy-color-text-muted); }
+.lp-foot-grid p + p { margin-top: 0.75rem; }
+.lp-foot-nav ul { display: grid; gap: 0.6rem; margin: 0; padding: 0; list-style: none; }
+.lp-foot-nav a { color: var(--hy-color-text); text-decoration: none; background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size var(--hy-duration-base) var(--hy-ease-out); }
+@media (hover: hover) { .lp-foot-nav a:hover { background-size: 100% 1px; } }
+.lp-foot-nav a:focus-visible { outline: var(--hy-focus-width) solid var(--hy-color-focus); outline-offset: 4px; }
+.lp-news { display: grid; gap: 0.75rem; align-content: start; }
+.lp-foot-grid > * { align-self: start; }
+.lp-news-row { display: flex; gap: 0.75rem; }
+.lp-news-row .hy-input { flex: 1 1 auto; min-width: 0; }
+.lp-news .lp-status { color: var(--hy-color-text-muted); }
+.lp-foot-legal { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 2rem; margin-top: clamp(3rem, 6vw, 5rem); color: var(--hy-color-text-muted); }
+@media (max-width: 60rem) { .lp-foot-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .lp-news { grid-column: 1 / -1; } }
+@media (max-width: 30rem) { .lp-foot-grid { grid-template-columns: minmax(0, 1fr); } .lp-news-row { flex-direction: column; } .lp-news-row .hy-btn { align-self: start; } }
+
+/* Captures : ?seul=<id> ne garde qu'une section */
+[data-seul] main > section:not(.is-seul), [data-seul] .lp-foot { display: none; }
+[data-seul] .lp-drop { margin-top: 0; }
+
+/* Structure : la page en gris, réduite à ses blocs, sans changer la mise en page (?structure=1 ou message hypha:set) */
+.is-structure { --s-bg: var(--hy-palette-myc-50); --s-block: var(--hy-palette-myc-200); --s-ink: var(--hy-palette-myc-300); --s-line: var(--hy-palette-myc-300); }
+.is-structure, .is-structure body, .is-structure :is(.lp-nav, .lp-scene, .lp-last) { background: var(--s-bg); }
+.is-structure body * { color: transparent !important; text-decoration-color: transparent !important; border-color: var(--s-line) !important; box-shadow: none !important; }
+.is-structure :is(h1, h2, p, b, label, legend, dt, dd, .hy-size span, .lp-navlink, .lp-notes span) {
+  background-image: repeating-linear-gradient(to bottom, transparent 0 0.22lh, var(--s-ink) 0.22lh 0.78lh, transparent 0.78lh 1lh); background-size: 100% 1lh;
+}
+.is-structure :is(p, h1, h2) :is(span, b, i, a) { background: none !important; }
+.is-structure .hy-btn, .is-structure .hy-input { background: var(--s-block) !important; }
+.is-structure .hy-btn::before { display: none; }
+.is-structure :is(.hy-size span, .lp-n) { background-color: transparent; box-shadow: inset 0 0 0 1px var(--s-line) !important; }
+.is-structure .hy-on-strain { background: var(--s-block) !important; }
+.is-structure :is(.lp-ruler-fill, .lp-tick, .hy-gauge-cells i, .lp-x::before, .lp-x::after, .lp-days-line, .lp-days-fill, .lp-ticks i, .lp-days-pin, .lp-days-bead) { background: var(--s-line) !important; }
+.is-structure .lp-spec line { stroke: var(--s-line); }
+.is-structure :is(canvas, .lp-set img, .lp-spec-img img), .is-structure .lp-word-h svg { visibility: hidden; }
+.is-structure .lp-shade { position: relative; }
+.is-structure .lp-shade::after { content: ''; position: absolute; inset: 0; background: var(--s-block)
+  url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 0L100 100M100 0L0 100' stroke='%23FFFFFF' stroke-width='0.6' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.is-structure .lp-set.lp-shade { position: absolute; }
+.is-structure :is(.lp-brand, .lp-foot-brand) .lp-shade::after { background-image: none; }
+.is-structure .lp-title, .is-structure .lp-end { opacity: 1 !important; visibility: visible !important; }
+.is-structure .lp-intro { opacity: 0 !important; }
+body { transition: opacity var(--hy-duration-fast) var(--hy-ease-standard); }
+</style>
+</head>
+<body class="hy-root">
+<a class="lp-skip" href="#main">Skip to content</a>
+<header class="lp-nav">
+  <div class="lp-wrap">
+    <a class="lp-brand" href="#top" aria-label="HYPHA, back to top"><span class="hy-wordmark hy-wordmark--small lp-word"><span class="lp-word-h lp-shade" data-lockup="intro" aria-hidden="true"></span><span aria-hidden="true">YPHA</span></span></a>
+    <a class="lp-navlink" href="#drop">Drop <span data-strain-drop>004</span>, 312 of 500 grown</a>
+    <a class="hy-btn hy-btn--primary hy-btn--compact" href="#drop">Reserve</a>
+  </div>
+</header>
+
+<main id="main">
+<section class="lp-scene hy-theme-chamber" id="top" aria-labelledby="scene-t">
+  <div class="lp-pin" id="pin">
+    <div class="lp-set lp-shade" id="set" role="img" aria-label="A sneaker grown from mycelium in the dark, its whole surface standing in white threads.">
+      <img class="lp-still" id="still" src="media/chambre-debut.jpg" alt="" aria-hidden="true">
+      <canvas id="pair" aria-hidden="true"></canvas>
+    </div>
+    <div class="lp-cap" aria-hidden="true">
+      <p><span class="lp-cap-day">Day <b data-day>1</b></span>We seed the mold with living culture. Scroll, and watch it grow.</p>
+      <p><span class="lp-cap-day">Day <b data-day>1</b></span>Each seed wakes, and reaches out in threads.</p>
+      <p><span class="lp-cap-day">Day <b data-day>1</b></span>The colonies meet. The pair finds its shape.</p>
+      <p><span class="lp-cap-day">Day <b data-day>1</b></span>The threads stand up, into a down 6&nbsp;mm deep.</p>
+      <p><span class="lp-cap-day">Day <b data-day>1</b></span>We could press it flat, into leather. We stop it here.</p>
+    </div>
+    <div class="lp-copy">
+      <p class="lp-intro hy-display" aria-hidden="true">Nine days<br><i>in the dark.</i></p>
+      <h1 class="lp-title hy-display" id="scene-t">Grown,<br><i>not made.</i></h1>
+    </div>
+    <div class="lp-end" id="scene-end">
+      <a class="hy-btn hy-btn--primary" href="#drop">Reserve a pair</a>
+    </div>
+    <div class="lp-ruler" aria-hidden="true" id="ruler"><i class="lp-ruler-fill"></i></div>
+  </div>
+  <p class="lp-sr">As you scroll, nine days pass in the growing chamber. The mold is seeded with living culture, points of light in the dark. On day 3 each seed sends out threads; on day 5 the colonies meet and the pair takes its shape; on day 7 the threads stand up into a down. On day 9, instead of pressing it into leather, we stop the growth and keep the pair as it grew.</p>
+</section>
+
+<section class="lp-drop hy-on-strain" id="drop" aria-labelledby="drop-t" data-cx-dwell="4500">
+  <div class="lp-wrap lp-drop-grid">
+    <div class="lp-drop-head">
+      <p class="hy-numeral">Drop <span data-strain-drop>004</span></p>
+      <h2 class="hy-title-1" id="drop-t">Mycelium One,<br><i>as it grew.</i></h2>
+      <p class="hy-lead">Mycelium is usually pressed into leather. We dry ours standing, on day&nbsp;9: the growth stops, the down stays.</p>
+    </div>
+    <figure class="lp-spec lp-shade hy-theme-chamber">
+      <span class="lp-spec-img"><img src="media/chambre-fin.jpg" width="1280" height="720" loading="lazy" decoding="async" alt="The Mycelium One in side view, covered in standing white threads: tufts across the upper, beaded eyelets along the lacing, a denser sole."></span>
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><line x1="58.14" y1="24.96" x2="58.14" y2="8.86"/><line x1="39.41" y1="47.99" x2="39.41" y2="8.86"/><line x1="23.73" y1="72.14" x2="23.73" y2="88.57"/></svg>
+      <span class="lp-x" style="--x: 58.14%; --y: 24.96%" aria-hidden="true"></span><span class="lp-n" style="--x: 58.14%; --y: 8.86%" aria-hidden="true">1</span>
+      <span class="lp-x" style="--x: 39.41%; --y: 47.99%" aria-hidden="true"></span><span class="lp-n" style="--x: 39.41%; --y: 8.86%" aria-hidden="true">2</span>
+      <span class="lp-x" style="--x: 23.73%; --y: 72.14%" aria-hidden="true"></span><span class="lp-n" style="--x: 23.73%; --y: 88.57%" aria-hidden="true">3</span>
+    </figure>
+    <ol class="lp-notes">
+      <li><span class="lp-n" aria-hidden="true">1</span><p><b>Down</b><span>Threads up to 6&nbsp;mm, dried to hold.</span></p></li>
+      <li><span class="lp-n" aria-hidden="true">2</span><p><b>Eyelets</b><span>Grown around pins. Hemp laces.</span></p></li>
+      <li><span class="lp-n" aria-hidden="true">3</span><p><b>Sole</b><span>Pressed dense, underfoot only.</span></p></li>
+    </ol>
+    <div class="lp-info">
+      <div class="hy-gauge lp-gauge">
+        <div class="hy-gauge-cells" aria-hidden="true"><i class="is-grown"></i><i class="is-grown"></i><i class="is-grown"></i><i class="is-grown"></i><i class="is-grown"></i><i class="is-grown"></i><i></i><i></i><i></i></div>
+        <p><span data-strain-name>Pink Oyster</span>, day 6 of 9 in the chamber</p>
+      </div>
+      <dl class="lp-facts">
+        <div><dt>Price</dt><dd>€165</dd></div>
+        <div><dt>Ships</dt><dd>Day 9, at 09:00</dd></div>
+        <div><dt>Pairs in the chamber</dt><dd>312 of 500</dd></div>
+      </dl>
+    </div>
+    <form class="lp-form" id="drop-form" novalidate>
+      <fieldset class="hy-sizes"><legend>Size, EU</legend><div class="hy-sizes-grid">
+        <label class="hy-size"><input type="radio" name="size" value="39"><span>39</span></label>
+        <label class="hy-size"><input type="radio" name="size" value="40"><span>40</span></label>
+        <label class="hy-size"><input type="radio" name="size" value="41"><span>41</span></label>
+        <label class="hy-size"><input type="radio" name="size" value="42"><span>42</span></label>
+        <label class="hy-size"><input type="radio" name="size" value="43"><span>43</span></label>
+        <label class="hy-size"><input type="radio" name="size" value="44" disabled aria-describedby="size-out"><span>44</span></label>
+        <label class="hy-size"><input type="radio" name="size" value="45"><span>45</span></label>
+      </div></fieldset>
+      <button type="submit" class="hy-btn hy-btn--primary">Start my pair</button>
+      <div class="lp-form-notes">
+        <p class="hy-help" id="size-out">Size 44 is fully grown for this drop.</p>
+        <p class="lp-status" id="drop-status" aria-live="polite"></p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="lp-last" id="after" aria-labelledby="mark-t soil-t" data-cx-dwell="11000">
+  <div class="lp-wrap lp-dip">
+    <div class="lp-panel">
+      <h2 class="hy-title-1" id="mark-t">No two pairs<br><i>grow alike.</i></h2>
+      <figure class="lp-plate lp-shade">
+        <div class="lp-print">
+          <canvas id="print" role="img" aria-label="The spore print of pair 0412: the spores of its strain, fallen in fine radiating gills, with the mark of the pair at its centre."></canvas>
+          <canvas class="lp-print-h" id="one-mark" data-hy-scene="mark" data-hy-seed="412" aria-hidden="true"></canvas>
+        </div>
+        <figcaption class="lp-plate-n"><span class="hy-numeral" id="pair-no" aria-live="polite"><span class="lp-sr">Pair </span>0412</span><span class="lp-plate-s" id="print-g"><span data-strain-name>Pink Oyster</span></span></figcaption>
+      </figure>
+      <div class="lp-ctl"><button type="button" class="hy-btn hy-btn--secondary" id="grow-another">Grow another</button></div>
+      <div class="lp-txt"><p class="hy-lead">Each pair carries the mark grown from its number, and the spore print its strain left in the chamber.</p></div>
+    </div>
+    <div class="lp-panel" id="soil">
+      <h2 class="hy-title-1" id="soil-t">Bury it.<br><i>Ninety days to soil.</i></h2>
+      <figure class="lp-plate lp-shade">
+        <canvas id="soil-c" role="img" aria-label="A cross-section of soil. The worn pair is buried, crumbles, and is taken back by the threads of the soil; on day 90, oyster mushrooms of its strain fruit where it lay."></canvas>
+        <figcaption class="lp-plate-n" aria-hidden="true"><span class="hy-numeral">Day <span class="lp-day-n" id="day-n">90</span></span><span class="lp-plate-s" id="day-cap">The strain fruits where it lay.</span></figcaption>
+      </figure>
+      <div class="lp-ctl lp-day"><label class="lp-sr" for="day">Day in the ground, from 0 to 90</label>
+        <div class="lp-days">
+          <input class="lp-range" id="day" type="range" min="0" max="90" step="1" value="90">
+          <div class="lp-days-run" aria-hidden="true"><i class="lp-days-line"></i><i class="lp-ticks"></i><i class="lp-days-fill"></i><i class="lp-days-head"><i class="lp-days-pin"></i><i class="lp-days-bead"></i></i></div>
+        </div></div>
+      <div class="lp-txt"><p class="hy-lead">Bury it, or send it back: we compost it and take €40 off your next pair.</p><a class="hy-btn hy-btn--primary" href="#drop">Reserve a pair</a></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="lp-foot" data-cx-dwell="5500">
+  <canvas class="lp-net" aria-hidden="true"></canvas>
+  <div class="lp-wrap">
+    <p class="lp-foot-word" role="img" aria-label="HYPHA"><span class="lp-foot-slot lp-shade" aria-hidden="true"><canvas class="lp-foot-h" id="foot-h" data-hy-scene="mark" data-hy-seed="44"></canvas></span><span aria-hidden="true">YPHA</span></p>
+    <div class="lp-foot-grid">
+      <div>
+        <h2>Drop <span data-strain-drop>004</span>, <span data-strain-name>Pink Oyster</span></h2>
+        <p>Day 6 of 9 in the chamber. 312 of 500 pairs growing.</p>
+        <p>We open the chamber at 09:00, on day 9 of each drop.</p>
+      </div>
+      <nav class="lp-foot-nav" aria-labelledby="foot-nav-t">
+        <h2 id="foot-nav-t">On this page</h2>
+        <ul>
+          <li><a href="#top">The chamber</a></li>
+          <li><a href="#drop">The drop</a></li>
+          <li><a href="#after">Your pair’s mark</a></li>
+          <li><a href="#soil">Return to soil</a></li>
+        </ul>
+      </nav>
+      <form class="lp-news" id="news" novalidate>
+        <h2><label for="news-mail">Be told when the next strain seeds</label></h2>
+        <div class="lp-news-row">
+          <input class="hy-input" id="news-mail" type="email" autocomplete="email" spellcheck="false" aria-describedby="news-status">
+          <button type="submit" class="hy-btn hy-btn--secondary">Notify me</button>
+        </div>
+        <p class="lp-status" id="news-status" aria-live="polite"></p>
+      </form>
+    </div>
+    <div class="lp-foot-legal">
+      <p class="hy-small">A fictional brand, created by Topiary to show its work. No product exists.</p>
+      <p class="hy-small">© 2026 Topiary</p>
+    </div>
+  </div>
+</footer>
+
+<script src="../brand/grow.js"></script>
+<script src="../brand/mark.js"></script>
+<script src="network.js"></script>
+<script src="soil.js"></script>
+<script>
+(function () {
+  'use strict';
+  var html = document.documentElement, Q = new URLSearchParams(location.search), calm = html.classList.contains('is-calm');
+  var STRAINS = { pink: { drop: '004', name: 'Pink Oyster' }, gold: { drop: '005', name: 'Golden Oyster' }, blue: { drop: '006', name: 'Blue Oyster' } };
+  function clamp(v, a, b) { return v < a ? a : v > b ? b : v; }
+  function smooth(a, b, v) { var t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function $(s) { return document.querySelector(s); }
+  function $$(s) { return Array.prototype.slice.call(document.querySelectorAll(s)); }
+
+  if (Q.get('seul')) $$('main > section').forEach(function (s) { s.classList.toggle('is-seul', s.id === Q.get('seul')); });
+
+  // ---------- Le mot-symbole : la marque d'HYPHA (brand/mark.js) tient lieu de premier H ----------
+  // Dans la barre, elle pousse à l'ouverture ; ?t=<ms> fige cette ouverture à un instant (captures)
+  $$('[data-lockup]').forEach(function (el) {
+    HyphaMark.lockup(el, { intro: el.getAttribute('data-lockup') === 'intro' && (!calm || Q.has('t')), t: Q.has('t') ? parseFloat(Q.get('t')) || 0 : null });
+  });
+  var fixedK = Q.has('k') ? clamp(parseFloat(Q.get('k')) || 0, 0, 1) : null;
+
+  // ---------- Souche courante : le drop affiché suit la souche ----------
+  function currentStrain() { return Object.keys(STRAINS).filter(function (s) { return html.classList.contains('hy-strain-' + s); })[0] || 'pink'; }
+  function applyStrain() {
+    var d = STRAINS[currentStrain()];
+    $$('[data-strain-drop]').forEach(function (e) { e.textContent = d.drop; });
+    $$('[data-strain-name]').forEach(function (e) { e.textContent = d.name; });
+  }
+  // Le thème ou la souche change : les dessins reprennent leurs couleurs (la marque, l'empreinte, la coupe du sol)
+  function recolor() { HyphaGrow.repaint(); if (typeof net !== 'undefined' && net) net.redraw(); if (typeof PRINT !== 'undefined') PRINT.build(); if (typeof SOIL !== 'undefined') { SOIL.build(); SOIL.again(); } }
+  function setTheme(th) { if (th !== 'chamber' && th !== 'daylight') return; html.classList.remove('hy-theme-chamber', 'hy-theme-daylight'); html.classList.add('hy-theme-' + th); recolor(); }
+  function setStrain(st) { if (!STRAINS[st]) return; Object.keys(STRAINS).forEach(function (s) { html.classList.remove('hy-strain-' + s); }); html.classList.add('hy-strain-' + st); applyStrain(); recolor(); }
+  function setStructure(on) {
+    if (on === html.classList.contains('is-structure')) return;
+    if (calm) { html.classList.toggle('is-structure', on); return; }
+    document.body.style.opacity = '0';
+    setTimeout(function () { html.classList.toggle('is-structure', on); document.body.style.opacity = ''; }, 200);
+  }
+  // La page parente (onglets de la section des agents) règle l'affichage : { type: 'hypha:set', theme, strain, structure }
+  window.addEventListener('message', function (e) {
+    if (e.source !== window.parent || !e.data || e.data.type !== 'hypha:set') return;
+    if (e.data.theme) setTheme(e.data.theme);
+    if (e.data.strain) setStrain(e.data.strain);
+    if ('structure' in e.data) setStructure(!!e.data.structure);
+  });
+  applyStrain();
+
+  // ---------- 1. La chambre : une suite d'images dessinée sur un canvas, que le défilement fait avancer ----------
+  // k va de 0 à 1 : les neuf jours, un jour par neuvième (la suite étire déjà le début de la pousse).
+  // L'encombrement de la paire dans l'image (fractions, tous instants confondus) : la scène se cadre sur lui, le reste est du noir.
+  var BOX = { x0: 0.087, x1: 0.9, y0: 0.215, y1: 0.799 }, IR = 16 / 9, RATIO = (BOX.x1 - BOX.x0) * IR / (BOX.y1 - BOX.y0);
+  var scene = $('#top'), pin = $('#pin'), cv = $('#pair'), still = $('#still'), cap = $('.lp-cap'), copy = $('.lp-copy'),
+    days = $$('[data-day]'), fill = $('.lp-ruler-fill'), intro = $('.lp-intro'), title = $('.lp-title'), end = $('#scene-end'), ruler = $('#ruler'),
+    caps = $$('.lp-cap > p'), lastDay = 0, lastCap = -1, lastOff = null, phone = false;
+  for (var d = 0; d <= 9; d++) { var tk = document.createElement('i'); tk.className = 'lp-tick'; tk.style.left = (d / 9 * 100) + '%'; ruler.appendChild(tk); }
+  var ticks = $$('#ruler .lp-tick');
+  // Le relevé change tous les deux jours : 1, 3, 5, 7, puis le jour 9, celui du retournement
+  var CAPS = [0, 2 / 9, 4 / 9, 6 / 9, 8 / 9];
+
+  // La suite d'images : une WebP par image, 960 px sur téléphone et en miniature, 1 280 px ailleurs. Elles arrivent du grossier au fin
+  // (une image sur 32, puis 16, 8…), d'abord autour de la position courante ; chacune est décodée à l'avance autour de cette position.
+  // Si le défilement va plus vite que le décodage, on dessine la plus proche prête.
+  var SEQ = (function () {
+    var small = Q.has('mini') || Math.min(screen.width, window.innerWidth) < 700, W = small ? 960 : 1280;
+    var N = 150, blobs = [], asked = [], cache = new Map(), busy = {}, want = 0, drawn = -1, dir = 1, CAP = small ? 26 : 18, active = 0, started = false;
+    var ctx = cv.getContext('2d', { alpha: false });
+    var order = [], seen = {};
+    [32, 16, 8, 4, 2, 1].forEach(function (s) { for (var i = 0; i < N; i += s) if (!seen[i]) { seen[i] = true; order.push(i); } });
+    if (!seen[N - 1]) order.push(N - 1);
+    function url(i) { return 'media/chambre-' + W + '/' + ('00' + i).slice(-3) + '.webp'; }
+    // La prochaine image à demander : celles qui entourent la position courante d'abord (dans le sens du défilement), puis l'ordre grossier-fin
+    function next() {
+      for (var s = 0; s <= 10; s++) { var a = want + s * dir, b2 = want - s * dir; if (a >= 0 && a < N && !asked[a]) return a; if (s <= 3 && b2 >= 0 && b2 < N && !asked[b2]) return b2; }
+      while (order.length && asked[order[0]]) order.shift();
+      return order.length ? order[0] : -1;
+    }
+    function pump() {
+      while (started && active < 6) {
+        var i = next(); if (i < 0) return;
+        asked[i] = true; active++;
+        (function (i) {
+          fetch(url(i)).then(function (r) { if (!r.ok) throw new Error(r.status); return r.blob(); })
+            .then(function (bl) { blobs[i] = bl; if (Math.abs(i - want) <= 10) decode(i); }, function () { /* image manquante : la plus proche la remplace */ })
+            .then(function () { active--; pump(); });
+        })(i);
+      }
+    }
+    function trim() {
+      while (cache.size > CAP) {
+        var far = -1, fd = -1;
+        cache.forEach(function (_, i) { var dd = Math.abs(i - want); if (dd > fd) { fd = dd; far = i; } });
+        var bm = cache.get(far); if (bm && bm.close) bm.close(); cache.delete(far);
+      }
+    }
+    function decode(i) {
+      if (i < 0 || i >= N || cache.has(i) || busy[i] || !blobs[i]) return;
+      busy[i] = true;
+      var p = window.createImageBitmap ? createImageBitmap(blobs[i]) : new Promise(function (res, rej) { var im = new Image(); im.onload = function () { res(im); }; im.onerror = rej; im.src = URL.createObjectURL(blobs[i]); });
+      p.then(function (bm) { delete busy[i]; cache.set(i, bm); trim(); paint(); }, function () { delete busy[i]; });
+    }
+    function prefetch() {
+      decode(want);
+      for (var s = 1; s <= 8; s++) { decode(want + s * dir); if (s <= 3) decode(want - s * dir); }
+    }
+    function nearest() {
+      if (cache.has(want)) return want;
+      var best = -1, bd = 1e9;
+      cache.forEach(function (_, i) { var dd = Math.abs(i - want); if (dd < bd) { bd = dd; best = i; } });
+      return best;
+    }
+    function paint() {
+      var i = nearest();
+      if (i < 0 || i === drawn) return;
+      ctx.drawImage(cache.get(i), 0, 0, cv.width, cv.height);
+      drawn = i;
+      if (still) { still.classList.add('is-gone'); }
+    }
+    // La taille du canvas : celle de l'image à l'écran, sans dépasser la définition de la suite
+    function size(cssW) {
+      var px = Math.min(W, Math.round(cssW * Math.min(2, window.devicePixelRatio || 1)));
+      if (cv.width !== px) { cv.width = px; cv.height = Math.round(px / IR); drawn = -1; ctx.imageSmoothingQuality = 'high'; paint(); }
+    }
+    function to(k) {
+      var i = Math.round(clamp(k, 0, 1) * (N - 1));
+      if (i !== want) { dir = i > want ? 1 : -1; want = i; }
+      prefetch(); paint(); pump();
+    }
+    function start() { if (started) return; started = true; pump(); }
+    return { to: to, size: size, start: start };
+  })();
+
+  // La paire tient entre le haut de la scène (le relevé, sur téléphone) et ce qui est posé en bas ; l'image entière l'entoure, son
+  // encombrement tombe exactement sur la scène. Sur ordinateur, la paire ne dépasse pas 1 120 px : l'image reste à sa définition.
+  function layout() {
+    var Wp = pin.clientWidth, cs = getComputedStyle(pin), gap = 16, gut = parseFloat(cs.paddingLeft) || 16;
+    phone = Wp < 640;
+    var top = phone ? cap.offsetTop + cap.offsetHeight + gap : parseFloat(cs.paddingTop) || 16;
+    var bottom = Math.min(copy.offsetTop, end.offsetTop, phone ? Infinity : cap.offsetTop) - gap;
+    var maxW = phone ? Wp - gut : Math.min(Wp - 2 * gut, 1120), band = Math.max(60, bottom - top);
+    var h = Math.min(maxW / RATIO, band), w = Math.round(h * RATIO), y = Math.round(top + (band - h) * (phone ? 0.42 : 0.45));
+    h = Math.round(w / RATIO);
+    pin.style.setProperty('--set-x', Math.round((Wp - w) / 2) + 'px');
+    pin.style.setProperty('--set-y', y + 'px');
+    pin.style.setProperty('--set-w', w + 'px');
+    pin.style.setProperty('--set-h', h + 'px');
+    var iw = w / (BOX.x1 - BOX.x0), ih = iw / IR, css = { width: iw.toFixed(1) + 'px', height: ih.toFixed(1) + 'px', left: (-BOX.x0 * iw).toFixed(1) + 'px', top: (-BOX.y0 * ih).toFixed(1) + 'px' };
+    [cv, still].forEach(function (el) { Object.keys(css).forEach(function (p) { el.style[p] = css[p]; }); });
+    SEQ.size(iw);
+  }
+  layout();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { layout(); render(kShown); });
+  window.addEventListener('resize', layout);
+
+  var kShown = 0;
+  function render(k) {
+    kShown = k;
+    SEQ.to(k);
+    var day = Math.min(9, 1 + Math.floor(k * 9 + 1e-6)), ci = 0;
+    if (day !== lastDay) { days.forEach(function (e) { e.textContent = String(day); }); lastDay = day; }
+    CAPS.forEach(function (v, i) { if (k >= v - 1e-6) ci = i; });
+    if (ci !== lastCap) { caps.forEach(function (e, i) { e.classList.toggle('is-on', i === ci); }); lastCap = ci; }
+    // Le relevé du jour 9 reste le plus longtemps possible, puis laisse la place à l'appel final (sur ordinateur, même place)
+    var off = !phone && k >= 0.975;
+    if (off !== lastOff) { cap.classList.toggle('is-off', off); lastOff = off; }
+    fill.style.transform = 'scaleX(' + k.toFixed(4) + ')';
+    ticks.forEach(function (t, i) { t.classList.toggle('is-past', i <= k * 9 + 1e-6); });
+    intro.style.opacity = String(1 - smooth(0.47, 0.53, k));
+    var ti = smooth(0.92, 0.98, k);
+    title.style.opacity = String(ti);
+    title.style.transform = ti < 1 ? 'translateY(' + ((1 - ti) * 0.3).toFixed(3) + 'em)' : '';
+    end.classList.toggle('is-on', k >= 0.985);
+  }
+  if (calm) {
+    // Animations réduites ou état figé : l'image finale ; ?k= (captures) charge la suite et se place à l'instant demandé
+    if (fixedK != null && fixedK < 1) SEQ.start(); else { still.src = 'media/chambre-fin.jpg'; cv.style.visibility = 'hidden'; }
+    render(fixedK != null ? fixedK : 1);
+  } else {
+    // La pousse suit le défilement, amortie (constante de 140 ms). En haut de la page, la chambre montre sa toute première image :
+    // la basket en semis dans le noir ; rien n'avance tant que l'on ne défile pas.
+    // La pousse occupe la scène moins sa dernière hauteur d'écran, pendant laquelle le drop monte par-dessus la chambre.
+    SEQ.start();
+    var kNow = 0, last = 0, raf = 0, stick = parseFloat(getComputedStyle(pin).top) || 64;
+    var tick = function (now) {
+      raf = 0;
+      var r = scene.getBoundingClientRect();
+      // Page masquée (la miniature de Clover quand son atelier est fermé) : aucune taille à lire, la pousse reste où elle est
+      // et attend l'image suivante (le navigateur ne les donne pas tant que la page est masquée)
+      if (!r.height) { last = 0; raf = requestAnimationFrame(tick); return; }
+      var span = Math.max(1, r.height - 2 * pin.offsetHeight), goal = clamp((stick - r.top) / span, 0, 1);
+      var dt = last ? Math.min(64, now - last) : 16; last = now;
+      kNow = Math.abs(goal - kNow) < 0.0004 ? goal : kNow + (goal - kNow) * (1 - Math.exp(-dt / 140));
+      render(kNow);
+      if (kNow !== goal) raf = requestAnimationFrame(tick); else last = 0;
+    };
+    var kick = function () { if (!raf) raf = requestAnimationFrame(tick); };
+    render(0);
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', kick);
+    kick();
+  }
+
+  // ---------- 3. Chaque paire, puis sa fin ----------
+  function prng(seed) { var a = seed >>> 0; return function () { a = (a + 0x6D2B79F5) | 0; var t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function easeOut(t) { return 1 - Math.pow(1 - clamp(t, 0, 1), 3); }
+  function easeInOut(t) { t = clamp(t, 0, 1); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function backOut(t) { var c = 1.5; t = clamp(t, 0, 1) - 1; return 1 + (c + 1) * t * t * t + c * t * t; }
+  function role(el, name, d) { var v = getComputedStyle(el).getPropertyValue('--hy-color-' + name).trim(); return /^#[0-9a-f]{6}$/i.test(v) ? v : d; }
+  function rgba(hex, a) { var n = parseInt(hex.slice(1), 16); return 'rgba(' + ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255) + ',' + a + ')'; }
+  // Une animation portée par le temps (requestAnimationFrame), interrompue par la suivante
+  function run(dur, step, done) {
+    var t0 = performance.now(), id = { on: true };
+    (function f(now) { if (!id.on) return; var q = clamp((now - t0) / dur, 0, 1); step(q); if (q < 1) requestAnimationFrame(f); else { id.on = false; if (done) done(); } })(t0);
+    return id;
+  }
+
+  // L'empreinte : la sporée que la souche de la paire a laissée. Des lames rayonnent depuis le pied (les longues, puis des plus
+  // courtes entre elles, comme sous un chapeau) ; la poussière y est dense près du pied et s'éclaircit vers le bord, qui ondule.
+  // La graine de la paire règle le nombre de lames, leur départ et le bord : deux paires n'ont jamais la même empreinte.
+  var PRINT = (function () {
+    var cv = $('#print'), seed = 412, img = null, k = calm ? 1 : 0, anim = null;
+    function build() {
+      var W = cv.clientWidth; if (!W) return;
+      var dpr = Math.min(2, window.devicePixelRatio || 1), px = Math.round(W * dpr), R = prng(seed * 9301 + 49297), col = role(cv, 'accent-graphic', '#F07BA0');
+      cv.width = px; cv.height = px;
+      var off = document.createElement('canvas'); off.width = px; off.height = px;
+      var g = off.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.fillStyle = col;
+      var c = W / 2, Rr = W / 2 * 0.97, G = 190 + Math.floor(R() * 60), gl = $('#print-g');
+      if (gl) gl.innerHTML = '<span data-strain-name>' + STRAINS[currentStrain()].name + '</span>, ' + G + ' gills';
+      var ph = R() * 6.283, lobes = 3 + Math.floor(R() * 3), amp = 0.025 + R() * 0.03, ph2 = R() * 6.283;
+      var B = [[], [], [], []], d = Math.max(0.55, 1.1 / dpr);
+      for (var gi = 0; gi < G; gi++) {
+        var th = ph + gi / G * Math.PI * 2, lvl = gi % 8 === 0 ? 0 : gi % 4 === 0 ? 1 : gi % 2 === 0 ? 2 : 3;
+        var edge = 0.94 + amp * Math.sin(th * lobes + ph2) + (R() - 0.5) * 0.012, r0 = [0.36, 0.5, 0.62, 0.74][lvl] + R() * 0.02, r1 = edge - lvl * 0.012;
+        var n = Math.round((r1 - r0) * Rr / 0.8);
+        for (var j = 0; j < n; j++) {
+          var u = j / n; if (R() > 0.92 - 0.62 * u) continue;
+          var tj = th + (R() - 0.5) * 0.007, rr = (r0 + (r1 - r0) * u) * Rr + (R() - 0.5) * 0.7;
+          B[Math.min(3, Math.floor((u + R() * 0.3) * 3))].push(c + Math.cos(tj) * rr, c + Math.sin(tj) * rr);
+        }
+      }
+      [0.9, 0.62, 0.4, 0.22].forEach(function (a, i) { g.globalAlpha = a; var b = B[i]; for (var q = 0; q < b.length; q += 2) g.fillRect(b[q] - d / 2, b[q + 1] - d / 2, d, d); });
+      // La cicatrice du pied, un cercle fin autour de la marque
+      g.globalAlpha = 0.55; g.strokeStyle = col; g.lineWidth = 0.75; g.beginPath(); g.arc(c, c, 0.335 * Rr, 0, Math.PI * 2); g.stroke();
+      img = off;
+      draw();
+    }
+    // La poussière tombe depuis le pied vers le bord : un front doux qui s'élargit
+    function draw() {
+      var ctx = cv.getContext('2d'), W = cv.width;
+      ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, W);
+      if (!img || k <= 0) return;
+      ctx.drawImage(img, 0, 0);
+      if (k >= 1) return;
+      var c = W / 2, r = easeOut(k) * W * 0.62, soft = W * 0.14;
+      ctx.globalCompositeOperation = 'destination-in';
+      var gr = ctx.createRadialGradient(c, c, Math.max(0, r - soft), c, c, Math.max(1, r));
+      gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = gr; ctx.fillRect(0, 0, W, W);
+      ctx.globalCompositeOperation = 'source-over';
+    }
+    function play() {
+      if (anim) anim.on = false;
+      if (calm) { k = 1; draw(); return; }
+      anim = run(2600, function (q) { k = q; draw(); });
+    }
+    // Reconstruite au plus une fois par image quand sa taille change (un changement d'appareil chez Clover en enchaîne beaucoup)
+    var rq = 0;
+    if (window.ResizeObserver) new ResizeObserver(function () { if (!rq) rq = requestAnimationFrame(function () { rq = 0; build(); }); }).observe(cv); else build();
+    return { build: build, play: play, seed: function (s) { seed = s; build(); }, reset: function () { if (anim) anim.on = false; if (!calm) { k = 0; draw(); } } };
+  })();
+  var mark = $('#one-mark'), pairNo = $('#pair-no'), seed = 412;
+  function label(n) { return 'The spore print of pair ' + String(n).padStart(4, '0') + ': the spores of its strain, fallen in fine radiating gills, with the mark of the pair at its centre.'; }
+  if (!calm) mark.setAttribute('data-hy-k', '0');
+  $('#grow-another').addEventListener('click', function () {
+    // Une autre paire du drop, jamais la même deux fois de suite : son empreinte retombe, sa marque repousse
+    var n = seed; while (n === seed) n = 1 + Math.floor(Math.random() * 500);
+    seed = n;
+    mark.setAttribute('data-hy-seed', String(n));
+    $('#print').setAttribute('aria-label', label(n));
+    pairNo.innerHTML = '<span class="lp-sr">Pair </span>' + String(n).padStart(4, '0');
+    PRINT.seed(n); PRINT.play();
+    HyphaGrow.play(mark);
+  });
+
+  // La coupe du sol : 90 jours, racontés comme la légende (le dessin : soil.js, en WebGL 2). La paire s'enfouit (jours 0 à 10) ; le
+  // sol s'éveille et ses cordons la rejoignent (6 à 30), la colonie la gagne en vague ; le feutre brunit et s'efface là où les fils
+  // sont passés, devient humus, et les fils gardent sa forme (20 à 64) ; des cordons montent, la souche fructifie (54 à 90). On la
+  // parcourt à la règle ; à l'arrivée, elle se joue une fois, sur une courbe de temps qui laisse respirer chaque étape.
+  var SOIL = (function () {
+    var cv = $('#soil-c'), range = $('#day'), num = $('#day-n'), cap = $('#day-cap'), fig = cap.parentNode, bar = $('.lp-days'), day = 90, anim = null, touched = false, eng = null;
+    function capOf(d) { return d < 10 ? 'Into the ground, laces and all.' : d < 38 ? 'The threads of the soil move in.' : d < 64 ? 'The felt is gone. The threads remain.' : STRAINS[currentStrain()].name + ' fruits where it lay.'; }
+    // La mise en page (px CSS du canvas) : la ligne du sol passe sous la plus haute des légendes ; si la légende surplombe la paire au
+    // jour 0, la paire part un peu enfoncée, juste sous elle ; si elle surplombe la touffe de pleurotes, la ligne du sol descend pour
+    // lui faire place (puis la touffe se réduit, s'il le faut)
+    function layout() {
+      var W = cv.clientWidth, H = cv.clientHeight; if (!W || !H || !window.HyphaSoil) return null;
+      var keep = cap.textContent, cr = cv.getBoundingClientRect(), box = {}, capB = 0;
+      [0, 10, 38, 64].forEach(function (dd) {
+        cap.textContent = capOf(dd);
+        var b = fig.getBoundingClientRect(); box[dd] = [b.left - cr.left, b.top - cr.top, b.right - cr.left, b.bottom - cr.top];
+        capB = Math.max(capB, box[dd][3]);
+      });
+      cap.textContent = keep;
+      var S = HyphaSoil, cx = W / 2, gy = Math.max(H * 0.36, capB + 12), sw = 0, fs = 1, fb = box[64], over = false;
+      for (var i = 0; i < 4; i++) {
+        sw = Math.min(W * 0.42, (H - gy) / 0.56, (gy - 8) / (0.98 * S.SH));
+        over = fb[2] > cx + (S.XF - 0.22) * sw;
+        var need = fb[3] + 6 + S.FRUIT_H * sw;
+        if (!over || need <= gy + 0.5) break;
+        gy = Math.min(need, H * 0.5);
+      }
+      if (over) fs = clamp((gy - fb[3] - 6) / (S.FRUIT_H * sw), 0.45, 1);
+      var top = gy - 0.98 * S.SH * sw, b0 = box[0];
+      if (b0[2] > cx - sw / 2 + 4) top = Math.max(top, b0[3] + 6);
+      return { W: W, H: H, cx: cx, gy: gy, sw: sw, ys: (top - gy) / sw, fruit: fs, cap: [fb[0] - 4, fb[1] - 4, fb[2] + 4, fb[3] + 4] };
+    }
+    function build() { var l = layout(); if (l && eng) eng.layout(l); }
+    // Les graduations : tous les dix jours ; celles que la souche a dépassées s'allument
+    var ticks = [];
+    for (var d = 0; d <= 90; d += 10) { var tk = document.createElement('i'); tk.style.left = (d / 90 * 100) + '%'; $('.lp-ticks').appendChild(tk); ticks.push(tk); }
+    var lit = -1;
+    // L'affichage, à un jour continu : la règle (sa tête, son remplissage), la planche ; le chiffre et la légende au jour rond
+    function show(d) {
+      day = clamp(d, 0, 90);
+      bar.style.setProperty('--p', (day / 90).toFixed(5));
+      var n = Math.floor(day / 10 + 1e-6);
+      if (n !== lit) { ticks.forEach(function (t, i) { t.classList.toggle('is-past', i <= n); }); lit = n; }
+      var r = Math.round(day), t = capOf(r);
+      if (num.textContent !== String(r)) num.textContent = String(r);
+      if (cap.textContent !== t) cap.textContent = t;
+      if (eng) eng.set(day);
+    }
+    // La règle native suit le jour rond, et dit le jour et sa légende
+    function speak(r) {
+      if (String(r) !== range.value) range.value = String(r);
+      range.setAttribute('aria-valuetext', 'Day ' + r + '. ' + capOf(r));
+    }
+    function set(d, user) {
+      show(d); speak(Math.round(day));
+      if (user) touched = true;
+    }
+    // Le geste (le doigt, la souris, le clavier) : la règle et la planche glissent jusqu'au jour choisi, au lieu de sauter d'un jour à
+    // l'autre. Un ressort à amortissement critique (pulsation 12 rad/s, posé en 0,35 s environ) : il part sans à-coup, accélère, se
+    // pose sans dépasser, et enchaîne les appuis successifs (sa vitesse est gardée). En mouvements réduits, elles y vont d'un coup.
+    var goal = 90, vel = 0, gRaf = 0, gLast = 0, OM = 12;
+    function glideTo(now) {
+      gRaf = 0;
+      var dt = gLast ? Math.min(0.064, (now - gLast) / 1000) : 1 / 60; gLast = now;
+      var x = day - goal, e = Math.exp(-OM * dt), k = vel + OM * x, nx = (x + k * dt) * e;
+      vel = (vel - k * OM * dt) * e;
+      if (Math.abs(nx) < 0.01 && Math.abs(vel) < 0.05) { nx = 0; vel = 0; }
+      show(goal + nx);
+      if (nx) gRaf = requestAnimationFrame(glideTo); else gLast = 0;
+    }
+    range.addEventListener('input', function () {
+      if (anim) { anim.on = false; anim = null; }
+      touched = true; goal = +range.value; speak(goal);
+      if (calm) { show(goal); return; }
+      if (!gRaf) { gLast = 0; gRaf = requestAnimationFrame(glideTo); }
+    });
+    // Le dessin se monte au repos (sa photo, son réseau, ses shaders) ; il suit ensuite la taille de la planche, au plus une fois
+    // par image (un changement d'appareil chez Clover en enchaîne beaucoup)
+    function mount() {
+      if (eng || !window.HyphaSoil) return;
+      var rq = 0, ro = window.ResizeObserver ? new ResizeObserver(function () { if (!rq) rq = requestAnimationFrame(function () { rq = 0; build(); }); }) : null;
+      // (si ses shaders sont refusés, le dessin passe en 2D sur un canvas neuf, qui prend la place de l'ancien)
+      eng = HyphaSoil.mount(cv, { src: 'media/chambre-fin.jpg', strain: currentStrain, onswap: function (c) { if (ro) ro.unobserve(cv); cv = c; c.setAttribute('data-soil', '2d'); if (ro) ro.observe(c); } });
+      if (!eng) return;
+      cv.setAttribute('data-soil', eng.engine);
+      build(); eng.set(day);
+      if (ro) ro.observe(cv);
+    }
+    // La lecture : 9,6 s sur une courbe de temps monotone (Fritsch-Carlson : aucun jour ne recule, départ et arrivée en douceur) qui
+    // donne à chaque étape sa durée : l'enfouissement en 1,15 s, l'arrivée des cordons en 2,15 s, l'effacement en 2,7 s, la montée et
+    // les primordia en 1,7 s, les pleurotes et leurs spores en 1,9 s
+    var KT = [0, 1.15, 3.3, 6, 7.7, 9.6].map(function (t) { return t / 9.6; }), KD = [0, 10, 30, 56, 72, 90], KM = [];
+    (function () {
+      var n = KT.length, s = [];
+      for (var k = 0; k < n - 1; k++) s.push((KD[k + 1] - KD[k]) / (KT[k + 1] - KT[k]));
+      KM[0] = 0; KM[n - 1] = 0;
+      for (k = 1; k < n - 1; k++) { var h0 = KT[k] - KT[k - 1], h1 = KT[k + 1] - KT[k]; KM[k] = s[k - 1] * s[k] <= 0 ? 0 : 3 * (h0 + h1) / ((2 * h1 + h0) / s[k - 1] + (h1 + 2 * h0) / s[k]); }
+    })();
+    function timeline(q) {
+      var k = 0; while (k < KT.length - 2 && q >= KT[k + 1]) k++;
+      var h = KT[k + 1] - KT[k], u = clamp((q - KT[k]) / h, 0, 1), u2 = u * u, u3 = u2 * u;
+      return (2 * u3 - 3 * u2 + 1) * KD[k] + (u3 - 2 * u2 + u) * h * KM[k] + (-2 * u3 + 3 * u2) * KD[k + 1] + (u3 - u2) * h * KM[k + 1];
+    }
+    function play() {
+      if (calm || touched) return;
+      if (anim) anim.on = false;
+      set(0);
+      anim = run(9600, function (q) { set(timeline(q)); }, function () { anim = null; });
+    }
+    // Avant sa lecture, la planche attend au jour 0 (la paire posée sur le sol) : aucun saut du jour 90 au jour 0 quand elle part ;
+    // en mouvements réduits, elle montre le jour 90
+    set(calm ? 90 : 0);
+    return { mount: mount, build: build, play: play, again: function () { if (eng) { build(); eng.recolor(); } set(day); }, reset: function () { if (anim) { anim.on = false; anim = null; } if (!touched) set(0); } };
+  })();
+
+  // Le pied de page : le mot-symbole en très grand ; le H est la marque vivante, calée sur la ligne de base et la capitale de YPHA
+  var foot = $('#foot-h'), fword = $('.lp-foot-word'), fslot = $('.lp-foot-slot');
+  if (!calm) foot.setAttribute('data-hy-k', '0');
+  function fitFoot() {
+    if (!window.HyphaMark || !HyphaMark.metrics) return;
+    var Wc = fword.clientWidth, ypha = fslot.nextElementSibling, m = HyphaMark.metrics(600), cf = m.base - m.cap;
+    if (!Wc) return;
+    fword.style.setProperty('--fw', '100px');
+    var r = ypha.getBoundingClientRect().width / 100, F = Wc / ((m.right - m.left) * 0.75 / cf + 0.035 + r) * 0.995, S = Math.round(0.75 * F / cf);
+    m = HyphaMark.metrics(S);
+    fword.style.setProperty('--fw', F.toFixed(2) + 'px');
+    fslot.style.width = ((m.right - m.left) * S).toFixed(1) + 'px';
+    foot.style.width = S + 'px'; foot.style.height = S + 'px';
+    foot.style.left = (-m.left * S).toFixed(1) + 'px';
+    // La boîte du H va de la ligne de capitale à la ligne de base du mot (0,75 em) : la ligne de capitale de la marque y tombe
+    foot.style.top = (-m.cap * S + (0.75 * F - (m.base - m.cap) * S)).toFixed(1) + 'px';
+  }
+  fitFoot();
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitFoot);
+  window.addEventListener('resize', fitFoot);
+
+  $('#news').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var v = $('#news-mail').value.trim();
+    $('#news-status').textContent = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? 'Thank you. We will write when the next strain seeds.' : 'Enter an email address, like name@example.com.';
+  });
+
+  // Le réseau du pied de page (network.js). Monté à l'approche du pied de page (polices prêtes), animé tant qu'il est à l'écran ;
+  // en animations réduites, il pousse d'un coup puis reste figé. Les lettres du mot-symbole sont ce qu'il contourne, avec une marge.
+  var net = null, footEl = $('.lp-foot'), netWait = null;
+  function mountNet() {
+    if (net || !window.HyphaNetwork) return;
+    // Sans taille (page masquée, ou pied de page mis de côté par la miniature de Clover : display: none), le réseau ne peut pas se
+    // construire, et ne revenait jamais : il attend d'en avoir une, puis se monte au repos suivant (avec le mot recalé)
+    var nc = $('.lp-net');
+    if (!nc.clientWidth || !nc.clientHeight) {
+      if (!netWait && window.ResizeObserver) {
+        netWait = new ResizeObserver(function () {
+          if (!nc.clientWidth || !nc.clientHeight) return;
+          netWait.disconnect(); netWait = null;
+          (window.requestIdleCallback || function (f) { return setTimeout(f, 300); })(function () { fitFoot(); mountNet(); }, { timeout: 2000 });
+        });
+        netWait.observe(nc);
+      }
+      return;
+    }
+    net = HyphaNetwork.mount(nc, {
+      still: calm, scale: Q.has('mini') ? 0.75 : 0,
+      food: function (g) {
+        var fr = footEl.getBoundingClientRect(), sr = fslot.getBoundingClientRect(), yr = fslot.nextElementSibling.getBoundingClientRect(), F = parseFloat(getComputedStyle(fword).fontSize);
+        g.font = '560 ' + F + 'px "Bodoni Moda"';
+        if ('letterSpacing' in g) g.letterSpacing = (0.01 * F).toFixed(2) + 'px';
+        var y = sr.bottom - fr.top;
+        g.lineJoin = 'round'; g.lineWidth = Math.max(2, F * 0.035);
+        [['H', sr.left - fr.left], ['YPHA', yr.left - fr.left]].forEach(function (w) {
+          g.fillStyle = '#000'; g.fillText(w[0], w[1], y);
+          g.strokeStyle = '#000'; g.strokeText(w[0], w[1], y);
+        });
+      },
+      mask: function () { return $('.lp-foot-grid').getBoundingClientRect().top - footEl.getBoundingClientRect().top; },
+      colors: function () { return { bg: role(footEl, 'bg', '#110F0D'), vein: role(footEl, 'text-muted', '#A8A197'), cap: role(footEl, 'border-strong', '#898279'), accent: role(footEl, 'accent-graphic', '#F07BA0'), dim: 0.2 }; }
+    });
+    if (!net) return;
+    if (calm) { net.still(600); return; }
+    var seen = false;
+    new IntersectionObserver(function (en) { seen = en[0].isIntersecting; if (seen && !document.hidden) net.start(); else net.stop(); }).observe(footEl);
+    document.addEventListener('visibilitychange', function () { if (document.hidden) net.stop(); else if (seen) net.start(); });
+    // La main éclaire le réseau : il s'en écarte
+    footEl.addEventListener('pointermove', function (e) { if (e.pointerType === 'touch') return; var r = footEl.getBoundingClientRect(); net.light(e.clientX - r.left, e.clientY - r.top, 120); }, { passive: true });
+    footEl.addEventListener('pointerleave', function () { net.light(0, 0, 0); });
+    var rt = 0;
+    window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(function () { net.resize(); }, 200); });
+  }
+  // Monté au repos, une fois la page chargée et ses polices là : sa compilation (une trentaine de millisecondes) ne tombe jamais en
+  // plein défilement (elle faisait sauter une image de la visite de Clover)
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(function () {
+    (window.requestIdleCallback || function (f) { return setTimeout(f, 300); })(function () { fitFoot(); mountNet(); SOIL.mount(); }, { timeout: 4000 });
+  });
+
+  // À l'arrivée à l'écran : l'empreinte retombe et la marque pousse ; le sol joue ses 90 jours ; le H du pied de page pousse.
+  // Sur la page, chacune ne se joue qu'une fois. Dans la miniature de Clover, dont la visite repasse en boucle, chacune revient à son
+  // départ quand elle quitte l'écran, et se rejoue au passage suivant.
+  if (!calm && window.IntersectionObserver) {
+    var again = Q.has('mini');
+    var watch = function (el, f, th, back) {
+      var armed = true, io = new IntersectionObserver(function (en) {
+        var e = en[en.length - 1];
+        if (armed && e.intersectionRatio >= th - 0.001) { armed = false; f(); if (!again) io.disconnect(); }
+        else if (again && !armed && !e.isIntersecting) { armed = true; back(); }
+      }, { threshold: [0, th] });
+      io.observe(el);
+    };
+    watch($('.lp-print'), function () { PRINT.play(); HyphaGrow.play(mark, { delay: 350 }); }, 0.55, function () { PRINT.reset(); HyphaGrow.progress(mark, 0); });
+    // Un temps de pose avant la lecture : on voit la paire sur le sol, et elle ne part pas avec les autres planches
+    var soilT = 0;
+    watch($('#soil .lp-plate'), function () { clearTimeout(soilT); soilT = setTimeout(SOIL.play, 450); }, 0.6, function () { clearTimeout(soilT); SOIL.reset(); });
+    watch(fword, function () { HyphaGrow.play(foot); }, 0.5, function () { HyphaGrow.progress(foot, 0); });
+  } else PRINT.play();
+  // ---------- Réservation (démonstration : rien n'est envoyé) ----------
+  $('#drop-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var size = this.querySelector('input[name="size"]:checked');
+    $('#drop-status').textContent = size ? 'Your pair is reserved in size ' + size.value + '. It starts growing tomorrow at 09:00 and ships on day 9.' : 'Choose a size first.';
+  });
+
+  HyphaGrow.auto();
+})();
+</script>
+</body>
+</html>

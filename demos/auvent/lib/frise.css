@@ -1,0 +1,23 @@
+/* Auvent · la frise du temps (météogramme-curseur). */
+.av-frise { position: relative; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.av-frise-svg { display: block; width: 100%; height: auto; overflow: visible; cursor: ew-resize; font-family: var(--av-font); }
+.av-frise-svg:focus-visible { outline: 2px solid var(--av-focus); outline-offset: 6px; }
+.av-frise-jour { transition: opacity 160ms var(--av-ease-standard); font-size: 15px; font-weight: var(--av-weight-medium); font-stretch: var(--av-width-donnees); fill: var(--av-text); }
+.av-frise-heure { font-size: 15px; font-stretch: var(--av-width-donnees); fill: var(--av-text-muted); text-anchor: middle; }
+.av-frise-minuit { stroke: var(--av-line-strong); stroke-width: 1; }
+.av-frise-grad { stroke: var(--av-line-strong); stroke-width: 1; }
+.av-frise-base { stroke: var(--av-text); stroke-width: 1; }
+.av-frise-h { fill: var(--av-map-ink); }
+.av-frise-hb { fill: var(--av-storm); }
+.av-frise-cap { stroke: var(--av-map-ink); stroke-width: 1.5; }
+.av-frise-cap.est-bloquee { stroke: var(--av-storm); stroke-width: 2; }
+.av-frise-seuil-ligne { stroke: var(--av-accent); stroke-width: 1.5; stroke-dasharray: 5 4; }
+.av-frise-attache { stroke: var(--av-line-strong); stroke-width: 1; stroke-dasharray: 2 3; }
+.av-frise-cote-ligne, .av-frise-cote-tic { stroke: var(--av-text-muted); stroke-width: 1.25; }
+.av-frise-cote.est-bloquee .av-frise-cote-ligne, .av-frise-cote.est-bloquee .av-frise-cote-tic { stroke: var(--av-storm); stroke-width: 1.75; }
+.av-frise-cote.est-repli .av-frise-cote-ligne, .av-frise-cote.est-repli .av-frise-cote-tic { stroke: var(--av-accent); stroke-width: 1.75; }
+.av-frise-tete-ligne { stroke: var(--av-text); stroke-width: 1.5; }
+.av-frise-poignee { fill: var(--av-text); transition: transform 160ms var(--av-ease-standard); transform-box: fill-box; transform-origin: center; }
+.av-frise.est-saisie .av-frise-poignee, .av-frise-svg:hover .av-frise-poignee { transform: scale(1.25); }
+.av-frise-etiq-fond { fill: var(--av-text); }
+.av-frise-etiq-txt { fill: var(--av-bg); font-size: 15px; font-weight: var(--av-weight-medium); font-stretch: var(--av-width-donnees); text-anchor: middle; }

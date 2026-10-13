@@ -1,0 +1,277 @@
+/* HYPHA — tokens v0.1.0 · territoire Chambre noire, souches de Drop · Bodoni Moda et Archivo
+   Fichier généré par design/hypha/tokens/build-tokens.mjs : modifier le script, pas ce fichier.
+   Marque fictive, un Original de Topiary. Préfixe --hy- : aucun conflit avec les tokens de Topiary.
+   Thèmes : .hy-theme-chamber (par défaut) ou .hy-theme-daylight. Souches : .hy-strain-pink (par défaut), -gold, -blue,
+   sur le même élément que le thème ou sur un descendant. Les thèmes ne s’imbriquent pas.
+   Polices : Bodoni Moda (ital, opsz, wght) et Archivo (wdth 62 à 125, wght), à auto-héberger en production. */
+
+:root {
+  /* Palette : gammes générées en OKLCH à partir des couleurs des territoires C et A */
+  --hy-palette-myc-50: #F9F6F1; --hy-palette-myc-100: #EDE9E1; --hy-palette-myc-200: #D8D4CB; --hy-palette-myc-300: #C0BAB0; --hy-palette-myc-400: #A8A197; --hy-palette-myc-500: #898279; --hy-palette-myc-600: #6B655D; --hy-palette-myc-700: #544F48; --hy-palette-myc-800: #3D3833; --hy-palette-myc-850: #2C2824; --hy-palette-myc-900: #1D1A17; --hy-palette-myc-950: #110F0D;
+  --hy-palette-pink-50: #FEF4F6; --hy-palette-pink-100: #FFE0E8; --hy-palette-pink-200: #FFC0D2; --hy-palette-pink-300: #F89AB7; --hy-palette-pink-400: #F07AA2; --hy-palette-pink-500: #C35C80; --hy-palette-pink-600: #9D4263; --hy-palette-pink-700: #802F4D; --hy-palette-pink-800: #621A37; --hy-palette-pink-850: #4C0A27; --hy-palette-pink-900: #380019; --hy-palette-pink-950: #24000E;
+  --hy-palette-gold-50: #FEF7DE; --hy-palette-gold-100: #FBEAAC; --hy-palette-gold-200: #F3CF3E; --hy-palette-gold-300: #DAB82A; --hy-palette-gold-400: #BFA00E; --hy-palette-gold-500: #9B8108; --hy-palette-gold-600: #796405; --hy-palette-gold-700: #5F4E03; --hy-palette-gold-800: #453801; --hy-palette-gold-850: #322802; --hy-palette-gold-900: #211A01; --hy-palette-gold-950: #140F00;
+  --hy-palette-blue-50: #F3F7FF; --hy-palette-blue-100: #E1E9FF; --hy-palette-blue-200: #C4D3FD; --hy-palette-blue-300: #A2B9F7; --hy-palette-blue-400: #6F8DEA; --hy-palette-blue-500: #627DD5; --hy-palette-blue-600: #4960AD; --hy-palette-blue-700: #364A8E; --hy-palette-blue-800: #23336F; --hy-palette-blue-850: #162358; --hy-palette-blue-900: #0A1444; --hy-palette-blue-950: #040833;
+  --hy-palette-green-50: #F3F9F4; --hy-palette-green-100: #E0EEE3; --hy-palette-green-200: #C2DCC9; --hy-palette-green-300: #9EC6A9; --hy-palette-green-400: #7CB18C; --hy-palette-green-500: #4D9566; --hy-palette-green-600: #2C7749; --hy-palette-green-700: #195E36; --hy-palette-green-800: #024623; --hy-palette-green-850: #003317; --hy-palette-green-900: #01220E; --hy-palette-green-950: #011407;
+  --hy-palette-red-50: #FEF4F2; --hy-palette-red-100: #FEE2DD; --hy-palette-red-200: #FDC5BB; --hy-palette-red-300: #F5A294; --hy-palette-red-400: #EA7F6E; --hy-palette-red-500: #D94E3D; --hy-palette-red-600: #B62A1B; --hy-palette-red-700: #951408; --hy-palette-red-800: #700601; --hy-palette-red-850: #530300; --hy-palette-red-900: #3A0100; --hy-palette-red-950: #260100;
+  --hy-palette-amber-50: #FCF6EE; --hy-palette-amber-100: #F5E7D6; --hy-palette-amber-200: #EAD0AF; --hy-palette-amber-300: #DAB381; --hy-palette-amber-400: #CA9751; --hy-palette-amber-500: #B17500; --hy-palette-amber-600: #8B5B02; --hy-palette-amber-700: #6D4702; --hy-palette-amber-800: #503201; --hy-palette-amber-850: #3A2300; --hy-palette-amber-900: #271700; --hy-palette-amber-950: #190C00;
+
+  /* font */
+  --hy-font-display: 'Bodoni Moda', 'Bodoni 72', Didot, 'Bodoni MT', serif;
+  --hy-font-text: 'Archivo', 'Helvetica Neue', Arial, sans-serif;
+  --hy-tracking-wordmark: 0.34em;
+  --hy-weight-wordmark: 500;
+
+  /* type */
+  --hy-text-display: clamp(3.5rem, 1.9167rem + 7.0370vw, 8.25rem);
+  --hy-family-display: var(--hy-font-display);
+  --hy-leading-display: 0.92;
+  --hy-tracking-display: -0.025em;
+  --hy-weight-display: 400;
+  --hy-stretch-display: 100%;
+  --hy-text-title-1: clamp(2.5rem, 1.7500rem + 3.3333vw, 4.75rem);
+  --hy-family-title-1: var(--hy-font-display);
+  --hy-leading-title-1: 1;
+  --hy-tracking-title-1: -0.02em;
+  --hy-weight-title-1: 400;
+  --hy-stretch-title-1: 100%;
+  --hy-text-title-2: clamp(1.875rem, 1.5833rem + 1.2963vw, 2.75rem);
+  --hy-family-title-2: var(--hy-font-display);
+  --hy-leading-title-2: 1.08;
+  --hy-tracking-title-2: -0.015em;
+  --hy-weight-title-2: 400;
+  --hy-stretch-title-2: 100%;
+  --hy-text-title-3: clamp(1.3125rem, 1.2083rem + 0.4630vw, 1.625rem);
+  --hy-family-title-3: var(--hy-font-text);
+  --hy-leading-title-3: 1.25;
+  --hy-tracking-title-3: -0.005em;
+  --hy-weight-title-3: 600;
+  --hy-stretch-title-3: 100%;
+  --hy-text-lead: clamp(1.1875rem, 1.1250rem + 0.2778vw, 1.375rem);
+  --hy-family-lead: var(--hy-font-text);
+  --hy-leading-lead: 1.5;
+  --hy-tracking-lead: 0;
+  --hy-weight-lead: 400;
+  --hy-stretch-lead: 100%;
+  --hy-text-body: clamp(1.0625rem, 1.0417rem + 0.0926vw, 1.125rem);
+  --hy-family-body: var(--hy-font-text);
+  --hy-leading-body: 1.6;
+  --hy-tracking-body: 0;
+  --hy-weight-body: 400;
+  --hy-stretch-body: 100%;
+  --hy-text-small: clamp(0.9375rem, 0.9167rem + 0.0926vw, 1rem);
+  --hy-family-small: var(--hy-font-text);
+  --hy-leading-small: 1.5;
+  --hy-tracking-small: 0;
+  --hy-weight-small: 400;
+  --hy-stretch-small: 100%;
+  --hy-text-numeral-xl: clamp(4rem, 2.8333rem + 5.1852vw, 7.5rem);
+  --hy-family-numeral-xl: var(--hy-font-text);
+  --hy-leading-numeral-xl: 0.88;
+  --hy-tracking-numeral-xl: 0;
+  --hy-weight-numeral-xl: 800;
+  --hy-stretch-numeral-xl: 62%;
+  --hy-text-numeral: clamp(1.625rem, 1.4583rem + 0.7407vw, 2.125rem);
+  --hy-family-numeral: var(--hy-font-text);
+  --hy-leading-numeral: 1;
+  --hy-tracking-numeral: 0.01em;
+  --hy-weight-numeral: 800;
+  --hy-stretch-numeral: 62%;
+
+  /* space */
+  --hy-space-0: 0;
+  --hy-space-1: 0.25rem;
+  --hy-space-2: 0.5rem;
+  --hy-space-3: 0.75rem;
+  --hy-space-4: 1rem;
+  --hy-space-5: 1.5rem;
+  --hy-space-6: 2rem;
+  --hy-space-7: 3rem;
+  --hy-space-8: 4rem;
+  --hy-space-9: 6rem;
+  --hy-space-10: 8rem;
+
+  /* layout */
+  --hy-measure: 62ch;
+  --hy-container: 80rem;
+  --hy-gutter: clamp(1rem, 0.5000rem + 2.2222vw, 2.5rem);
+  --hy-section: clamp(4rem, 2.0000rem + 8.8889vw, 10rem);
+  --hy-control-height: 3.25rem;
+
+  /* radius */
+  --hy-radius-none: 0;
+  --hy-radius-xs: 2px;
+  --hy-radius-round: 999px;
+
+  /* border */
+  --hy-border-hairline: 1px;
+  --hy-border-strong: 1.5px;
+  --hy-focus-width: 2px;
+  --hy-focus-offset: 3px;
+
+  /* motion */
+  --hy-duration-instant: 100ms;
+  --hy-duration-fast: 200ms;
+  --hy-duration-base: 320ms;
+  --hy-duration-slow: 600ms;
+  --hy-duration-grow: 2600ms;
+  --hy-ease-standard: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --hy-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --hy-ease-grow: cubic-bezier(0.45, 0, 0.2, 1);
+  --hy-ease-linear: linear;
+}
+
+/* Thème Chambre (par défaut), souche Pink Oyster */
+:root, .hy-theme-chamber {
+  color-scheme: dark;
+  --hy-color-bg: var(--hy-palette-myc-950); /* Fond de page */
+  --hy-color-surface: var(--hy-palette-myc-900); /* Surfaces, cartes */
+  --hy-color-surface-raised: var(--hy-palette-myc-850); /* Survols, champs */
+  --hy-color-text: var(--hy-palette-myc-100); /* Texte principal */
+  --hy-color-text-muted: var(--hy-palette-myc-400); /* Texte secondaire */
+  --hy-color-border: var(--hy-palette-myc-800); /* Filets décoratifs */
+  --hy-color-border-strong: var(--hy-palette-myc-500); /* Contours de contrôles, 3:1 au moins */
+  --hy-color-focus: var(--hy-palette-myc-100); /* Anneau de focus clavier */
+  --hy-color-action: var(--hy-palette-myc-100); /* Bouton principal */
+  --hy-color-action-text: var(--hy-palette-myc-950); /* Texte du bouton principal */
+  --hy-color-graphic: var(--hy-palette-myc-100); /* Fils de mycélium des dessins */
+  --hy-color-success-text: var(--hy-palette-green-300); /* Succès */
+  --hy-color-danger-text: var(--hy-palette-red-300); /* Erreur */
+  --hy-color-warning-text: var(--hy-palette-amber-300); /* Avertissement */
+  --hy-color-accent: var(--hy-palette-pink-400); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-pink-400); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-pink-400); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-pink-400); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-pink-400); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+
+/* Thème Plein jour, souche Pink Oyster */
+.hy-theme-daylight {
+  color-scheme: light;
+  --hy-color-bg: var(--hy-palette-myc-100); /* Fond de page */
+  --hy-color-surface: var(--hy-palette-myc-50); /* Surfaces, cartes */
+  --hy-color-surface-raised: var(--hy-palette-myc-200); /* Survols, champs */
+  --hy-color-text: var(--hy-palette-myc-950); /* Texte principal */
+  --hy-color-text-muted: var(--hy-palette-myc-700); /* Texte secondaire */
+  --hy-color-border: var(--hy-palette-myc-200); /* Filets décoratifs */
+  --hy-color-border-strong: var(--hy-palette-myc-600); /* Contours de contrôles, 3:1 au moins */
+  --hy-color-focus: var(--hy-palette-myc-950); /* Anneau de focus clavier */
+  --hy-color-action: var(--hy-palette-myc-950); /* Bouton principal */
+  --hy-color-action-text: var(--hy-palette-myc-50); /* Texte du bouton principal */
+  --hy-color-graphic: var(--hy-palette-myc-950); /* Fils de mycélium des dessins */
+  --hy-color-success-text: var(--hy-palette-green-700); /* Succès */
+  --hy-color-danger-text: var(--hy-palette-red-700); /* Erreur */
+  --hy-color-warning-text: var(--hy-palette-amber-800); /* Avertissement */
+  --hy-color-accent: var(--hy-palette-pink-400); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-pink-600); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-pink-500); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-pink-400); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-pink-400); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+
+/* Souche Pink Oyster, drop 004 */
+.hy-strain-pink {
+  --hy-color-accent: var(--hy-palette-pink-400); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-pink-400); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-pink-400); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-pink-400); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-pink-400); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+.hy-theme-daylight.hy-strain-pink, .hy-theme-daylight .hy-strain-pink {
+  --hy-color-accent: var(--hy-palette-pink-400); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-pink-600); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-pink-500); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-pink-400); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-pink-400); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+
+/* Souche Golden Oyster, drop 005 */
+.hy-strain-gold {
+  --hy-color-accent: var(--hy-palette-gold-200); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-gold-200); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-gold-200); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-gold-200); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-gold-200); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+.hy-theme-daylight.hy-strain-gold, .hy-theme-daylight .hy-strain-gold {
+  --hy-color-accent: var(--hy-palette-gold-200); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-gold-600); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-gold-500); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-gold-200); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-gold-200); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+
+/* Souche Blue Oyster, drop 006 */
+.hy-strain-blue {
+  --hy-color-accent: var(--hy-palette-blue-400); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-blue-400); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-blue-400); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-blue-400); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-blue-400); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+.hy-theme-daylight.hy-strain-blue, .hy-theme-daylight .hy-strain-blue {
+  --hy-color-accent: var(--hy-palette-blue-400); /* Souche, en aplat */
+  --hy-color-on-accent: var(--hy-palette-myc-950); /* Texte sur la souche */
+  --hy-color-accent-text: var(--hy-palette-blue-600); /* Souche en texte : chiffres, liens */
+  --hy-color-accent-graphic: var(--hy-palette-blue-500); /* Souche dans les graphiques : jauge, sélection */
+  --hy-color-action-hover: var(--hy-palette-blue-400); /* Bouton principal au survol : la souche pousse dedans */
+  --hy-color-action-hover-text: var(--hy-palette-myc-950); /* Texte du bouton principal au survol */
+  --hy-color-selection-bg: var(--hy-palette-blue-400); /* Sélection de texte */
+  --hy-color-selection-text: var(--hy-palette-myc-950); /* Texte sélectionné */
+}
+
+/* Sur un aplat de souche : le contenu en reprend les couleurs (texte, contours, boutons, jauge) */
+.hy-on-strain {
+  background: var(--hy-color-accent); color: var(--hy-color-on-accent);
+  --hy-color-bg: var(--hy-color-accent);
+  --hy-color-surface: var(--hy-color-accent);
+  --hy-color-surface-raised: var(--hy-color-accent);
+  --hy-color-text: var(--hy-color-on-accent);
+  --hy-color-text-muted: var(--hy-color-on-accent);
+  --hy-color-border: var(--hy-color-on-accent);
+  --hy-color-border-strong: var(--hy-color-on-accent);
+  --hy-color-focus: var(--hy-color-on-accent);
+  --hy-color-action: var(--hy-color-on-accent);
+  --hy-color-action-text: var(--hy-color-accent);
+  --hy-color-action-hover: var(--hy-palette-myc-100);
+  --hy-color-action-hover-text: var(--hy-palette-myc-950);
+  --hy-color-graphic: var(--hy-color-on-accent);
+  --hy-color-accent-text: var(--hy-color-on-accent);
+  --hy-color-accent-graphic: var(--hy-color-on-accent);
+  --hy-color-success-text: var(--hy-color-on-accent);
+  --hy-color-danger-text: var(--hy-color-on-accent);
+  --hy-color-warning-text: var(--hy-color-on-accent);
+  --hy-color-selection-bg: var(--hy-color-on-accent);
+  --hy-color-selection-text: var(--hy-color-accent);
+}
+
+/* Animations réduites : durées à 1 ms ; les pousses s’affichent directement dans leur état final (côté script). */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --hy-duration-instant: 1ms;
+    --hy-duration-fast: 1ms;
+    --hy-duration-base: 1ms;
+    --hy-duration-slow: 1ms;
+    --hy-duration-grow: 1ms;
+  }
+}
