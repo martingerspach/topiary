@@ -1,0 +1,85 @@
+/* Topiary v4.1 : « Retourner sur Topiary », posé sur les landings des Projets choisis telles que Topiary les publie
+   (p/outils/retour_inject.py ; les sources des landings n'en savent rien). Le chrome de Topiary, pas celui de la
+   marque : encre, Onest, coin de 10 px. On voit qu'on sort du projet pour revenir au studio.
+   Valeurs reprises de v4.css (--ink, --paper, --accent, --ease), écrites ici parce que la landing ne charge pas v4.css. */
+html a.tp-retour {
+  --tp-ink: #1F201E;
+  --tp-paper: #F4F2EF;
+  --tp-accent: #FF7360;
+  --tp-ease: cubic-bezier(.22, .7, .18, 1);
+  position: fixed;
+  z-index: 2147483000;
+  left: max(16px, env(safe-area-inset-left, 0px));
+  bottom: max(16px, env(safe-area-inset-bottom, 0px));
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 44px;
+  margin: 0;
+  padding: 0 16px 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--tp-ink);
+  color: var(--tp-paper);
+  font: 500 16px/1 "Onest", "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: -0.005em;
+  text-transform: none;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  /* un filet clair à l'intérieur pour rester lisible sur une page sombre, une ombre courte sur une page claire */
+  box-shadow: inset 0 0 0 1px rgb(244 242 239 / .14), 0 1px 2px rgb(0 0 0 / .16), 0 10px 28px -10px rgb(0 0 0 / .4);
+  transition: background-color .6s var(--tp-ease), padding .5s var(--tp-ease);
+}
+html a.tp-retour:hover { background: color-mix(in oklab, var(--tp-ink) 84%, var(--tp-paper)); color: var(--tp-paper); text-decoration: none; }
+html a.tp-retour:focus { outline: none; }
+/* au clavier : un anneau corail dans le bouton (5,9:1 sur l'encre), lisible sur toutes les landings */
+html a.tp-retour:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--tp-accent), 0 1px 2px rgb(0 0 0 / .16), 0 10px 28px -10px rgb(0 0 0 / .4);
+}
+html a.tp-retour svg {
+  display: block;
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform .6s var(--tp-ease);
+}
+html a.tp-retour:hover svg { transform: translateX(-3px); }
+html a.tp-retour .tp-retour__label {
+  display: block;
+  overflow: hidden;
+  max-width: 14em;
+  margin-left: 8px;
+  transition: max-width .5s var(--tp-ease), margin-left .5s var(--tp-ease), opacity .35s var(--tp-ease);
+}
+/* replié en flèche quand on descend dans la page (retour.js) ; déplié au survol et au clavier */
+html a.tp-retour.is-compact:not(:hover):not(:focus-visible) { padding: 0 12px; }
+html a.tp-retour.is-compact:not(:hover):not(:focus-visible) .tp-retour__label { max-width: 0; margin-left: 0; opacity: 0; }
+
+/* Banc, au téléphone : sa navigation occupe le bas de l'écran et sa question remplit le hero jusqu'à elle ; le haut
+   est libre. Le bouton se pose en haut à droite, sous le bouton Pause du hero tant qu'il est là (--tp-top, retour.js) */
+@media (max-width: 600px) {
+  html a.tp-retour[data-projet="banc"] {
+    left: auto;
+    right: max(16px, env(safe-area-inset-right, 0px));
+    bottom: auto;
+    top: max(var(--tp-top, 14px), env(safe-area-inset-top, 0px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html a.tp-retour, html a.tp-retour svg, html a.tp-retour .tp-retour__label { transition: none; }
+}
+@media (forced-colors: active) {
+  html a.tp-retour { border: 1px solid LinkText; }
+}
+@media print {
+  html a.tp-retour { display: none; }
+}
