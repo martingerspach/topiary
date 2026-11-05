@@ -36,39 +36,22 @@
   const villeInit = VILLES.some((v) => v.id === q.get('ville')) ? q.get('ville') : 'nantes';
   choixVille.value = choixEssai.value = villeInit;
 
-  function bulletinDe(b) {
-    const J = maj(JOURS[b.jour]);
-    const serie = b.serie;
-    const plage = (hs) => `de ${hh(hs[0])} à ${hh(hs[hs.length - 1] + 1)}`;
-    if (!b.cle) return { chantier: `Votre chantier, ${b.nom}`, texte: `Rien à décaler cette semaine. Si la prévision change, vous le saurez la veille.` };
-    const T = b.types[b.cle][b.jour], hs = T.heures, suite = b.prochain(b.cle);
-    const quand = suite !== null ? JOURS[suite] : 'la semaine prochaine';
-    const coule = suite !== null ? `On coule ${quand} à 7${NB}h.` : 'On coule la semaine prochaine.';
-    // Le bulletin parle comme un chef de chantier : la tâche, la raison en mots, la reprise. Une plage horaire au plus,
-    // aucune mesure (ni km/h ni °C) : la mesure reste dans l'appli, pas dans la consigne.
-    if (b.cle === 'coulage') {
-      const pluie = hs.filter((t) => serie[t].pluie > 1);
-      // la pluie continue après le créneau : « à partir de 9 h » (la démo des limites montre la journée entière, 9 h à 16 h)
-      const apres = pluie.length && serie[pluie[pluie.length - 1] + 1], dure = apres && apres.pluie > 1;
-      if (pluie.length) return { chantier: b.id === 'nantes' ? 'Les Bateliers, Nantes' : `Votre chantier, ${b.nom}`, texte: `Pas de coulage ${JOURS[b.jour]}${NB}: il pleut ${dure ? `à partir de ${hh(pluie[0])}` : plage(pluie)}. ${coule}` };
-      return { chantier: `Votre chantier, ${b.nom}`, texte: `Pas de coulage ${JOURS[b.jour]}${NB}: il fera trop froid le matin. ${coule}` };
-    }
-    if (b.cle === 'nacelle') return { chantier: `Votre chantier, ${b.nom}`, texte: `Pas de nacelle ${JOURS[b.jour]}${NB}: il y a trop de vent en hauteur. On reprend ${quand}.` };
-    if (b.cle === 'couverture') {
-      // cause dominante : le vent si toutes les heures bloquées dépassent 40 km/h, sinon la pluie (seuil de 0,2 mm/h)
-      const vent = hs.every((t) => serie[t].rafales > 40);
-      return { chantier: `Votre chantier, ${b.nom}`, texte: `Pas de toiture ${JOURS[b.jour]}${NB}: ${vent ? 'il y a trop de vent' : 'il pleut'} ${plage(hs)}. On reprend ${quand}.` };
-    }
-    return { chantier: `Votre chantier, ${b.nom}`, texte: `Pas de levage ${JOURS[b.jour]}${NB}: il y a trop de vent ${plage(hs)}. On reprend ${quand}.` };
-  }
-  // Le verdict du héros : celui de ville.js, sauf le cas du froid (dit sans température) et la semaine sans blocage
+  // Le verdict : la tâche que la météo bloque, le jour, et quand elle reprend. La cause est dite quand ce n'est pas la
+  // pluie que mesure l'instrument (le vent, le froid du matin). Aucune mesure dans la phrase : elle est sur la cote.
   function verdictDe(b) {
     if (!b.cle) return `Cette semaine, la météo ne bloque rien à ${b.nom}.`;
-    if (b.cle === 'coulage' && !b.types.coulage[b.jour].heures.some((t) => b.serie[t].pluie > 1)) {
-      const suite = b.prochain('coulage');
-      return `${maj(JOURS[b.jour])}, il fera trop froid${NB}: la coule de la dalle attendra ${suite !== null ? JOURS[suite] : 'la semaine prochaine'}.`;
+    const J = maj(JOURS[b.jour]), suite = b.prochain(b.cle), quand = suite !== null ? JOURS[suite] : 'la semaine prochaine';
+    if (b.cle === 'coulage') {
+      const froid = !b.types.coulage[b.jour].heures.some((t) => b.serie[t].pluie > 1);
+      return froid ? `${J}, il fera trop froid${NB}: la coule de la dalle attendra ${quand}.` : `${J}, la coule de la dalle attendra ${quand}.`;
     }
-    return b.titre.replace(/ :/g, NB + ':').replace(/(\d) /g, '$1' + NB);
+    if (b.cle === 'nacelle') return `${J}, le vent laissera la nacelle au sol.`;
+    if (b.cle === 'couverture') {
+      // cause dominante : le vent si toutes les heures bloquées dépassent 40 km/h, sinon la pluie
+      const vent = b.types.couverture[b.jour].heures.every((h) => b.serie[h].rafales > 40);
+      return `${J}, ${vent ? 'le vent' : 'la pluie'} repousse la pose de la toiture à ${quand}.`;
+    }
+    return `${J}, le levage attendra que le vent tombe.`;
   }
   function titreEnLignes(el, texte) {
     el.textContent = '';
@@ -77,40 +60,32 @@
       el.appendChild(s); if (i < arr.length - 1) el.appendChild(document.createTextNode(' '));
     });
   }
-  // Le titre du héros est la promesse (fixe) ; la ville change le verdict dessous, ses faits, le bulletin et les cotes.
   titreEnLignes($('#titre'), $('#titre').textContent);
-  let villeCourante = null;
   function choisirVille(id, anime = true) {
-    villeCourante = id;
     const b = V.bilan(id);
     const verdict = $('.heros-verdict');
     $('#verdict').textContent = verdictDe(b);
     if (anime && !reduit()) { verdict.classList.remove('rejoue'); void verdict.offsetWidth; verdict.classList.add('rejoue'); }
-    const bu = bulletinDe(b);
-    $('#bulletin-chantier').textContent = bu.chantier;
-    $('#bulletin-texte').textContent = bu.texte;
-    $('#cote-ville').textContent = `${b.nom}, ${JOURS[b.jour]}`;
     choixEssai.value = id;
     niveauMm = b.mm < 1 ? 0 : Math.round(b.mm);       // la cote et le niveau disent la même valeur, au millimètre
+    $('#cote-quand').textContent = ` de pluie ${JOURS[b.jour]} à ${b.nom}.`;
     if (anime && !reduit() && affiche === null) cotes(true, DUREE_VILLE, COURBE_VILLE); else cotes();
     if (anime && averse) averse(3500);
   }
   choixVille.addEventListener('change', () => choisirVille(choixVille.value));
 
-  // ---------- Héros : les cotes de l'instrument (coordonnées de l'image 1360 × 2048) ----------
-  // Relevées au pixel sur le rendu (canal alpha) : bord de l'entonnoir le plus large à y 82 (x 265 à 1095), bague sous
-  // l'entonnoir de y 390 à 440, éprouvette de y 450 à 1515 (x 501 à 858), ménisque y 1110, axe x 680.
-  const IMG = { w: 1360, h: 2048, axe: 680, bordG: 265, bordD: 1095, bordY: 82, tubeG: 501, tubeD: 858, tubeH: 450, tubeB: 1515, eau: 1110,
-    // Intérieur du tube : alpha > 200 de 503 à 857. Graduations relevées sur l'éprouvette sèche (outils/eau.py) : une tous
-    // les 29,6 px, une longue sur cinq, la première au-dessus du fond à y 1 480 ; le zéro est donc à 1 509,6 et la n-ième
-    // graduation en partant du bas vaut n mm. Le niveau se lit au bas du ménisque, contre la face avant : dans la bande de
-    // 62 px du ménisque, à 45,5 px du haut (courbe la plus basse, mesurée au centre). La teinte commence sous la bande.
+  // ---------- Héros : l'instrument (coordonnées de l'image 1360 × 2048) ----------
+  // Relevées au pixel sur le rendu (canal alpha) : bord de l'entonnoir le plus large à y 82 (x 265 à 1095), éprouvette
+  // de y 450 à 1515 (x 501 à 858), axe x 680. Intérieur du tube : alpha > 200 de 503 à 857. Graduations relevées sur
+  // l'éprouvette sèche (outils/eau.py) : une tous les 29,6 px, la première au-dessus du fond à y 1 480 ; le zéro est donc
+  // à 1 509,6 et la n-ième graduation vaut n mm. Le niveau se lit au bas du ménisque (bande de 62 px, lu à 45,5 px du haut).
+  // Les mêmes repères, en fractions de la hauteur, placent le verdict en CSS (landing.css, .heros-sortie).
+  const IMG = { w: 1360, h: 2048, axe: 680, bordG: 265, bordD: 1095, bordY: 82, tubeG: 501, tubeD: 858, tubeH: 450, tubeB: 1515,
     inG: 503, inD: 857, zero: 1509.6, grad: 29.6, fond: 1503, menH: 62, menLu: 45.5 };
   const niveauY = (mm) => Math.max(IMG.tubeH + 70, IMG.zero - mm * IMG.grad);
   const texteMm = (mm) => (mm < 1 ? `moins de 1${NB}mm` : `${mm}${NB}mm`);
-  // La montée d'ouverture dure le temps de l'averse et monte à vitesse presque constante, comme une pluie qui remplit
-  // l'éprouvette ; un changement de ville est plus court. Le chiffre de la cote compte avec l'eau ; la surface frémit
-  // à l'arrivée (1,5 px, une seconde). Rien de tout cela en mouvement réduit.
+  // La montée d'ouverture dure le temps de l'averse ; un changement de ville est plus court. Le chiffre compte avec l'eau,
+  // la surface frémit à l'arrivée. Rien de tout cela en mouvement réduit.
   const COURBE_EAU = [0.3, 0.1, 0.25, 1], COURBE_VILLE = [0.45, 0.05, 0.2, 1];
   const DUREE_MONTEE = 2600, DUREE_VILLE = 1200;
   function bezier([x1, y1, x2, y2]) {
@@ -137,93 +112,43 @@
   }
   // niveauMm : la pluie de la ville (au millimètre) ; affiche : le niveau dessiné (0 jusqu'à la montée d'ouverture) ;
   // mmDessine : la valeur que montre la cote
+  const heros = $('#haut');
   let finEau = 0, niveauMm = 14, mmDessine = 0, minuterieEau = 0, affiche = (reduit() || q.has('fige')) ? null : 0;
   if (affiche === 0) setTimeout(() => { affiche = null; cotes(true, DUREE_MONTEE, COURBE_EAU); }, 700);
   function cotes(anime = false, duree = 0, courbe = COURBE_VILLE) {
-    const fig = $('#objet'), svg = $('#cotes'), svgN = $('#cotes-niveau'), eau = $('#eau');
+    const fig = $('#objet'), svg = $('#cotes'), eau = $('#eau');
     const w = fig.clientWidth, h = fig.clientHeight;
     if (!w || !h) return;
-    // hors d'un changement de ville, tout se pose sans glisser (redimensionnement, polices)
-    // (sauf pendant un mouvement de l'eau : un replacement à l'arrivée des polices coupait la montée en pleine course)
-    // Un replacement demandé pendant un mouvement de l'eau (polices, verdict qui change de taille) attend sa fin : il
-    // recréait le trait de rappel et reposait l'étiquette en pleine course.
+    // Hors d'un changement de ville, tout se pose sans glisser (redimensionnement, polices) ; un replacement demandé
+    // pendant un mouvement de l'eau attend sa fin.
     if (anime) finEau = performance.now() + duree;
     else if (performance.now() < finEau) { clearTimeout(cotes.attente); cotes.attente = setTimeout(() => cotes(), finEau - performance.now() + 30); return; }
-    else { fig.classList.add('pose'); requestAnimationFrame(() => requestAnimationFrame(() => fig.classList.remove('pose'))); }
+    else { heros.classList.add('pose'); requestAnimationFrame(() => requestAnimationFrame(() => heros.classList.remove('pose'))); }
     const s = Math.min(w / IMG.w, h / IMG.h), ox = (w - IMG.w * s) / 2, oy = (h - IMG.h * s) / 2;
     const X = (x) => ox + x * s, Y = (y) => oy + y * s;
-    const r = (v) => Math.round(v) + 0.5;           // traits de 1 px posés sur le pixel
+    const r = (v) => Math.round(v) + 0.5;
     svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    let d = '';
-    // axe de symétrie (trait mixte fin), du dessus de l'entonnoir au pied
-    const axe = `<line class="cote-axe" x1="${r(X(IMG.axe))}" y1="${Y(26) - 22}" x2="${r(X(IMG.axe))}" y2="${Y(2030) + 14}" stroke-dasharray="14 4 2 4"/>`;
+    // l'axe de symétrie (trait mixte fin), du dessus de l'entonnoir au pied
+    svg.innerHTML = `<line x1="${r(X(IMG.axe))}" y1="${Y(26) - 22}" x2="${r(X(IMG.axe))}" y2="${Y(2030) + 14}" stroke-dasharray="14 4 2 4"/>`;
     // l'eau : calque posé sur l'intérieur du tube, surface à la pluie de la ville (sec sous 1 mm)
     const mm = affiche === null ? niveauMm : affiche, sec = mm < 1;
-    const yEau = niveauY(mm);                         // tube sec : le ménisque s'efface au fond
+    const yEau = niveauY(mm);
     const haut = IMG.tubeH, k = Math.max(0, (IMG.fond - (yEau - IMG.menLu + IMG.menH)) / (IMG.fond - haut));
     Object.assign(eau.style, { left: X(IMG.inG) + 'px', top: Y(haut) + 'px', width: (IMG.inD - IMG.inG) * s + 'px', height: (IMG.fond - haut) * s + 'px' });
     if (anime) {
-      fig.style.setProperty('--eau-duree', duree + 'ms'); fig.style.setProperty('--eau-courbe', `cubic-bezier(${courbe.join(',')})`);
-      clearTimeout(minuterieEau); minuterieEau = setTimeout(() => { fig.style.removeProperty('--eau-duree'); fig.style.removeProperty('--eau-courbe'); }, duree + 100);
+      heros.style.setProperty('--eau-duree', duree + 'ms'); heros.style.setProperty('--eau-courbe', `cubic-bezier(${courbe.join(',')})`);
+      clearTimeout(minuterieEau); minuterieEau = setTimeout(() => { heros.style.removeProperty('--eau-duree'); heros.style.removeProperty('--eau-courbe'); }, duree + 100);
     }
     eau.style.setProperty('--eau-y', ((yEau - IMG.menLu - haut) * s).toFixed(2) + 'px');
     eau.style.setProperty('--eau-k', (sec ? 0 : k).toFixed(4));
     eau.style.setProperty('--eau-o', sec ? '0' : '1');
-    // la cote : mesurée et placée avec sa valeur finale ; pendant le mouvement, son chiffre compte avec l'eau (largeur
-    // gardée, elle ne bouge pas de côté)
-    const lab = $('#cote-niveau'), mmEl = $('#cote-mm');   // (déclarées avant le placement)
-    cancelAnimationFrame(rafCompte); lab.style.minWidth = '';
-    mmEl.textContent = texteMm(mm);
-    // Étiquettes : ligne de rappel horizontale vers la droite, sinon vers la gauche ; une position est retenue si
-    // l'étiquette reste dans la fenêtre et ne touche ni le texte du héros ni le bulletin (marge de 12 px).
-    const F = fig.getBoundingClientRect();
-    // marge de 48 px autour du texte : une cote posée sur la ligne du verdict se lisait comme sa suite (contre-revue)
-    const obstacles = ['.heros-titre .ligne', '.heros-chapeau', '.heros-ville label', '.heros-ville .choix', '.heros-verdict-titre', '.heros-actions > *', '#bulletin', '.tete-nav', '.tete-marque'].flatMap((q) => [...document.querySelectorAll(q)]).map((e) => e.getBoundingClientRect());
-    const libre = (x0, y0, x1, y1) => x0 >= 16 - F.left && x1 <= innerWidth - 16 - F.left && !obstacles.some((o) => x1 + F.left > o.left - 48 && x0 + F.left < o.right + 48 && y1 + F.top > o.top - 12 && y0 + F.top < o.bottom + 12);
-    function placer(el, yImg, xG, xD, classe, lien) {
-      el.style.display = '';
-      const y = r(Y(yImg)), L = Math.max(34, 130 * s);
-      // à droite en entier, à droite la mesure seule (« 14 mm »), puis à gauche en entier : à gauche, près du texte du
-      // héros, la cote se lisait comme la suite d'une phrase (contre-revue)
-      const cands = [{ cote: 'droite', court: false }, { cote: 'droite', court: true }, { cote: 'gauche', court: false }];
-      for (const c of cands) {
-        el.classList.toggle('court', c.court);
-        const lw = el.offsetWidth, lh = el.offsetHeight;
-        Object.assign(c, c.cote === 'droite' ? { x0: X(xD) + 6, x1: X(xD) + L, lx: X(xD) + L + 12 } : { x0: X(xG) - 6, x1: X(xG) - L, lx: X(xG) - L - 12 - lw });
-        if (!libre(c.lx, y - lh / 2, c.lx + lw, y + lh / 2)) continue;
-        // la cote se déplace avec l'eau (propriété translate : elle ne gêne pas l'animation d'entrée, en transform)
-        Object.assign(el.style, { left: '0px', top: '0px', right: 'auto', translate: `${c.lx}px ${y - lh / 2}px`, textAlign: c.cote === 'droite' ? 'left' : 'right' });
-        el.dataset.cote = c.cote;
-        // la ligne de lecture en travers du tube, puis le rappel vers l'étiquette (qui s'efface s'il change de côté)
-        return (lien ? `<path class="${classe}" d="${lien}"/>` : '') + `<g class="rappel"><path class="${classe}" d="M${r(c.x0)} 0H${r(c.x1)}"/><circle class="cote-point${classe ? '' : ' cote-point--clair'}" cx="${r(c.x1)}" cy="0" r="${classe ? 2.5 : 2}"/></g>`;
-      }
-      el.style.display = 'none';
-      return '';
-    }
-    // tube sec : la cote montre le fond de l'éprouvette, sans ligne en travers (le zéro tombe dans la bague)
-    const yLu = sec ? IMG.fond - 4 : yEau, yE = r(Y(yLu));
-    const coteAvant = lab.dataset.cote, translateAvant = lab.style.translate;
-    // avant la montée d'ouverture, l'étiquette prend déjà le côté de son niveau final (elle montera avec l'eau sans
-    // changer de côté), posée au fond
-    const avantMontee = affiche === 0;
-    const niv = placer(lab, avantMontee ? niveauY(niveauMm) : yLu, IMG.tubeG, IMG.tubeD, 'cote-niveau', sec ? '' : `M${r(X(IMG.tubeG) + 2)} 0H${r(X(IMG.tubeD) - 2)}`);
-    if (avantMontee && lab.style.display !== 'none') lab.style.translate = `${lab.style.translate.split(' ')[0]} ${yE - lab.offsetHeight / 2}px`;
-    svg.innerHTML = axe + `<g>${d}</g>`;
-    svgN.setAttribute('viewBox', `0 0 ${w} ${h}`);
-    svgN.innerHTML = niv;
-    svgN.style.translate = `0 ${yE}px`;
-    // Si l'étiquette change de côté, elle ne traverse pas le tube : elle s'efface, se pose de l'autre côté pendant
-    // qu'elle est invisible, et revient quand l'eau arrive.
-    if (anime && coteAvant && coteAvant !== lab.dataset.cote && translateAvant) {
-      const translateApres = lab.style.translate;
-      lab.style.translate = translateAvant;
-      const g = svgN.querySelector('.rappel'), cache = [{ opacity: 1 }, { opacity: 0, offset: 0.14 }, { opacity: 0, offset: 0.8 }, { opacity: 1 }];
-      lab.animate(cache, { duration: duree, easing: 'linear' });
-      if (g) g.animate([{ opacity: 0 }, { opacity: 0, offset: 0.8 }, { opacity: 1 }], { duration: duree, easing: 'linear' });
-      setTimeout(() => { lab.style.transition = 'none'; lab.style.translate = translateApres; void lab.offsetWidth; lab.style.transition = ''; }, duree * 0.15);
-    }
+    // le verdict se pose sur la ligne de lecture : la surface de l'eau, ou le fond de l'éprouvette quand elle est sèche
+    // (en millimètres de graduation, que landing.css convertit avec les mêmes repères)
+    const yLu = sec ? IMG.fond - 4 : yEau;
+    heros.style.setProperty('--mm', ((IMG.zero - yLu) / IMG.grad).toFixed(3));
+    cancelAnimationFrame(rafCompte);
+    $('#cote-mm').textContent = texteMm(mm);
     if (anime && mm !== mmDessine) {
-      if (lab.style.display !== 'none') lab.style.minWidth = lab.offsetWidth + 'px';
       compter(mmDessine, mm, duree, courbe);
       if (!sec) fremir(duree, 4 * s);
     }
@@ -232,22 +157,33 @@
 
   // ---------- Héros : l'averse (canvas, 19,5° depuis la verticale) ----------
   // Une averse dure 4 s, puis passe : les gouttes ne renaissent plus et s'effacent en 0,9 s. Elle revient à chaque
-  // changement de ville. Aucun mouvement automatique ne dépasse donc 5 s (WCAG 2.2.2 ; défaut P1-3 de la v10, où la pluie
-  // tombait sans fin) et plus rien ne bouge sous le bulletin en verre une fois l'averse passée.
+  // changement de ville (WCAG 2.2.2 : aucun mouvement automatique au-delà de 5 s). L'entonnoir la recueille : une goutte
+  // qui atteint sa bouche y entre (elle est coupée au bord), et sous l'entonnoir, à l'abri de son pavillon, il ne pleut pas.
   let averse = null;
   function pluie() {
     const cv = $('#pluie'), ctx = cv.getContext('2d');
-    const ang = (19.5 * Math.PI) / 180, sx = Math.sin(ang), sy = Math.cos(ang);
+    const ang = (19.5 * Math.PI) / 180, sx = Math.sin(ang), sy = Math.cos(ang), pente = sx / sy;
     let W = 0, H = 0, dpr = 1, gouttes = [], raf = 0, visible = true, t0 = 0, fin = 0;
+    let bouche = null;                  // l'entonnoir dans le repère du canvas : { y, g, d }
     const EFFACE = 900;
     const N = () => Math.round(clamp((W * H) / 9000, 60, 220));
+    function mesurer() {
+      const f = $('#objet').getBoundingClientRect(), c = cv.getBoundingClientRect();
+      const s = Math.min(f.width / IMG.w, f.height / IMG.h);
+      if (!s) { bouche = null; return; }
+      const ox = f.left - c.left + (f.width - IMG.w * s) / 2, oy = f.top - c.top + (f.height - IMG.h * s) / 2;
+      bouche = { y: oy + IMG.bordY * s, g: ox + (IMG.bordG + 10) * s, d: ox + (IMG.bordD - 10) * s };
+    }
     function taille() {
       dpr = Math.min(2, devicePixelRatio || 1); W = cv.clientWidth; H = cv.clientHeight;
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
       gouttes = Array.from({ length: N() }, () => ({ x: rnd() * (W + H * 0.4) - H * 0.35, y: rnd() * H, l: 26 + rnd() * 70, v: 700 + rnd() * 600, a: 0.035 + rnd() * 0.1 }));
+      mesurer();
       dessiner(0);
     }
+    // sous la bouche, à l'abri : le point, remonté le long de la pluie jusqu'à la hauteur de la bouche, tombe dans l'entonnoir
+    const abrite = (x, y) => bouche && y > bouche.y && (() => { const xb = x - (y - bouche.y) * pente; return xb > bouche.g && xb < bouche.d; })();
     function dessiner(dt, now = 0) {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
@@ -255,12 +191,18 @@
       const k = now ? clamp(1 - (now - fin) / EFFACE) : 1;      // 1 pendant l'averse, puis vers 0
       for (const g of gouttes) {
         if (g.mort) continue;
-        g.y += g.v * dt; g.x += g.v * dt * (sx / sy);
+        g.y += g.v * dt; g.x += g.v * dt * pente;
         if (g.y - g.l > H) {
           if (now && now > fin) { g.mort = true; continue; }
-          g.y = -g.l * sy; g.x -= H * (sx / sy) + g.l * sx;
+          g.y = -g.l * sy; g.x -= H * pente + g.l * sx;
         }
-        const x1 = g.x, y1 = g.y, x0 = x1 - sx * g.l, y0 = y1 - sy * g.l;
+        let x1 = g.x, y1 = g.y;
+        const x0 = x1 - sx * g.l, y0 = y1 - sy * g.l;
+        if (abrite(x1, y1)) {
+          if (y0 >= bouche.y) continue;                 // déjà dans l'entonnoir
+          const u = (bouche.y - y0) / (y1 - y0);         // coupée au bord de la bouche
+          x1 = x0 + (x1 - x0) * u; y1 = bouche.y;
+        }
         const gr = ctx.createLinearGradient(x0, y0, x1, y1);
         gr.addColorStop(0, 'rgba(188,205,232,0)'); gr.addColorStop(1, `rgba(220,228,239,${(g.a * k).toFixed(4)})`);
         ctx.strokeStyle = gr; ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1); ctx.stroke();
@@ -272,8 +214,10 @@
       raf = visible ? requestAnimationFrame(boucle) : 0;
     }
     new ResizeObserver(() => { taille(); if (!reduit() && !raf) ctx.clearRect(0, 0, W, H); }).observe(cv);
+    new ResizeObserver(mesurer).observe($('#objet'));
     if (reduit()) return;
     averse = (ms) => {
+      mesurer();
       fin = performance.now() + ms; gouttes.forEach((g) => (g.mort = false));
       if (!raf && visible) { t0 = 0; raf = requestAnimationFrame(boucle); }
     };
@@ -291,10 +235,10 @@
   // (propriété enregistrée en longueur, donc lue en pixels ; mise en cache, relue au redimensionnement)
   const seuils = new Map();
   addEventListener('resize', () => seuils.clear());
-  function seuilDe(s, v, h) {
+  function seuilDe(cle, s, v, h) {
     if (!v.startsWith('--')) return +v < 0 ? h + +v : +v;
-    if (!seuils.has(s)) { const [nom, k] = v.split('*'); seuils.set(s, parseFloat(getComputedStyle(s).getPropertyValue(nom)) * (+k || 1)); }
-    return seuils.get(s);
+    if (!seuils.has(cle)) { const [nom, k] = v.split('*'); seuils.set(cle, parseFloat(getComputedStyle(s).getPropertyValue(nom)) * (+k || 1)); }
+    return seuils.get(cle);
   }
   function contexte() {
     const y = 36;
@@ -304,8 +248,8 @@
       if (r.top <= y && r.bottom > y) {
         ctx = s.dataset.contexte;
         // « nuit@-230 » : le fond devient sombre à 230 px du bas ; « jour@150 » : clair à partir de 150 px du haut
-        const b = s.dataset.bascule;
-        if (b) { const [c, v] = b.split('@'); if (y - r.top >= seuilDe(s, v, r.height)) ctx = c; }
+        // plusieurs bascules, dans l'ordre de la section : « jour@--aube*0.5 nuit@-230 »
+        for (const b of (s.dataset.bascule || '').split(' ').filter(Boolean)) { const [c, v] = b.split('@'); if (y - r.top >= seuilDe(s.id + v, s, v, r.height)) ctx = c; }
         break;
       }
     }
@@ -645,8 +589,6 @@
   $('#notif-ok').addEventListener('click', () => repondre('#notif-ok', `Lu à 6${NB}h${NB}04${NB}: le bureau est prévenu.`));
   $('#notif-pb').addEventListener('click', () => repondre('#notif-pb', `Le conducteur de travaux vous rappelle.`));
 
-  // ---------- Limites : la démonstration jouable est dans landing/limites.js ----------
-
   // ---------- Questions : l'ouverture est native (::details-content dans landing.css), plus de script ----------
 
   // ---------- Essai : validation, envoi, confirmation (rien ne part : la marque est une démonstration) ----------
@@ -707,10 +649,8 @@
   choisirVille(villeInit, false);
   fondTelephone();
   pluie();
-  // les cotes évitent le texte du héros : on les replace dès que ce texte change de taille (chargement des polices, ville)
-  const roCotes = new ResizeObserver(() => cotes());
-  ['#objet', '.heros-texte', '#bulletin'].forEach((q) => roCotes.observe($(q)));
-  addEventListener('load', cotes);
+  new ResizeObserver(() => cotes()).observe($('#objet'));
+  addEventListener('load', () => cotes());   // sans l'événement en argument : il passait pour « anime » et coupait le compteur
   new ResizeObserver(() => releve()).observe($('#releve-graphe'));
   const etapeInit = q.has('etape') ? clamp(+q.get('etape'), 0, 3) : 0;
   if (q.has('etape')) modeManuel = true;

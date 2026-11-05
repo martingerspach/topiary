@@ -207,130 +207,159 @@ html.menu-ouvert { overflow: hidden; }
 /* Sous 360 px, l'appel quitte la barre (il est dans le menu et dans le héros) : logo, menu, rien ne se touche */
 @media (max-width: 359px) { .tete-appel { display: none; } }
 
-/* ---------- 1 · Héros ---------- */
+/* ---------- 1 · Héros « L'instrument » (v25, 2026-11-03) ----------
+   Le pluviomètre au centre ; tout se lit à travers lui, de gauche à droite. Au-dessus, la promesse. À gauche, la ville
+   du chantier (ce qui entre) ; à droite, le verdict posé sur la surface de l'eau (ce qui sort), qui monte et descend avec
+   elle quand on change de ville. Le pied de l'instrument descend dans « À 6 h » : la nuit continue.
+   Géométrie (aucun calcul de mise en page en script, donc aucun saut au chargement) : la figure garde les proportions de
+   l'image, 1360 × 2048 ; --G est sa hauteur et --g-top son haut. Repères relevés au pixel sur l'image (IMG dans
+   landing.js) : demi-largeur de l'éprouvette 178/2048 de la hauteur, zéro de la graduation à 1 509,6/2048, une
+   graduation (1 mm) tous les 29,6/2048. --mm (posée par landing.js) est le niveau lu, en millimètres. */
 .heros {
-  position: relative;
-  min-height: clamp(720px, 100svh, 1040px);
-  display: grid;
-  grid-template-rows: auto 1fr;
-  overflow: hidden;
-  /* Le bas du héros rejoint ciel-800, où commence l'aube de « À 6 h », sur 360 px, en smoothstep. La v12 le faisait en fondu
-     linéaire sur 160 px : la cassure de pente à la limite dessinait une bande claire, puis une arête nette. Essayé aussi :
-     prolonger la lueur dans l'énoncé (plus de couture, mais une vallée sombre sous le texte, puis le jour). */
+  --h: clamp(640px, 100svh, 1120px);
+  --titre-fs: min(var(--av-text-h1), 10.2svh);
+  --titre-haut: calc(var(--tete-h) + clamp(12px, 3.6svh, 52px));
+  --g-top: calc(var(--titre-haut) + var(--titre-fs) * 2 + clamp(14px, 2.6svh, 32px));
+  --debord: 1.1;                         /* le pied de l'instrument descend dans la section suivante */
+  --G: calc((var(--h) - var(--g-top)) * var(--debord));
+  --tube: calc(var(--G) * 0.0869);
+  --rappel: clamp(52px, 5vw, 92px);
+  --bord: max(var(--gouttiere), calc((100% - 1512px) / 2 + var(--gouttiere)));
+  --mesure-mi: 12px;
+  position: relative; z-index: 1;
+  height: var(--h);
+  overflow-x: clip;
+  /* Le bas du héros rejoint ciel-800, la nuit de « À 6 h », en smoothstep (aucune bande) */
   background:
     var(--grain),
     var(--heros-fin),
-    radial-gradient(60% 46% at 64% 104%, var(--lueur-1), transparent 70%),
+    radial-gradient(70% 50% at 50% 104%, var(--lueur-1), transparent 70%),
     radial-gradient(90% 60% at 50% 120%, var(--lueur-2), transparent 72%),
     linear-gradient(180deg, var(--av-ciel-950) 0%, var(--av-ciel-900) 38%, #0B2140 70%, var(--av-ciel-800) 100%);
   isolation: isolate;
 }
 :root {
-  --lueur-1: rgb(64 112 181 / 0.55); --lueur-2: rgb(28 76 142 / 0.6);
+  --lueur-1: rgb(64 112 181 / 0.42); --lueur-2: rgb(28 76 142 / 0.5);
   /* ciel-800 avec une opacité en smoothstep : pente nulle aux deux bouts, donc aucune bande */
   --heros-fin: linear-gradient(180deg, rgb(11 37 71 / 0) calc(100% - 360px), rgb(11 37 71 / 0.028) calc(100% - 324px), rgb(11 37 71 / 0.104) calc(100% - 288px), rgb(11 37 71 / 0.216) calc(100% - 252px), rgb(11 37 71 / 0.352) calc(100% - 216px), rgb(11 37 71 / 0.5) calc(100% - 180px), rgb(11 37 71 / 0.648) calc(100% - 144px), rgb(11 37 71 / 0.784) calc(100% - 108px), rgb(11 37 71 / 0.896) calc(100% - 72px), rgb(11 37 71 / 0.972) calc(100% - 36px), rgb(11 37 71) 100%);
 }
-/* La pluie s'efface sur les 280 derniers pixels du héros (courbe douce) : elle n'est plus tranchée par l'énoncé */
+/* La pluie s'efface sur les 280 derniers pixels du héros (courbe douce) */
 .heros-pluie {
   position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none;
   --fin-pluie: linear-gradient(180deg, #000 0, #000 calc(100% - 280px), rgb(0 0 0 / 0.86) calc(100% - 224px), rgb(0 0 0 / 0.6) calc(100% - 168px), rgb(0 0 0 / 0.32) calc(100% - 112px), rgb(0 0 0 / 0.1) calc(100% - 56px), transparent 100%);
   -webkit-mask-image: var(--fin-pluie); mask-image: var(--fin-pluie);
 }
-.heros-objet {
-  position: absolute; z-index: 1;
-  left: 65%; top: calc(var(--tete-h) + 8px); bottom: 24px;
-  aspect-ratio: 1360 / 2048;
-  transform: translateX(-50%);
-}
+
+.heros-titre { position: relative; z-index: 2; font-size: var(--titre-fs); line-height: 0.98; letter-spacing: -0.045em; text-align: center; }
+.heros-chapeau { position: relative; z-index: 2; font-size: var(--av-text-lead); line-height: var(--av-leading-lead); letter-spacing: var(--av-tracking-lead); color: var(--av-text-muted); }
+
+.heros-objet { position: absolute; z-index: 1; aspect-ratio: 1360 / 2048; height: var(--G); }
 .heros-instrument { position: absolute; inset: 0; }
 .heros-image { width: 100%; height: 100%; object-fit: contain; user-select: none; -webkit-user-drag: none; }
 /* L'eau du pluviomètre : l'image est l'éprouvette sèche (outils/eau.py) ; la colonne teinte le verre en multiplication
    et le ménisque se pose à la hauteur de la pluie de la ville (une graduation par millimètre). landing.js place le
-   calque sur l'intérieur du tube (503 à 857 px de l'image) et règle --eau-y (ligne de lecture du ménisque, une
-   graduation par millimètre) et --eau-k (hauteur de la colonne). L'eau monte à
-   l'ouverture puis suit le changement de ville, sur la courbe « reveal » ; posée d'un coup en mouvement réduit. */
-.heros-objet { --eau-duree: 1100ms; }
+   calque sur l'intérieur du tube et règle --eau-y (ligne de lecture du ménisque) et --eau-k (hauteur de la colonne). */
+.heros { --eau-duree: 1100ms; }
 .eau { position: absolute; pointer-events: none; }
 .eau-colonne { position: absolute; inset: 0; background: url(../images/eau.png) 0 0 / 100% 100% no-repeat; mix-blend-mode: multiply; transform-origin: 50% 100%; transform: scaleY(var(--eau-k, 0)); }
-.eau-menisque { position: absolute; left: 0; top: 0; width: 100%; height: auto; max-width: none; translate: 0 var(--eau-y, 0px); opacity: var(--eau-o, 0); }
-/* l'eau monte comme de l'eau : départ doux, arrivée lente (la courbe « reveal » faisait l'essentiel du trajet en 300 ms) */
-.eau-colonne, .eau-menisque, .cotes--niveau, .cote--niveau { transition: transform var(--eau-duree) var(--eau-courbe, cubic-bezier(.45, .05, .2, 1)), translate var(--eau-duree) var(--eau-courbe, cubic-bezier(.45, .05, .2, 1)), opacity 420ms var(--av-ease-standard); }
-/* le frémissement de la surface est une animation de transform, à part de translate (le niveau) */
-.eau-menisque { will-change: translate, transform; }
-.cote--niveau b { font-variant-numeric: tabular-nums; }
-.heros-objet.pose .eau-colonne, .heros-objet.pose .eau-menisque, .heros-objet.pose .cotes--niveau, .heros-objet.pose .cote--niveau { transition: none; }
-@media (prefers-reduced-motion: reduce) { .heros-objet { --eau-duree: 0ms !important; } }
+.eau-menisque { position: absolute; left: 0; top: 0; width: 100%; height: auto; max-width: none; translate: 0 var(--eau-y, 0px); opacity: var(--eau-o, 0); will-change: translate, transform; }
+/* L'eau, le verdict et sa ligne de lecture bougent ensemble : même durée, même courbe (départ doux, arrivée lente) */
+.eau-colonne, .eau-menisque, .heros-sortie { transition: transform var(--eau-duree) var(--eau-courbe, cubic-bezier(.45, .05, .2, 1)), translate var(--eau-duree) var(--eau-courbe, cubic-bezier(.45, .05, .2, 1)), opacity 420ms var(--av-ease-standard); }
+.heros.pose .eau-colonne, .heros.pose .eau-menisque, .heros.pose .heros-sortie { transition: none; }
+@media (prefers-reduced-motion: reduce) { .heros { --eau-duree: 0ms !important; } }
 @media (forced-colors: active) { .eau { display: none; } }
 .cotes { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
-.cotes path, .cotes line { fill: none; stroke: rgb(242 245 250 / 0.55); stroke-width: 1; vector-effect: non-scaling-stroke; shape-rendering: geometricPrecision; }
-.cotes .cote-niveau { stroke: var(--av-signal-300); stroke-width: 1.25; }
-.cotes .cote-point { fill: var(--av-signal-300); stroke: none; }
-.cote { position: absolute; margin: 0; font-family: var(--av-font-mono); font-size: 15px; line-height: 1.3; letter-spacing: 0; color: var(--av-brume-200); white-space: nowrap; pointer-events: none; }
-.cote b { font-weight: 400; color: var(--av-brume-50); }
-.cote--niveau { color: var(--av-brume-200); }
-.cote--niveau b { color: var(--av-signal-300); }
-.cote--niveau.court #cote-ville { display: none; }
+.cotes line { fill: none; stroke: rgb(242 245 250 / 0.26); stroke-width: 1; vector-effect: non-scaling-stroke; }
 
-.heros-texte { position: relative; z-index: 2; padding-top: calc(var(--tete-h) + clamp(28px, 6.5vh, 76px)); }
-/* Le titre dit ce que fait Auvent ; le verdict de la ville, dessous, le prouve (défaut P1-9 de la v10 : le titre était
-   le verdict d'un cas, la promesse en bas d'écran). Taille réglée pour tenir en trois lignes à gauche de l'instrument. */
-.heros-titre { font-size: clamp(2.375rem, 1.3rem + 3.6vw, 4.75rem); line-height: 0.98; letter-spacing: -0.045em; max-width: 9.6em; }
-.heros-chapeau { margin-top: clamp(16px, 2.4vh, 24px); max-width: 26em; font-size: var(--av-text-lead); line-height: var(--av-leading-lead); letter-spacing: var(--av-tracking-lead); color: var(--av-text-muted); }
-.heros-demo { margin-top: clamp(24px, 4vh, 40px); max-width: 32em; }
-.heros-ville { color: var(--av-brume-200); }   /* 4,4:1 en atténué à 320 px (mesuré sur le rendu) : un ton plus clair */
-.heros-ville { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.heros-ville .choix { margin: 0; color: var(--av-text); }
-.heros-verdict { margin-top: 14px; min-height: calc(2em * var(--av-leading-h3)); font-size: var(--av-text-h3); }
-.heros-verdict-titre { display: block; font-size: var(--av-text-h3); line-height: var(--av-leading-h3); letter-spacing: var(--av-tracking-h3); color: var(--av-text); }
-@media (min-width: 900px) and (max-width: 1199px) {
-  .heros-objet { left: 75%; }
-  .heros-chapeau, .heros-demo { max-width: 21em; }
-  .heros-titre { max-width: 8.6em; font-size: clamp(2.375rem, 0.6rem + 4.4vw, 3.6rem); }
+/* La ville : un libellé, puis le sélecteur en grand (le même verre que la navigation) */
+.heros-entree { position: relative; z-index: 3; display: flex; flex-direction: column; gap: 10px; }
+.heros-entree-libelle { font-size: var(--av-text-lead); line-height: 1.3; color: var(--av-brume-200); }
+.choix--grand { height: 56px; border-radius: 14px; color: var(--av-text); }
+.choix--grand select { padding: 0 52px 0 18px; font-size: clamp(1.375rem, 1.2rem + 0.5vw, 1.75rem); font-weight: 400; letter-spacing: -0.02em; }
+.choix--grand svg { right: 18px; width: 14px; height: 9px; margin-top: -4.5px; }
+
+/* Le verdict : la mesure (dans la police des cotes), puis la phrase. Le niveau lu fixe sa hauteur. */
+.heros-sortie { position: relative; z-index: 2; }
+.heros-mesure { height: calc(var(--mesure-mi) * 2); display: flex; align-items: center; font-family: var(--av-font-mono); font-size: 17px; letter-spacing: 0; color: var(--av-signal-300); white-space: nowrap; }
+.heros-mesure b { font-weight: 400; font-variant-numeric: tabular-nums; }
+.heros-verdict { margin-top: 10px; min-height: calc(2em * var(--av-leading-h3)); font-size: var(--av-text-h3); line-height: var(--av-leading-h3); letter-spacing: var(--av-tracking-h3); color: var(--av-text); text-wrap: balance; }
+.heros-actions { position: relative; z-index: 2; display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* Grand écran : tout se pose autour de l'instrument */
+@media (min-width: 900px) {
+  .heros-titre { position: absolute; top: var(--titre-haut); left: 50%; translate: -50% 0; width: max-content; max-width: min(13.4em, calc(100% - 2 * var(--gouttiere))); }
+  .heros-objet { top: var(--g-top); left: 50%; translate: -50% 0; }
+  .heros-entree { position: absolute; right: calc(50% + var(--tube) + var(--rappel)); top: calc(var(--g-top) + var(--G) * 0.42); translate: 0 -50%; align-items: flex-end; text-align: right; }
+  /* la ligne de rappel : du sélecteur au bord de l'éprouvette */
+  .heros-entree::after { content: ''; position: absolute; left: calc(100% + 14px); bottom: 28px; width: calc(var(--rappel) - 18px); height: 1px; background: rgb(242 245 250 / 0.34); }
+  .heros-sortie {
+    position: absolute; left: calc(50% + var(--tube) + var(--rappel)); top: 0;
+    width: min(16em, calc(50% - var(--tube) - var(--rappel) - var(--bord)));
+    font-size: var(--av-text-h3);
+    translate: 0 calc(var(--g-top) + var(--G) * (0.73711 - var(--mm, 0.36) * 0.014453) - var(--mesure-mi));
+  }
+  /* la ligne de lecture : en travers de l'éprouvette, à la surface de l'eau, jusqu'à la mesure */
+  .heros-sortie::before { content: ''; position: absolute; top: calc(var(--mesure-mi) - 0.625px); right: calc(100% + 14px); width: calc(var(--rappel) + 2 * var(--tube) - 18px); height: 1.25px; background: var(--av-signal-300); }
+  .heros-chapeau { position: absolute; left: var(--bord); bottom: calc(clamp(24px, 5svh, 56px) + 44px + 22px); width: min(23em, calc(50% - var(--tube) - var(--rappel) - var(--bord) - 24px)); }
+  .heros-actions { position: absolute; left: var(--bord); bottom: clamp(24px, 5svh, 56px); }
 }
-.heros-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: clamp(24px, 4vh, 40px); }
+@media (min-width: 900px) and (max-width: 1199px) {
+  .heros-chapeau { font-size: var(--av-text-body); }
+}
+/* écran bas (portable de 720 à 800 px) : moins de débord, le verdict d'une ville sèche reste dans l'écran */
+@media (min-width: 900px) and (max-height: 800px) { .heros { --debord: 1.02; } }
 
-.heros-pied { position: relative; z-index: 2; display: flex; align-items: flex-end; justify-content: flex-end; gap: 24px; padding-bottom: clamp(24px, 4vh, 40px); }
-
-/* le bulletin peut passer sur le chrome de l'instrument : verre plus fumé que le verre courant (contraste mesuré) */
-.av-nuit .bulletin { background: rgb(6 21 40 / 0.6); }
-.bulletin { width: min(400px, 100%); padding: 20px 20px 20px 22px; border-radius: var(--av-radius-l); display: grid; grid-template-columns: 1fr 44px; column-gap: 16px; row-gap: 4px; align-items: end; }
-.bulletin-tete { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 2px 12px; margin-bottom: 10px; font-size: 15px; color: var(--av-brume-200); }
-.bulletin-tete > span { white-space: nowrap; }
-@media (max-width: 1199px) { .av-nuit .bulletin { background: rgb(6 21 40 / 0.7); } }
-.bulletin-date { font-variant-numeric: tabular-nums; }
-.bulletin-chantier { grid-column: 1; font-weight: 500; }
-.bulletin-texte { grid-column: 1; color: var(--av-brume-200); }
-/* le bouton est posé à 12 px du coin : rayon 24 − 12 = 12, concentrique au bulletin */
-.bulletin .bouton-icone { position: absolute; right: 12px; bottom: 12px; }
+/* Téléphone et tablette : la promesse et la ville en colonne, puis l'instrument à gauche et le verdict qui monte avec
+   l'eau à sa droite, dans une même scène */
+@media (max-width: 899px) {
+  .heros {
+    --G: min(460px, 58svh);
+    --g-top: 0px;
+    --rappel: 26px;
+    height: auto;
+    display: grid; grid-template-columns: minmax(0, 1fr);
+    padding: calc(var(--tete-h) + 20px) var(--gouttiere) 0;
+  }
+  .heros-titre { font-size: clamp(2.375rem, 1.6rem + 3.4vw, 3.5rem); max-width: 11em; text-align: left; }
+  .heros-chapeau { margin-top: 16px; max-width: 26em; }
+  .heros-entree { margin-top: 28px; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  .heros-entree-libelle { font-size: var(--av-text-body); }
+  .choix--grand { height: 52px; }
+  /* la scène : l'instrument et le verdict partagent une rangée de la hauteur de l'instrument */
+  .heros-objet, .heros-sortie { grid-row: 5; grid-column: 1; align-self: start; }
+  .heros-objet { position: relative; margin-top: 20px; margin-left: calc(var(--G) * -0.12); }
+  .heros-sortie { margin-top: 20px; margin-left: calc(var(--G) * 0.212 + var(--tube) + var(--rappel)); max-width: 15em; translate: 0 calc(var(--G) * (0.73711 - var(--mm, 0.36) * 0.014453) - var(--mesure-mi)); }
+  .heros-sortie::before { content: ''; position: absolute; top: calc(var(--mesure-mi) - 0.625px); right: calc(100% + 8px); width: calc(var(--rappel) + 2 * var(--tube) - 10px); height: 1.25px; background: var(--av-signal-300); }
+  .heros-verdict { font-size: clamp(1.25rem, 1.1rem + 0.8vw, 1.5rem); min-height: calc(3em * var(--av-leading-h3)); }
+  .heros-actions { grid-row: 6; margin-top: 8px; padding-bottom: 40px; }
+  .heros-titre { grid-row: 1; } .heros-chapeau { grid-row: 2; } .heros-entree { grid-row: 3; }
+}
+/* Tablette : la promesse en tête, puis la scène du grand écran (la ville à gauche de l'éprouvette, le verdict à droite) */
+@media (min-width: 600px) and (max-width: 899px) {
+  .heros { --G: min(640px, 60svh); --rappel: 46px; }
+  .heros-titre { max-width: 12em; }
+  .heros-entree, .heros-objet, .heros-sortie { grid-row: 5; grid-column: 1; align-self: start; }
+  .heros-objet { justify-self: center; margin-left: 0; margin-top: 32px; }
+  .heros-entree { margin-top: calc(32px + var(--G) * 0.42 - 45px); width: calc(50% - var(--tube) - var(--rappel)); flex-direction: column; align-items: flex-end; text-align: right; }
+  .heros-entree::after { content: ''; position: absolute; left: calc(100% + 10px); bottom: 26px; width: calc(var(--rappel) - 12px); height: 1px; background: rgb(242 245 250 / 0.34); }
+  .heros-sortie { margin-top: 32px; margin-left: calc(50% + var(--tube) + var(--rappel)); max-width: calc(50% - var(--tube) - var(--rappel)); }
+  .heros-sortie::before { right: calc(100% + 10px); width: calc(var(--rappel) + 2 * var(--tube) - 12px); }
+  .heros-actions { margin-top: 16px; }
+}
 
 /* Entrée du héros : une fois, au chargement */
 @media (prefers-reduced-motion: no-preference) {
   .js .heros-titre .ligne { display: inline-block; animation: monte 1100ms var(--av-ease-reveal) both; animation-delay: calc(var(--i, 0) * 60ms + 80ms); }
-  .js .heros-chapeau, .js .heros-demo, .js .heros-actions { animation: monte-doux 1000ms var(--av-ease-reveal) both 420ms; }
+  .js .heros-chapeau, .js .heros-actions { animation: monte-doux 1000ms var(--av-ease-reveal) both 620ms; }
+  .js .heros-entree { animation: monte-doux 1000ms var(--av-ease-reveal) both 460ms; }
   .js .heros-instrument { animation: objet 1600ms var(--av-ease-reveal) both 120ms; }
-  .js .heros-pied > * { animation: monte-doux 1000ms var(--av-ease-reveal) both 620ms; }
-  .js .bulletin { animation: verre-entre 1200ms var(--av-ease-verre) both 900ms; }
+  .js .heros-verdict, .js .heros-mesure { animation: monte-doux 900ms var(--av-ease-reveal) both 900ms; }
+  .js .cotes, .js .heros-entree::after, .js .heros-sortie::before { animation: apparait 900ms var(--av-ease-standard) both 1000ms; }
 }
 @keyframes monte { from { opacity: 0; transform: translateY(0.42em); } to { opacity: 1; transform: none; } }
 @keyframes monte-doux { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 @keyframes objet { from { opacity: 0; transform: translateY(5%) scale(0.97); } to { opacity: 1; transform: none; } }
-@keyframes verre-entre { from { opacity: 0; transform: translateY(18px) scale(0.94); } to { opacity: 1; transform: none; } }
-
-@media (max-width: 899px) {
-  .heros { min-height: 0; display: flex; flex-direction: column; }
-  .heros-texte { order: 1; }
-  .heros-objet { order: 2; position: relative; left: auto; top: auto; bottom: auto; transform: none; width: min(66vw, 360px); margin: 8px -7vw 0 auto; }
-  .cote--niveau { white-space: normal; width: 10.6em; }
-  .cote--niveau b { display: block; }
-  .heros-pied { order: 3; flex-direction: column; align-items: stretch; margin-top: -64px; }
-  .bulletin { order: 1; width: 100%; }
-  .heros-titre { max-width: 11em; }
-}
-@media (min-width: 600px) and (max-width: 899px) {
-  .heros-objet { width: min(46vw, 380px); margin: 32px 3vw 0 auto; }   /* le pavillon ne touche plus les boutons */
-  .heros-pied { align-items: flex-start; margin-top: -210px; padding-bottom: 40px; }
-  .bulletin { width: min(420px, 56%); }
-}
+@keyframes apparait { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---------- Lignes de construction (sections claires) : les colonnes de la grille, en pointillés ----------
    Elles passent sous les pièces de verre, dont le bord les courbe : c'est là que la lentille se voit. */
@@ -342,15 +371,15 @@ html.menu-ouvert { overflow: hidden; }
 .plan > .guides { bottom: var(--plan-fondu); }
 @media (max-width: 899px) { .guides { display: none; } }
 
-/* ---------- 3 · Traduction ---------- */
-/* L'aube : la nuit du héros s'éclaircit en haut de la section (fondu « aube » sur --aube), puis le jour du bureau.
-   Le titre se pose à 62 % du fondu, où le ciel est assez clair pour l'encre (5,6:1 au plus sombre, mesuré).
-   --aube est enregistrée en longueur : landing.js lit sa valeur calculée pour basculer l'en-tête au milieu du fondu. */
+/* ---------- 2 · « À 6 h » (v25) ----------
+   À 6 h, en octobre, il fait encore nuit : la section garde la nuit du héros (aucune bande de dégradé entre les deux) et
+   reçoit le pied de l'instrument, qui déborde du héros. Le graphique est posé à même le ciel, sans carte ; le téléphone
+   du chef de chantier à côté. L'aube vient ensuite, en haut du planning. */
 @property --aube { syntax: '<length>'; inherits: false; initial-value: 0px; }
 .traduction {
-  --aube: clamp(280px, 30vw, 420px);
-  position: relative; padding-block: calc(var(--aube) * 0.7) clamp(64px, 7vw, 104px);   /* la rangée du titre, plus claire sous elle */
-  background: var(--grain), var(--av-fondu-aube) top / 100% var(--aube) no-repeat, var(--av-fondu-traduction) 0 var(--aube) / 100% calc(100% - var(--aube)) no-repeat, var(--av-lait-50);
+  position: relative; z-index: 0;
+  padding-block: clamp(96px, 10vw, 152px) clamp(40px, 4vw, 64px);
+  background: var(--grain), var(--av-ciel-800);
 }
 /* Rendu final (2026-10-24) : le titre et sa phrase en rangée au-dessus, comme dans les limites ; le graphique sur huit
    colonnes, le téléphone sur quatre, la phrase posée exactement au-dessus du téléphone (même largeur, même bord). La
@@ -359,8 +388,8 @@ html.menu-ouvert { overflow: hidden; }
 .trad-texte { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: end; row-gap: 20px; position: relative; z-index: 1; }
 .trad-texte h2 { grid-column: 1 / span 7; }
 .trad-texte p { grid-column: 9 / span 4; padding-inline: max(0px, calc((100% - 340px) / 2)); }
-.trad-texte h2, .plan-texte h2, .seuils-texte h2, .pied-appel h2, .questions-titre, .prix-titre { font-size: var(--av-text-h2); line-height: var(--av-leading-h2); letter-spacing: var(--av-tracking-h2); }
-.trad-texte p { color: var(--av-encre-900); }   /* posée haut dans l'aube : encre pleine (4,3:1 en encre-700, mesuré) */   /* sur le haut bleuté de la section : 5,5:1 en atténué, 8:1 ici */
+.trad-texte h2, .plan-texte h2, .pied-appel h2, .questions-titre, .prix-titre { font-size: var(--av-text-h2); line-height: var(--av-leading-h2); letter-spacing: var(--av-tracking-h2); }
+.trad-texte p { color: var(--av-brume-200); }   /* sur ciel-800 */
 
 
 /* La météo à gauche, le téléphone à droite, chacun avec sa légende dessous : la même journée, avant et après Auvent.
@@ -369,17 +398,9 @@ html.menu-ouvert { overflow: hidden; }
 .releve-carte {
   flex: 1; display: flex; flex-direction: column;
   min-height: 520px;
-  padding: 22px 22px 16px;
-  border-radius: var(--av-radius-m);
   color: var(--av-brume-50);
-  background:
-    /* la lueur du bas reste sous ciel-600 en clarté : les heures blanches gardent 7:1 (4,4 avec l'ancienne lueur) */
-    radial-gradient(120% 70% at 50% 112%, rgb(34 80 150 / 0.95), rgb(28 70 132 / 0.7) 34%, transparent 72%),
-    linear-gradient(180deg, var(--av-ciel-950) 0%, var(--av-ciel-900) 40%, var(--av-ciel-700) 100%);
-  overflow: hidden;
-  box-shadow: 0 30px 60px -36px rgb(6 21 40 / 0.6);
 }
-.releve-tete { font-size: 17px; font-weight: 500; color: var(--av-brume-50); }
+.releve-tete { font-size: var(--av-text-lead); line-height: 1.3; color: var(--av-brume-50); }
 .releve-legende[hidden] { display: none; }
 .releve-legende { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-size: 15px; font-weight: 500; color: var(--av-signal-300); }
 .releve-tirets { width: 26px; height: 0; border-top: 1.25px dashed currentColor; }
@@ -402,7 +423,7 @@ html.menu-ouvert { overflow: hidden; }
 
 /* Verre : sur fond clair, un liseré blanc et une ombre de bord donnent l'épaisseur ; à l'appui, la pièce s'enfonce */
 .av-jour [data-verre]:not(.tete-curseur) { box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.75), inset 0 -1px 0 rgb(10 18 32 / 0.05), 0 1px 1px rgb(10 18 32 / 0.04), 0 18px 40px -24px rgb(6 21 40 / 0.22); }
-.bouton--verre, .essai, .bulletin { transition: transform 420ms var(--av-ease-verre), box-shadow var(--av-duration-moyen) var(--av-ease-standard); }
+.bouton--verre, .essai { transition: transform 420ms var(--av-ease-verre), box-shadow var(--av-duration-moyen) var(--av-ease-standard); }
 .bouton--verre:active { transform: scale(0.985); }
 
 @media (max-width: 1099px) {
@@ -414,7 +435,7 @@ html.menu-ouvert { overflow: hidden; }
   .trad-texte { display: flex; flex-direction: column; align-items: stretch; }
   .trad-texte p { padding-inline: 0; max-width: 34em; }
   .releve { grid-column: 1 / -1; }
-  .releve-carte { min-height: 420px; }
+  .releve-carte { min-height: 380px; }
 }
 
 /* ---------- 4 · Planning ---------- */
@@ -423,18 +444,23 @@ html.menu-ouvert { overflow: hidden; }
    dans la chorégraphie d'un passage. */
 .planning {
   position: relative;
-  padding-block: var(--section-pad) 0;
+  /* l'aube : la nuit de « À 6 h » s'éclaircit en haut de la section ; le titre se pose aux deux tiers du fondu, où le ciel est
+     assez clair pour l'encre. --aube est lue par landing.js pour basculer l'en-tête au milieu du fondu. */
+  --aube: clamp(240px, 22vw, 320px);
+  --plan-fondu: clamp(300px, 30vw, 440px);
+  padding-block: calc(var(--aube) * 0.66) 0;
   background:
     var(--grain),
+    var(--av-fondu-aube) top / 100% var(--aube) no-repeat,
+    var(--av-fondu-traduction) 0 var(--aube) / 100% clamp(320px, 36vw, 560px) no-repeat,
     var(--av-fondu-planning) bottom / 100% var(--plan-fondu) no-repeat,
     linear-gradient(180deg, var(--av-lait-50) 0%, var(--av-ciel-50) 100%);
-  --plan-fondu: clamp(300px, 30vw, 440px);
 }
 /* Fin de la section : la colonne des étapes se prolonge de 160 px sous le filet (.plan-texte), la fenêtre reste donc
    épinglée 160 px de plus à la dernière étape (les accusés arrivent pendant qu'elle est posée) ; le fondu vers la nuit
    commence sous la fin de la colonne (38 % de sa hauteur) au lieu de 24 px après : la fenêtre qui part découvre le ciel
    qui fonce, plus un long aplat clair. */
-.plan { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colonne-gap); padding-bottom: calc(var(--plan-fondu) * 0.62); }
+.plan { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colonne-gap); padding-bottom: calc(var(--plan-fondu) * 0.42); }
 .plan-texte { grid-column: 1 / span 4; position: relative; z-index: 1; padding-bottom: 160px; }   /* le maintien de la dernière étape, sous le filet */
 .plan-chapeau { margin-top: 20px; color: var(--av-text-muted); max-width: 28em; }
 /* Repère de progression : un filet à gauche des étapes, encré jusqu'à la ligne de lecture (la mi-hauteur de l'écran, là
@@ -463,7 +489,7 @@ html.menu-ouvert { overflow: hidden; }
 .etape-texte { margin-top: 10px; color: var(--av-text-muted); max-width: 30em; }
 .etape-quand, .etape-titre, .etape-texte { transition: color var(--av-duration-moyen) var(--av-ease-standard); }
 .etape.actif .etape-titre { color: var(--av-text); }
-.etape.actif .etape-quand { color: var(--av-accent); }
+.etape.actif .etape-quand { color: var(--av-text); }   /* v25 : l'aube passe sous les premières étapes ; le bleu d'accent y tombait à 4,3:1 */
 .etape.actif .etape-texte { color: var(--av-text); }
 .etape.actif { border-top-color: var(--av-text); }
 .plan-scene { grid-column: 5 / span 8; position: relative; }
@@ -678,23 +704,12 @@ html.menu-ouvert { overflow: hidden; }
   .tel-horloge { font-size: 80px; }
 }
 
-/* ---------- 6 · Limites (la démonstration : landing/limites.css et landing/limites.js) ---------- */
-.seuils {
-  position: relative;
-  padding-block: clamp(40px, 4vw, 64px) clamp(64px, 7vw, 104px);   /* le fondu du planning fait déjà le passage */
-  /* La nuit des limites finit à plat sur ciel-800, là où commence le fondu du tarif : un seul passage vers le jour */
-  background: var(--grain), linear-gradient(180deg, var(--av-ciel-950), rgb(2 10 18 / 0)) top / 100% clamp(220px, 24vw, 340px) no-repeat, var(--av-fondu-seuils);
-  overflow: hidden;
-}
-/* la fin de nuit des limites est la plus claire : texte atténué un ton plus clair (contraste mesuré 5,2 en v10, 7 visé) */
-.seuils { --av-text-muted: var(--av-brume-200); }
-
 /* ---------- 7 · Fin de page, de nuit : le tarif et l'essai côte à côte, puis les questions ----------
    Rendu final (2026-10-23) : la page ne repasse plus au jour après les limites. Les limites finissent sur ciel-800 ;
    le tarif le garde à plat, le pied descend ensuite vers ciel-950 (un seul passage nuit → jour → nuit sur la page). */
-.tarif { position: relative; padding-block: clamp(56px, 6vw, 96px) clamp(88px, 9vw, 136px); background: var(--grain), var(--av-ciel-800); }
+.tarif { position: relative; padding-block: clamp(24px, 3vw, 48px) clamp(72px, 7vw, 112px); background: var(--grain), linear-gradient(180deg, var(--av-ciel-950), rgb(2 10 18 / 0)) top / 100% clamp(200px, 22vw, 320px) no-repeat, var(--av-fondu-seuils) top / 100% clamp(360px, 40vw, 600px) no-repeat, var(--av-ciel-800); }
 .tarif { --av-text-muted: var(--av-brume-200); }   /* 9,3:1 sur ciel-800 */
-.tarif-grille { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colonne-gap); row-gap: clamp(72px, 8vw, 112px); align-items: start; }
+.tarif-grille { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--colonne-gap); row-gap: clamp(56px, 6vw, 88px); align-items: start; }
 .prix { grid-column: 1 / span 5; display: flex; flex-direction: column; gap: 28px; align-items: flex-start; }
 .prix-montant { display: flex; flex-direction: column; gap: 10px; font-size: var(--av-text-lead); line-height: var(--av-leading-lead); letter-spacing: var(--av-tracking-lead); }
 .prix-v { font-size: clamp(64px, 5vw, 76px); line-height: 0.88; letter-spacing: -0.05em; font-weight: 300; font-variant-numeric: tabular-nums; }
@@ -829,12 +844,6 @@ html.menu-ouvert { overflow: hidden; }
 }
 
 /* ---------- Compléments : cotes, météogramme, front ---------- */
-.cotes .cote-axe { stroke: rgb(242 245 250 / 0.28); }
-.cotes .cote-point--clair { fill: var(--av-brume-200); }
-.js .heros-titre.rejoue .ligne { animation: monte 900ms var(--av-ease-reveal) both; animation-delay: calc(var(--i, 0) * 60ms); }
-@media (prefers-reduced-motion: no-preference) {
-  .js .cotes, .js .cote { animation: monte-doux 900ms var(--av-ease-reveal) both 1100ms; }
-}
 
 .releve-graphe .g-tick { stroke: rgb(242 245 250 / 0.4); stroke-width: 1; shape-rendering: crispEdges; }
 /* barres : un dégradé de la pluie (plus dense en haut) ; les heures bloquées passent au bleu du signal, hachées */
@@ -917,15 +926,18 @@ html.menu-ouvert { overflow: hidden; }
 
 /* Couleurs forcées : chaque commande garde un contour ; ni fond d'écran ni pluie sous le texte */
 @media (forced-colors: active) {
-  .bouton-texte, .bouton-fleche, .bouton-icone, .notif-action, .onglet, .faq-plus, .essai .choix, .heros-ville .choix, .saisie { border: 1px solid ButtonBorder; }
+  .bouton-texte, .bouton-fleche, .bouton-icone, .notif-action, .onglet, .faq-plus, .essai .choix, .heros-entree .choix, .saisie { border: 1px solid ButtonBorder; }
   .tel-ecran::before, .heros-pluie { display: none; }
   .tete-curseur { border: 1px solid Highlight; }
+  /* les lignes de rappel et de lecture du héros sont des fonds : on leur rend une couleur du système */
+  .heros-entree::after, .heros-sortie::before { forced-color-adjust: none; background: CanvasText; }
+  .heros-mesure { color: CanvasText; }
   /* traits du menu et signes des questions : des fonds, que le mode forcé efface ; on leur donne la couleur du texte */
   .tete-menu { border: 1px solid ButtonBorder; }
   .tete-menu-traits i, .faq-plus::before, .faq-plus::after { forced-color-adjust: none; background: ButtonText; }
   .tete-feuille { border: 1px solid CanvasText; }
   /* la trame est une vraie image : Chromium garderait alors tous les calques de fond, dégradés sombres compris */
-  .heros, .traduction, .planning, .seuils, .tarif, .pied, .releve-carte, .tel-ecran { background: Canvas; }
+  .heros, .traduction, .planning, .tarif, .pied, .releve-carte, .tel-ecran { background: Canvas; }
   /* le graphique est en SVG : ses couleurs ne sont pas forcées, on lui donne celles du système */
   .releve-carte { border: 1px solid CanvasText; }
   .releve-graphe .g-heure, .releve-graphe .g-seuil-txt, .releve-graphe .g-fenetre-txt, .releve-graphe .g-accolade-txt { fill: CanvasText; }
@@ -942,7 +954,7 @@ html.menu-ouvert { overflow: hidden; }
    écran de téléphone : le fondu du planning faisait 324 px de dégradé vide avant les limites. */
 @media (max-width: 599px) {
   :root { --section-pad: 64px; }
-  .traduction { --aube: 220px; }
+  .planning { --aube: 220px; }
   .planning { --plan-fondu: 200px; }
   .tarif { padding-bottom: 48px; }
 }

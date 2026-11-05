@@ -148,7 +148,7 @@
   function monter(hote, etat) {
     const grille = document.createElement('div');
     grille.className = 'pg';
-    let html = `<div class="pg-coin">Chantier</div>` + JOURS.map(([j, d], i) => `<div class="pg-jour"><b>${j} ${d}</b>${i === 1 ? '<span class="pg-jour-suf"> · pluie et vent</span>' : ''}</div>`).join('');
+    let html = `<div class="pg-coin">Chantier</div>` + JOURS.map(([j, d], i) => `<div class="pg-jour"><b>${j} ${d}</b>${i === 1 ? '<span class="pg-jour-suf">, pluie et vent</span>' : ''}</div>`).join('');
     SITES.forEach((s, i) => {
       html += `<div class="pg-site" data-site="${s.id}"><b>${s.nom}</b><span>${s.ville}</span><span class="vu">Vu à 6${NB}h${NB}${String(VUS[i][0]).padStart(2, '0')}</span></div>`;
       for (let j = 0; j < 4; j++) html += `<div class="pg-case" data-site="${s.id}" data-jour="${j}"></div>`;
@@ -278,12 +278,12 @@
     // État d'une barre : un préfixe (masqué dans les barres étroites) et l'essentiel ; le texte entier va dans le titre.
     // Dans une barre étroite, on garde l'essentiel : « Bloquée » (la cause est masquée), l'heure d'un déplacement,
     // « À suivre » pour une tâche incertaine (sans pourcentage : la page ne montre pas de probabilités).
-    const pre = (p, c) => `<span class="etat-pre">${p} · </span>${c}`;
-    const suf = (c, x) => `${c}<span class="etat-suf"> · ${x}</span>`;
+    const pre = (p, c) => `<span class="etat-pre">${p} à </span>${c}`;
+    const suf = (c, x) => `${c}<span class="etat-suf"> ${x}</span>`;
     function texteEtat(t, ev, deplacee) {
       if (deplacee) return pre('Déplacée', deplacee);
       if (ev.etat === 'abri') return 'À l’abri';
-      if (ev.etat === 'bloquee') return suf('Bloquée', ev.causes[0] && ev.causes[0].g === 'rafales' ? 'vent' : 'pluie');
+      if (ev.etat === 'bloquee') return suf('Bloquée', ev.causes[0] && ev.causes[0].g === 'rafales' ? '(vent)' : '(pluie)');
       if (ev.etat === 'surveiller') return 'À suivre';
       return 'Prévue';
     }
@@ -344,10 +344,10 @@
     const statuts = ETAPES.map((E, i) => {
       const c = etatBarres(i);
       return [
-        `${c.bloquees} tâches menacées · ${c.surveiller} à suivre`,
-        `${c.bloquees} tâches bloquées mercredi · ${c.surveiller} à suivre`,
-        `${repli.moves.length} tâches déplacées · ${repli.moves.filter((m) => m.echange).length} travaux avancés · En attente de votre accord`,
-        `Envoyé aux 5 chefs de chantier · Tous l’ont lu`,
+        `${c.bloquees} tâches menacées, ${c.surveiller} à suivre`,
+        `${c.bloquees} tâches bloquées mercredi, ${c.surveiller} à suivre`,
+        `${repli.moves.length} tâches déplacées, ${repli.moves.filter((m) => m.echange).length} travaux avancés. En attente de votre accord.`,
+        `Envoyé aux 5 chefs de chantier. Tous l’ont lu.`,
       ][i].replace(/(\d) h/g, '$1' + NB + 'h');
     });
     const montrerEmis = etiquettes(etat.emis, ETAPES.map((E) => E.emis));
